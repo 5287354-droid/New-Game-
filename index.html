@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="31a2fe74c8";</script>
+<script>window.JG_APP=true;window.JG_VER="7c96f79402";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -539,6 +539,7 @@ img,canvas{-webkit-user-drag:none;user-drag:none}
 .shell{height:100vh;height:100dvh;max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;padding:max(8px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
 .shell>.top2,.shell>.tabs,.shell>.partybar{flex:none}
 .main{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:16px;padding-bottom:24px}
+.main>*{flex-shrink:0}
 .shell.walking .main{overflow:hidden;padding-bottom:0;gap:0}
 .top2{display:flex;align-items:center;gap:8px;font-family:var(--f-disp);min-width:0}
 .top2 .loc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}

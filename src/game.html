@@ -525,6 +525,7 @@ img,canvas{-webkit-user-drag:none;user-drag:none}
 .shell{height:100vh;height:100dvh;max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;padding:max(8px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
 .shell>.top2,.shell>.tabs,.shell>.partybar{flex:none}
 .main{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:16px;padding-bottom:24px}
+.main>*{flex-shrink:0}
 .shell.walking .main{overflow:hidden;padding-bottom:0;gap:0}
 .top2{display:flex;align-items:center;gap:8px;font-family:var(--f-disp);min-width:0}
 .top2 .loc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
