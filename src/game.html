@@ -580,6 +580,8 @@ img,canvas{-webkit-user-drag:none;user-drag:none}
 .shell .battle.ended .cmd>.row{position:sticky;bottom:-8px;background:var(--win);padding:6px 0 2px;display:flex}
 .shell .battle.ended .cmd>.row .btn{flex:1}
 @media (min-width:700px){.shell .battle .bc.foe .seal{--s:108px;--i:96px}.shell .battle .bc.foe.mighty .seal{--s:150px;--i:144px}.shell .side.mates .seal{display:grid}}
+.cmd.locked{opacity:.45;pointer-events:none;transition:opacity .2s}
+.battle .side.foes{transition:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fusion{display:none}.gcard,.gtitle,.gbtns{opacity:1!important}.gstar,.gflash{display:none}}
 </style>
 
@@ -3484,7 +3486,7 @@ function startBattle(foes,opt){
   const idx={};enemies.forEach(c=>{if(cnt[c.label]>1){idx[c.label]=(idx[c.label]||0)+1;c.label+='ABC'[idx[c.label]-1];}});
   enemies.forEach(c=>{state.seen[c.mon.sp]=true;if(c.mon.shiny)state.shinySeen[c.mon.sp]=true;});
   B={allies,enemies,turn:1,log:[],phase:'input',inputIdx:0,cmds:[],target:0,menu:'main',boss:!!opt.boss,ura:!!opt.ura,town:opt.town,field:opt.field,scene:opt.scene||'inaka',
-    cup:opt.cup||null,rival:opt.rival||null,tower:opt.tower||0,towerBoss:!!opt.towerBoss,trainer:opt.trainer||null,onigiri:false,auto:false,result:null,fx:null,pops:[],intro:true,next:null,after:null};
+    cup:opt.cup||null,rival:opt.rival||null,tower:opt.tower||0,towerBoss:!!opt.towerBoss,trainer:opt.trainer||null,onigiri:false,auto:false,result:null,fx:null,pops:[],intro:true,lockUntil:performance.now()+900,next:null,after:null};
   log(opt.boss?`${(opt.ura?TOWN[opt.town].ura:TOWN[opt.town].boss).title}が立ちはだかる！`:opt.trainer?`${opt.trainer}が勝負をしかけてきた！`:`${[...new Set(enemies.map(c=>SP[c.mon.sp].name))].join('と')}があらわれた！`);
   if(enemies.some(c=>has(c,'metalbody')))log('キラリと光る魔生物がいる！');
   if(enemies.some(c=>c.mon.shiny)){enemies.filter(c=>c.mon.shiny).forEach(c=>log(`色違いの${c.label}がいる！`));sfx('shiny');}
@@ -3798,7 +3800,12 @@ function stChips(c){
   if(c.guard)out.push('<span class="chip up">防御</span>');
   return `<div class="chips">${out.join('')}</div>`;
 }
+/* 戦闘の始まりと終わりの直後は、押しまちがい防止のため少しだけ操作を受けつけない */
+const BATTLE_ACTS=new Set(['catk','cmenu','cguard','citem','csk','cauto','cguardAll','autoT','scout','flee','forfeit','tgt','cback','bend','bendStop']);
+function battleLocked(){return !!(B&&B.lockUntil&&performance.now()<B.lockUntil);}
 function renderBattle(){
+  if(B.phase==='end'&&!B.endLock){B.endLock=true;B.lockUntil=performance.now()+700;}
+  if(battleLocked()){clearTimeout(B.lockT);const bb=B;B.lockT=setTimeout(()=>{if(B===bb)render();},B.lockUntil-performance.now()+30);}
   const f=B.fx,pops=B.pops||[],flash=B.flash,intro=B.intro;B.fx=null;B.pops=[];B.flash=false;B.intro=false;
   const fc=c=>f&&f.uid===c.mon.uid?f.type:'';
   const pp=c=>pops.filter(p=>p.uid===c.mon.uid).map((p,i)=>`<span class="pop ${p.k}" style="--d:${i*110}ms">${esc(p.t)}</span>`).join('');
@@ -3813,7 +3820,7 @@ function renderBattle(){
     <div class="stage" style="background-image:url(${scene(B.scene,state.time)})"><div class="side foes">${foes}</div></div>
     <div class="blog win" aria-live="polite">${B.log.slice(-6).map(l=>`<p>${esc(l)}</p>`).join('')}</div>
     <div class="side mates">${mates}</div>
-    <div class="cmd win">${cmdPanel()}</div></section>`;
+    <div class="cmd win ${battleLocked()?'locked':''}" ${battleLocked()?'aria-busy="true"':''}>${cmdPanel()}</div></section>`;
 }
 function cmdPanel(){
   if(B.phase==='end'){
@@ -3971,6 +3978,7 @@ const H={
 };
 document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]');if(!el||el.disabled)return;
+  if(B&&BATTLE_ACTS.has(el.dataset.act)&&battleLocked())return;
   const f=H[el.dataset.act];if(f)f(el.dataset,el);
 });
 document.addEventListener('change',e=>{
