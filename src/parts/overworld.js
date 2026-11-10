@@ -1,5 +1,5 @@
 /* ========== ミチクサ: 歩けるマップ ========== */
-const TS=16,VW=15,VH=11,OWSCALE=4;
+const TS=16,VW=15,OWSCALE=4;
 /* 色: 朝昼は昼の色、夕方は夕焼けの色、夜は街灯と窓の明かり */
 const OW_DAY={grass:'#7cc860',grass2:'#62b04e',grass3:'#a8dc80',forest:'#5aa84a',forest2:'#4a9040',tall:'#3e9a44',tall2:'#2c7a36',path:'#ead8a0',path2:'#d4bc80',
   tree:'#2e8a3e',tree2:'#1e6a30',tree3:'#5ab45a',trunk:'#7a5030',water:'#4aa0e8',water2:'#8ad0f8',paddy:'#8ac8a8',paddy2:'#5aa048',
@@ -81,7 +81,7 @@ const OW_DOOR={
 };
 
 /* ---- 描画 ---- */
-const OWC={bg:{},img:{},raf:0,cv:null,ctx:null,held:null,dash:false,mv:null,anim:0};
+const OWC={bg:{},img:{},raf:0,cv:null,ctx:null,held:null,dash:false,mv:null,anim:0,vh:11};
 function owMap(){return MAPS[state.ow&&state.ow.map];}
 function owNpcs(m){return m.npcs.filter(n=>!(n.id==='nushi'&&state.boss.komorebi));}
 function owPaint(m,ti){
@@ -146,7 +146,7 @@ function owDraw(){
   const m=owMap(),c=OWC.ctx;if(!m||!c)return;
   const bg=owBg(m,state.time),o=state.ow,mv=OWC.mv;
   let px=o.x*TS,py=o.y*TS;if(mv){const t=mv.t;px=(mv.fx+(o.x-mv.fx)*t)*TS;py=(mv.fy+(o.y-mv.fy)*t)*TS;}
-  const MW=bg.width,MH=bg.height;
+  const MW=bg.width,MH=bg.height,VH=OWC.vh;
   let cx=Math.round(px+8-VW*TS/2),cy=Math.round(py+8-VH*TS/2);
   cx=MW<=VW*TS?Math.round((MW-VW*TS)/2):Math.max(0,Math.min(MW-VW*TS,cx));cy=MH<=VH*TS?Math.round((MH-VH*TS)/2):Math.max(0,Math.min(MH-VH*TS,cy));
   c.setTransform(OWSCALE,0,0,OWSCALE,0,0);c.imageSmoothingEnabled=false;
@@ -212,14 +212,28 @@ function owLoop(ts){
   else if(OWC.held)owTryMove(OWC.held);
   owDraw();
 }
+/* 端末の画面に合わせて、見える範囲(縦のマス数)と大きさを決める */
+function owResize(){
+  const cv=document.getElementById('owc'),box=cv&&cv.parentElement.parentElement,m=owMap();if(!cv||!box||!m)return;
+  const W=box.clientWidth,Hh=box.clientHeight;if(!W||!Hh)return;
+  let s=W/VW,rows=Math.floor(Hh/s);
+  if(rows<9){rows=9;s=Hh/9;}
+  rows=Math.min(rows,m.rows.length);
+  if(OWC.vh!==rows||cv.height!==rows*TS*OWSCALE){OWC.vh=rows;cv.height=rows*TS*OWSCALE;cv.width=VW*TS*OWSCALE;OWC.cv=null;}
+  cv.style.width=Math.floor(VW*s)+'px';cv.style.height=Math.floor(rows*s)+'px';
+  owDraw();
+}
+window.addEventListener('resize',()=>owResize());
+if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>owResize());
+document.addEventListener('contextmenu',e=>{if(!/INPUT|TEXTAREA/.test(e.target.tagName))e.preventDefault();});
 function owEnsureLoop(){if(!OWC.raf)OWC.raf=requestAnimationFrame(owLoop);}
 function owActive(){return state&&state.started&&!B&&ui.tab==='map'&&!ui.station&&MAPS[state.town]&&state.ow&&MAPS[state.ow.map]&&MAPS[state.ow.map].town===state.town;}
 function owEnsureState(){if(MAPS[state.town]&&(!state.ow||!MAPS[state.ow.map]||MAPS[state.ow.map].town!==state.town)){const s=MAPS[state.town].spawn;state.ow={map:state.town,x:s.x,y:s.y,dir:s.dir};}}
 function renderOverworld(){
   const m=owMap(),tm=TIMES[state.time];
   return `<section class="ow" aria-label="${m.name}のマップ">
-    <div class="ow-screen"><canvas id="owc" width="${VW*TS*OWSCALE}" height="${VH*TS*OWSCALE}" aria-label="${m.name}を見下ろしたマップ。主人公が立っている"></canvas>
-      <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}</span></div></div>
+    <div class="ow-screen"><div class="ow-cv"><canvas id="owc" width="${VW*TS*OWSCALE}" height="${OWC.vh*TS*OWSCALE}" aria-label="${m.name}を見下ろしたマップ。主人公が立っている"></canvas>
+      <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}</span></div>${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
     <div class="ow-pad">
       <div class="dpad">${['up','left','right','down'].map(d=>`<button class="dp dp-${d}" data-owdir="${d}" aria-label="${{up:'上',down:'下',left:'左',right:'右'}[d]}">${{up:'▲',down:'▼',left:'◀',right:'▶'}[d]}</button>`).join('')}<span class="dp-c"></span></div>
       <div class="abtn"><button class="ob ob-b" data-owb="1" aria-label="Bボタン(押しているあいだ走る)">B</button><button class="ob ob-a" data-act="owA" aria-label="Aボタン(調べる・話す)">A</button></div>
@@ -245,3 +259,4 @@ function renderStationIn(){
   document.addEventListener('pointerout',e=>{if(e.target.closest&&e.target.closest('[data-owdir]'))OWC.held=null;});
   window.addEventListener('blur',()=>{OWC.held=null;OWC.dash=false;});
 })();
+
