@@ -550,6 +550,36 @@ img,canvas{-webkit-user-drag:none;user-drag:none}
 .ow-pad .ob-b{width:calc(var(--pd)*.38);height:calc(var(--pd)*.38);margin-top:calc(var(--pd)*.22)}
 .shell.walking .ow-help{display:none}
 @media (max-width:560px){.top2 .tchip{padding:2px 8px}.top2{font-size:13px;gap:6px}}
+
+/* ---- 戦闘画面を一画面に ---- */
+.shell.inbattle .main{overflow:hidden;padding-bottom:0}
+.shell .battle{height:100%;min-height:0;display:flex;flex-direction:column;gap:6px}
+.shell .bhead{flex:none;flex-wrap:nowrap;gap:8px;min-width:0;align-items:center}
+.shell .bhead h3{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.shell .bhead .small{display:none}
+.shell .stage{flex:1 0 auto;min-height:0;padding:10px 6px 6px}
+.shell .side.foes{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.shell .bc.foe{padding:6px 4px;gap:3px}
+.shell .battle .bc.foe .seal{--s:clamp(56px,11dvh,112px);--i:calc(var(--s) * .78)}
+.shell .battle .bc.foe .seal img.spr{image-rendering:pixelated}
+.shell .bc .nm{font-size:13px}.shell .bc .sub{font-size:11px}
+.shell .blog{flex:0 1 calc(3 * 1.45em + 14px);min-height:calc(1.45em + 12px);font-size:13.5px;line-height:1.45;padding:6px 12px;overflow:hidden}
+.shell .blog p:not(:nth-last-child(-n+3)){display:none}
+.shell .side.mates{flex:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.shell .side.mates .bc{padding:6px 8px;gap:6px}
+.shell .side.mates .seal{display:none}
+.shell .cmd{flex:none;max-height:46%;overflow-y:auto;overscroll-behavior:contain;padding:8px 10px;gap:6px}
+.shell .cmd h3{font-size:14px}
+.shell .cmd>.row:first-child{flex-wrap:nowrap}.shell .cmd>.row:first-child .small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.shell .cmd>.row:not(:first-child){display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:6px}
+.shell .cmd .btn{padding:8px 4px;font-size:13px;min-height:40px;white-space:nowrap}
+.shell .cmd .btn.sm{font-size:12px}
+.shell .cmdgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.shell .skbtn{padding:6px 8px}.shell .skbtn b{font-size:14px}.shell .skbtn span{font-size:11px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.shell .battle.ended .cmd{flex:1 1 0;max-height:none;min-height:0}
+.shell .battle.ended .cmd>.row{position:sticky;bottom:-8px;background:var(--win);padding:6px 0 2px;display:flex}
+.shell .battle.ended .cmd>.row .btn{flex:1}
+@media (min-width:700px){.shell .battle .bc.foe .seal{--s:108px;--i:96px}.shell .battle .bc.foe.mighty .seal{--s:150px;--i:144px}.shell .side.mates .seal{display:grid}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fusion{display:none}.gcard,.gtitle,.gbtns{opacity:1!important}.gstar,.gflash{display:none}}
 </style>
 
@@ -2831,13 +2861,16 @@ function render(){
   if(!state.started)body=renderIntro()+(ui.transfer?renderTransfer():'');
   else if(B)body=renderBattle();
   else{head=renderHeader();body=walking?`${renderTab()}${ui.transfer?renderTransfer():''}`:`${ui.toast?`<div class="toast" role="status">${esc(ui.toast)}</div>`:''}${renderTab()}${renderFoot()}${ui.transfer?renderTransfer():''}`;}
-  app.innerHTML=`<div class="shell ${walking?'walking':''}">${head}<main class="main" id="main">${body}</main></div>${!B&&ui.result?renderResult():''}${!B&&ui.gacha?renderGachaResult():''}${ui.dlg?renderDlg():''}`;
+  app.innerHTML=`<div class="shell ${walking?'walking':''} ${B&&state.started?'inbattle':''}">${head}<main class="main" id="main">${body}</main></div>${!B&&ui.result?renderResult():''}${!B&&ui.gacha?renderGachaResult():''}${ui.dlg?renderDlg():''}`;
   const rw=app.querySelector('.railwrap'),rc=rw&&rw.querySelector('.station.cur');if(rc&&rw.scrollWidth>rw.clientWidth)rw.scrollLeft=rc.offsetLeft-(rw.clientWidth-rc.offsetWidth)/2;
   ui._st=ui.tab+(B?'b':'')+(ui.station?'s':'');const nm=document.getElementById('main');if(nm&&keep)nm.scrollTop=keep;
   if(document.getElementById('owc')){owResize();owEnsureLoop();if(ui.toast){clearTimeout(OWC.tt);const tv=ui.toast;OWC.tt=setTimeout(()=>{if(ui.toast===tv){ui.toast='';const e=document.querySelector('.ow-toast');if(e)e.remove();}},2600);}}
   bgmUpdate();
 }
 /* 会話ウィンドウ */
+const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;}catch(e){return false;}};
+const canFull=()=>!isStandalone()&&!!(document.fullscreenEnabled&&document.documentElement.requestFullscreen);
+document.addEventListener('fullscreenchange',()=>{if(state&&state.started)render();});
 function scrollTop0(){const m=document.getElementById('main');if(m)m.scrollTop=0;}
 function talk(lines,cb){ui.dlg={lines,i:0,cb};render();}
 function renderDlg(){
@@ -2859,7 +2892,7 @@ function renderHeader(){
   const t=TOWN[state.town],tm=TIMES[state.time];
   const tabs=[['map','探索'],['party','なかま'],['breed','配合'],['gacha','ガチャ'],['tower','星界の塔'],['dex','図鑑'],['shop','コンビニ']];
   const dot=reqReadyCount();
-  return `<header class="top2"><span class="tchip" style="--tc:${tm.c}"><i></i>${tm.n}</span><span class="loc">${t.code} ${t.name}</span><span class="grow"></span><b class="yen num">${state.yen.toLocaleString()}<small>円</small></b><b class="stars num" title="流星石">★${(state.stars||0).toLocaleString()}</b><button class="ib" data-act="bgm" aria-pressed="${!!state.bgm}" aria-label="BGM ${state.bgm?'オン':'オフ'}" title="${state.bgm&&BGM.cur?'♪ '+(SONG_NAME[BGM.cur]||''):'BGM'}">♪</button><button class="ib" data-act="sound" aria-pressed="${!!state.sound}" aria-label="効果音 ${state.sound?'オン':'オフ'}">SE</button></header>
+  return `<header class="top2"><span class="tchip" style="--tc:${tm.c}"><i></i>${tm.n}</span><span class="loc">${t.code} ${t.name}</span><span class="grow"></span><b class="yen num">${state.yen.toLocaleString()}<small>円</small></b><b class="stars num" title="流星石">★${(state.stars||0).toLocaleString()}</b><button class="ib" data-act="bgm" aria-pressed="${!!state.bgm}" aria-label="BGM ${state.bgm?'オン':'オフ'}" title="${state.bgm&&BGM.cur?'♪ '+(SONG_NAME[BGM.cur]||''):'BGM'}">♪</button><button class="ib" data-act="sound" aria-pressed="${!!state.sound}" aria-label="効果音 ${state.sound?'オン':'オフ'}">SE</button>${canFull()?`<button class="ib" data-act="fs" aria-label="${document.fullscreenElement?'全画面をやめる':'全画面にする'}"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">${document.fullscreenElement?'<path d="M5 1v4H1M9 1v4h4M5 13V9H1M9 13V9h4"/>':'<path d="M1 5V1h4M13 5V1H9M1 9v4h4M13 9v4H9"/>'}</svg></button>`:''}</header>
     <nav class="tabs" aria-label="メニュー">${tabs.map(([k,n])=>`<button class="tab" data-act="tab" data-v="${k}" ${ui.tab===k?'aria-current="page"':''}>${n}${k==='map'&&dot?`<i class="ndot" title="達成できる依頼があります">${dot}</i>`:''}${k==='gacha'&&missionReady()?`<i class="ndot" title="受け取れるミッションがあります">${missionReady()}</i>`:''}</button>`).join('')}</nav>${ui.tab!=='party'?renderPartyBar():''}`;
 }
 function renderTab(){if(ui.tab==='map'&&MAPS[state.town]){owEnsureState();return ui.station?renderStationIn():renderOverworld();}return ({map:renderMap,party:renderParty,breed:renderBreed,gacha:renderGacha,tower:renderTower,dex:renderDex,shop:renderShop}[ui.tab]||renderMap)();}
@@ -3775,7 +3808,7 @@ function renderBattle(){
   const mates=B.allies.map((c,i)=>`<div class="bc ${B.phase==='input'&&i===B.inputIdx?'turn':''} ${alive(c)?'':'down'} ${fc(c)} ${ac(c)}">
     ${pp(c)}${seal(c.mon.sp,'sm',true,c.mon.shiny)}<div class="info"><span class="nm">${esc(c.label)}</span><span class="sub">Lv${c.mon.lv} ・ HP ${c.hp}/${c.st.hp} ・ MP ${c.mp}</span>${hpBar(c.hp,c.st.hp)}${hpBar(c.mp,c.st.mp,'mp')}${stChips(c)}</div></div>`).join('');
   const tag=B.boss?'ぬし戦':B.cup?'配合杯':B.rival?'ライバル戦':'野生の魔生物';
-  return `<section class="battle ${intro?'enter':''} ${flash?'flash':''} ${B.boss?'is-boss':''}">
+  return `<section class="battle ${B.phase==='end'?'ended':''} ${intro?'enter':''} ${flash?'flash':''} ${B.boss?'is-boss':''}">
     <div class="bhead"><span class="tag ${B.boss?'warn':''}">${tag}</span><h3>${esc(B.field)}</h3><span class="lv num">ターン ${B.turn}</span>${B.trainer?`<span class="small muted">相手: ${esc(B.trainer)}</span>`:''}</div>
     <div class="stage" style="background-image:url(${scene(B.scene,state.time)})"><div class="side foes">${foes}</div></div>
     <div class="blog win" aria-live="polite">${B.log.slice(-6).map(l=>`<p>${esc(l)}</p>`).join('')}</div>
@@ -3790,7 +3823,7 @@ function cmdPanel(){
   }
   if(B.phase==='busy')return `<p class="muted typing">……</p><div class="row"><button class="btn sm" data-act="autoT">${B.auto?'オートを止める':'オート戦闘: オフ'}</button></div>`;
   const c=B.allies[B.inputIdx],t=pickT(B.enemies,B.target);
-  const head=`<div class="row between"><h3>${esc(c.label)}はどうする？</h3><span class="small muted">ねらい: ${t?esc(t.label):'―'}(敵をタップで変更)</span></div>`;
+  const head=`<div class="row between"><h3>${esc(c.label)}はどうする？</h3><span class="small muted">ねらい: ${t?esc(t.label):'―'}(敵をタップ)</span></div>`;
   if(B.menu==='skill')return head+`<div class="cmdgrid">${c.mon.skills.map(id=>{const s=SK[id];return `<button class="skbtn el-${s.e||'none'}" data-act="csk" data-id="${id}" ${c.mp<s.mp?'disabled':''}><b>${s.n}</b><span>MP${s.mp}${s.e?' ・ '+s.e:''} ・ ${s.d}</span></button>`;}).join('')}</div><div class="row"><button class="btn sm" data-act="cmenu" data-v="main">もどる</button></div>`;
   if(B.menu==='item'){
     const it=Object.keys(ITEMS).filter(k=>state.items[k]>0&&!ITEMS[k].cat&&!ITEMS[k].field&&!ITEMS[k].rare);
@@ -3798,8 +3831,8 @@ function cmdPanel(){
   }
   const canScout=t&&!t.boss&&!B.trainer,prev=B.allies.slice(0,B.inputIdx).some(alive);
   return head+`<div class="row"><button class="btn primary" data-act="catk">こうげき</button><button class="btn" data-act="cmenu" data-v="skill">とくぎ</button><button class="btn" data-act="cguard" title="このターンは行動せず、受けるダメージを半分にする">ぼうぎょ</button><button class="btn" data-act="cmenu" data-v="item">どうぐ</button>${prev?'<button class="btn sm" data-act="cback">ひとつ前へ</button>':''}</div>
-    <div class="row"><button class="btn" data-act="cauto">このターンをおまかせ</button><button class="btn" data-act="cguardAll" title="残りのなかま全員が防御する">みんなでぼうぎょ</button><button class="btn sm" data-act="autoT">オート戦闘: ${B.auto?'オン':'オフ'}</button>
-    ${B.trainer?'':`<button class="btn" data-act="scout" ${canScout?'':'disabled'}>スカウト${canScout?`(約${Math.round(scoutP(t)*100)}%)`:''}</button>`}
+    <div class="row"><button class="btn" data-act="cauto" title="このターンの行動をおまかせにする">おまかせ</button><button class="btn" data-act="cguardAll" title="残りのなかま全員が防御する">全員ぼうぎょ</button><button class="btn sm" data-act="autoT" aria-pressed="${!!B.auto}">オート ${B.auto?'オン':'オフ'}</button>
+    ${B.trainer?'':`<button class="btn" data-act="scout" ${canScout?'':'disabled'}>スカウト${canScout?` ${Math.round(scoutP(t)*100)}%`:''}</button>`}
     ${B.cup||B.tower?'<button class="btn danger" data-act="forfeit">棄権する</button>':B.rival?'':'<button class="btn" data-act="flee">にげる</button>'}</div>`;
 }
 
@@ -3893,6 +3926,7 @@ const H={
   sound:()=>{state.sound=!state.sound;save();render();sfx('sel');},
   bgm:()=>{state.bgm=!state.bgm;if(state.bgm){try{bgmCtx().resume();}catch(e){}}else bgmStop(),BGM.cur=null;save();render();},
   owA:()=>owA(),
+  fs:()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{});}catch(e){}},
   owExit:()=>{ui.station=false;const s=MAPS[state.town].station;state.ow={map:state.town,x:s.x,y:s.y,dir:s.dir};sfx('sel');save();render();},
   dlgNext:()=>{const d=ui.dlg;if(!d)return;d.i++;if(d.i>=d.lines.length){const cb=d.cb;ui.dlg=null;render();if(cb)cb();}else render();},
   rename:()=>{ui.renaming=true;render();const el=document.getElementById('nick');if(el){el.focus();el.select();}},
