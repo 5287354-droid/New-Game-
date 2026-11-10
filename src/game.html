@@ -1987,10 +1987,10 @@ function dayKey(off=0){const d=new Date(Date.now()+off*864e5);return d.getFullYe
 const BANNERS=[{sp:'suzaku',n:'南天',c:'#ff7a3a'},{sp:'byakko',n:'西天',c:'#bfefff'},{sp:'seiryu',n:'東天',c:'#4ac8ff'},{sp:'genbu',n:'北天',c:'#8af0a0'}];
 function curBanner(){return BANNERS.find(b=>b.sp===state.gban)||BANNERS[0];}
 function addStars(n,why){state.stars=(state.stars||0)+n;if(why)ui.starNote=`★${n} ${why}`;}
-function firstOwn(id){if(!state.owned[id]&&SP[id]&&!SP[id].gacha)addStars(10,'はじめてなかまにした種族');}
+function firstOwn(id){if(!state.owned[id]&&SP[id]&&!SP[id].gacha)addStars(1,'はじめてなかまにした種族');}
 function dailyRoll(){const t=dayKey();if(!state.daily||state.daily.d!==t)state.daily={d:t,ex:0,win:0,br:0,got:{}};}
 function dailyInc(k){if(!state||!state.started)return;dailyRoll();state.daily[k]=(state.daily[k]||0)+1;}
-const MISSIONS=[{k:'ex',n:'探索する',goal:10,rw:50},{k:'win',n:'戦闘で勝つ',goal:5,rw:50},{k:'br',n:'配合する',goal:1,rw:50},{k:'all',n:'上の3つをすべて受け取る',goal:3,rw:100}];
+const MISSIONS=[{k:'ex',n:'探索する',goal:10,rw:3},{k:'win',n:'戦闘で勝つ',goal:5,rw:3},{k:'br',n:'配合する',goal:1,rw:3},{k:'all',n:'上の3つをすべて受け取る',goal:3,rw:5}];
 const missionVal=k=>k==='all'?['ex','win','br'].filter(x=>state.daily.got[x]).length:(state.daily[k]||0);
 const missionReady=()=>{dailyRoll();return MISSIONS.filter(x=>!state.daily.got[x.k]&&missionVal(x.k)>=x.goal).length;};
 function loginBonus(){
@@ -1998,7 +1998,7 @@ function loginBonus(){
   const t=dayKey(),y=dayKey(-1),L=state.login||{last:'',streak:0};
   if(L.last===t)return null;
   const streak=L.last===y?L.streak+1:1;state.login={last:t,streak};
-  const g=100+(streak%7===0?500:0);addStars(g);dailyRoll();save();
+  const g=5+(streak%7===0?25:0);addStars(g);dailyRoll();save();
   return {g,streak};
 }
 function loginCheck(){const r=loginBonus();if(r&&!B){ui.toast=`ログインボーナス ★${r.g}(${r.streak}日連続${r.streak%7===0?' ・ 7日ごとのボーナス！':''})`;render();}}
@@ -2006,7 +2006,7 @@ function gachaRetro(){
   if(state.flags.gacha||!state.started)return;
   state.flags.gacha=true;
   const own=dexList().filter(s=>state.owned[s.id]).length,boss=Object.keys(state.boss).length,cups=Object.keys(state.cups).length,req=Object.keys(state.reqDone).length,dm=Object.keys(state.dexClaim).length;
-  const g=1000+own*10+boss*300+cups*200+req*30+dm*100;
+  const g=50+own*1+boss*15+cups*10+req*2+dm*5;
   addStars(g);state.gpity=state.gpity||0;save();
   talk([['ハザマ所長','たいへんじゃ！ 研究所の裏の祠に、夜空から星が降ってきおった。'],['ハザマ所長','「星降りの祠」に流星石をそなえると、星座や四神の力をもつ魔生物が降りてくるらしい。'],['ハザマ所長','これまでのきみの冒険をたたえて、流星石を'+g.toLocaleString()+'個わたそう。「ガチャ」の画面からためしてみなさい。'],['ハザマ所長','流星石は、毎日のログインやデイリーミッション、はじめて仲間にした種族、ぬしの初撃破、それに新しく見つかった「星界の塔」でも手に入るぞ。']]);
 }
@@ -2053,10 +2053,10 @@ function renderGacha(){
       <details class="rules"><summary>排出される魔生物と確率</summary><div class="stack" style="margin-top:8px">${rows}
         <p class="small muted">ガチャ産の魔生物はLv10で生まれ、はじめからレベル上限が80と高く、能力も高い。そのかわり+値ごとの伸びは配合産の半分以下で、世代ボーナスもつきにくい。四神(SSS)は育てきると、配合で育てきったSSと互角になる。覚醒や配合でたどりつく創世ランクは、+値を重ねるほど大きく伸び、最強をめざせる。+値1ごとにレベル上限が3上がる(最大250)。配合で血を重ねた魔生物は、育てきるとガチャ産に追いつき、追いこせる。</p>
         <p class="small muted">創世ランクはガチャからは出ない。四神(SSS)をLv80以上にして「覚醒の宝珠」を使うと「真」の姿に覚醒する。四神どうしの特殊配合からは「コウリュウ」が生まれる。</p></div></details></div>
-    <div class="panel stack"><div class="row between"><h3>デイリーミッション</h3><span class="small muted">ログイン ${L.streak||0}日連続(毎日★100、7日ごとに★500)</span></div><div class="mslist">${ms}</div></div>
+    <div class="panel stack"><div class="row between"><h3>デイリーミッション</h3><span class="small muted">ログイン ${L.streak||0}日連続(毎日★5、7日ごとに★25)</span></div><div class="mslist">${ms}</div></div>
     <div class="panel stack"><h4>流星石の手に入れかた</h4><ul class="small" style="margin:0;padding-left:1.2em">
-      <li>毎日のログイン ★100(7日連続ごとに +★500)</li><li>デイリーミッション 1日 最大★250</li><li>はじめて仲間にした種族 ★10 ・ 依頼の達成 ★30 ・ 図鑑の記念品 ★100</li>
-      <li>ぬしの初撃破 ★300(裏のぬし ★500)・ 配合杯の初優勝 ★200</li><li>星界の塔の初踏破 1階ごと★30(5階ごとのボス★200)</li><li>コンビニの交換所(10,000円で★20、1日5回まで)</li></ul></div></section>`;
+      <li>毎日のログイン ★5(7日連続ごとに +★25)</li><li>デイリーミッション 1日 最大★14</li><li>はじめて仲間にした種族 ★1 ・ 依頼の達成 ★2 ・ 図鑑の記念品 ★5</li>
+      <li>ぬしの初撃破 ★15(裏のぬし ★25)・ 配合杯の初優勝 ★10</li><li>星界の塔の初踏破 1階ごと★2(5階ごとのボス★10)</li><li>コンビニの交換所(10,000円で★1、1日5回まで)</li></ul></div></section>`;
 }
 /* ----- 星界の塔 ----- */
 const towerOpen=()=>!!state.boss.tengu;
@@ -2077,17 +2077,17 @@ function startTower(n){
   if(!towerOpen()||n>(state.tower||0)+1||n<1)return;
   startBattle(towerFoes(n),{tower:n,towerBoss:n%5===0,trainer:'星界の番人',field:`星界の塔 ${n}階${n%5===0?' ・ 番人の間':''}`,scene:'tower'});
 }
-function towerReward(n){return {stars:n%5===0?200:30,kakusei:n%10===0?1:0,tenpu:n%10===0?1:0};}
+function towerReward(n){return {stars:n%5===0?10:2,kakusei:n%10===0?1:0,tenpu:n%10===0?1:0};}
 function renderTower(){
   if(!towerOpen())return `<section class="panel stack"><h2>星界の塔</h2><p class="muted">天狗岳の奥宮のぬしを鎮めると、夜空に塔があらわれる。</p></section>`;
   const best=state.tower||0,next=best+1,pick5=[];for(let i=Math.max(1,next-4);i<=next;i++)pick5.push(i);
-  const fl=n=>{const rw=towerReward(n),done=n<=best;return `<div class="cuprow ${done?'won':''}"><span class="rankbadge">${n}</span><div class="stack tight"><b>${n}階${n%5===0?' ・ 番人の間':''}</b><span class="small muted">敵Lv${towerLv(n)}前後 ・ ${done?'踏破済み(再挑戦で★5)':`初踏破 ★${rw.stars}${rw.kakusei?' ・ 覚醒の宝珠':''}${rw.tenpu?' ・ 天賦の宝珠':''}`}</span></div><button class="btn sm ${n===next?'primary':''}" data-act="tower" data-n="${n}" ${state.party.some(m=>m.hp>0)?'':'disabled'}>挑む</button></div>`;};
+  const fl=n=>{const rw=towerReward(n),done=n<=best;return `<div class="cuprow ${done?'won':''}"><span class="rankbadge">${n}</span><div class="stack tight"><b>${n}階${n%5===0?' ・ 番人の間':''}</b><span class="small muted">敵Lv${towerLv(n)}前後 ・ ${done?'踏破済み':`初踏破 ★${rw.stars}${rw.kakusei?' ・ 覚醒の宝珠':''}${rw.tenpu?' ・ 天賦の宝珠':''}`}</span></div><button class="btn sm ${n===next?'primary':''}" data-act="tower" data-n="${n}" ${state.party.some(m=>m.hp>0)?'':'disabled'}>挑む</button></div>`;};
   const boss=[];for(let i=5;i<=best;i+=5)if(!pick5.includes(i))boss.push(i);
   return `<section class="stack"><div class="hero"><img class="scene" src="${scene('tower',3)}" alt=""><div class="hero-title"><span class="eyebrow">高難易度ダンジョン</span><h1 class="logo">星界の塔</h1></div></div>
     <p class="muted desc">夜空から降りてきた果てしない塔。上の階ほど敵が強くなり、ガチャ限定の魔生物も番人として立ちはだかる。勝つとHPとMPはそのままで次の階へ進める。負けても円は落とさない。</p>
     <div class="panel stack"><div class="row between"><h3>階をえらぶ</h3><span class="lv num">最高 ${best}階</span></div><div class="list">${pick5.reverse().map(fl).join('')}</div>
     ${boss.length?`<h4>番人の間(再挑戦)</h4><div class="list">${boss.slice(-6).reverse().map(fl).join('')}</div>`:''}</div>
-    <div class="panel stack"><h4>報酬</h4><p class="small">初めて踏破した階: ★30。5階ごとの番人の間: ★200。10階ごとに「覚醒の宝珠」と「天賦の宝珠」。経験値もたっぷりもらえる。</p></div></section>`;
+    <div class="panel stack"><h4>報酬</h4><p class="small">初めて踏破した階: ★2。5階ごとの番人の間: ★10。10階ごとに「覚醒の宝珠」と「天賦の宝珠」。経験値もたっぷりもらえる。</p></div></section>`;
 }
 
 /* ========== 拡張: JG07 火ノ島・炎の魔生物 ========== */
@@ -3365,7 +3365,7 @@ function renderShop(){
     <div class="stack" style="gap:4px;margin-top:8px"><span class="eyebrow">店内のテナント</span><h2>配合研究所の売店</h2><p class="muted small">配合のときに(2つまで)使うと、生まれる子に影響を与える「配合触媒」を扱っている。</p></div>
     <div class="shop">${all.filter(([,it])=>it.cat).map(card).join('')}</div>
     <div class="stack" style="gap:4px;margin-top:8px"><span class="eyebrow">星降りの祠の出張所</span><h2>流星石の交換所</h2><p class="muted small">円を流星石に交換できる。1日5回まで(今日はあと${5-(state.xchg&&state.xchg.d===dayKey()?state.xchg.n:0)}回)。</p></div>
-    <div class="shop"><div class="panel stack"><div class="row between"><h3>流星石 ★20</h3><span class="lv num">10,000円</span></div><p class="small muted">ガチャ「星降りの祠」に使う石。</p><div class="row between"><span class="small num">持っている数: ★${(state.stars||0).toLocaleString()}</span><button class="btn" data-act="xchg" ${state.yen>=10000&&!(state.xchg&&state.xchg.d===dayKey()&&state.xchg.n>=5)?'':'disabled'}>交換する</button></div></div></div>
+    <div class="shop"><div class="panel stack"><div class="row between"><h3>流星石 ★1</h3><span class="lv num">10,000円</span></div><p class="small muted">ガチャ「星降りの祠」に使う石。</p><div class="row between"><span class="small num">持っている数: ★${(state.stars||0).toLocaleString()}</span><button class="btn" data-act="xchg" ${state.yen>=10000&&!(state.xchg&&state.xchg.d===dayKey()&&state.xchg.n>=5)?'':'disabled'}>交換する</button></div></div></div>
     ${townOpen(TOWN.mayoiga)?`<div class="stack" style="gap:4px;margin-top:8px"><span class="eyebrow">霧の向こうから</span><h2>異界の行商人</h2><p class="muted small">マヨイガから来たという行商人。ふつうの店にはない品を、とても高い値段で売っている。</p></div><div class="shop">${card(['saino',ITEMS.saino])}</div>`:''}</section>`;
 }
 
@@ -3675,7 +3675,7 @@ function win(){
   state.yen+=yen;
   if(B.boss){
     const tid=B.ura?B.town+'_ura':B.town,first=!state.boss[tid];state.boss[tid]=true;
-    if(first){const g=B.ura?500:300;addStars(g);lines.push(`流星石★${g}を手に入れた！`);lines.push(BB.clear);for(const [k,n] of Object.entries(BB.drops||{})){state.items[k]=(state.items[k]||0)+n;lines.push(`配合研究所から${ITEMS[k].n}を${n}個もらった！`);}if(STORY['boss_'+tid])B.after=()=>talk(STORY['boss_'+tid]);}
+    if(first){const g=B.ura?25:15;addStars(g);lines.push(`流星石★${g}を手に入れた！`);lines.push(BB.clear);for(const [k,n] of Object.entries(BB.drops||{})){state.items[k]=(state.items[k]||0)+n;lines.push(`配合研究所から${ITEMS[k].n}を${n}個もらった！`);}if(STORY['boss_'+tid])B.after=()=>talk(STORY['boss_'+tid]);}
     else if(B.ura&&Math.random()<.3){state.items.saino=(state.items.saino||0)+1;lines.push('雲海に才能のかけらが落ちていた！');}
   }
   if(B.rival){const r=RIVALS[B.rival];if(!state.rival[B.rival]){state.rival[B.rival]=true;lines.push(`アオイから ${giveReward(r.reward)} を受け取った。`);}B.after=()=>talk(r.post);}
@@ -3684,7 +3684,7 @@ function win(){
     if(B.cup.round<3){B.next={id:cup.id,round:B.cup.round+1};lines.push(`第${B.cup.round}試合に勝利！ HPとMPはそのままで次の試合へ。`);}
     else{
       const first=!state.cups[cup.id];state.cups[cup.id]=true;lines.push(`${cup.name} 優勝！`);
-      if(first){lines.push(`賞品: ${giveReward(cup.reward)}`);addStars(200);lines.push('流星石★200を手に入れた！');}else{const y=Math.floor(cup.reward.yen/4);state.yen+=y;lines.push(`賞金 ${y.toLocaleString()}円`);}
+      if(first){lines.push(`賞品: ${giveReward(cup.reward)}`);addStars(10);lines.push('流星石★10を手に入れた！');}else{const y=Math.floor(cup.reward.yen/4);state.yen+=y;lines.push(`賞金 ${y.toLocaleString()}円`);}
       healAll();lines.push('会場の医務室で、なかまが回復した。');B.after=()=>talk(STORY.cup);
     }
   }
@@ -3694,7 +3694,7 @@ function win(){
     if(first){state.tower=n;const rw=towerReward(n);addStars(rw.stars);lines.push(`${n}階を初めて踏破！ 流星石★${rw.stars}を手に入れた！`);
       if(rw.kakusei){state.items.kakusei=(state.items.kakusei||0)+1;lines.push('覚醒の宝珠を手に入れた！');}
       if(rw.tenpu){state.items.tenpu=(state.items.tenpu||0)+1;lines.push('天賦の宝珠を手に入れた！');}}
-    else{addStars(5);lines.push('流星石★5を手に入れた。');}
+    else{lines.push('踏破済みの階なので、流星石はもらえなかった。');}
     B.next={tower:n+1};
   }
   B.result={win:true,lines};save();sfx(lines.some(l=>l.includes('レベル'))?'lvup':'win');render();
@@ -3775,7 +3775,7 @@ function explore(fid){
 
 /* ========== 操作 ========== */
 const H={
-  starter:d=>{const m=newMon(d.id,3,{talent:randTalent(5,12)});m.gen=0;state.party=[m];state.owned[d.id]=true;state.seen[d.id]=true;state.started=true;state.flags.intro=true;state.flags.v2=true;state.flags.gacha=true;state.stars=1000;state.login={last:dayKey(),streak:1};ui.sel=m.uid;ui.toast=`${SP[d.id].name}が相棒になった！ まずは田んぼのあぜ道でなかまをスカウトしよう。`;save();render();talk(STORY.intro);},
+  starter:d=>{const m=newMon(d.id,3,{talent:randTalent(5,12)});m.gen=0;state.party=[m];state.owned[d.id]=true;state.seen[d.id]=true;state.started=true;state.flags.intro=true;state.flags.v2=true;state.flags.gacha=true;state.stars=50;state.login={last:dayKey(),streak:1};ui.sel=m.uid;ui.toast=`${SP[d.id].name}が相棒になった！ まずは田んぼのあぜ道でなかまをスカウトしよう。`;save();render();talk(STORY.intro);},
   tab:d=>{ui.tab=d.v;ui.toast='';ui.confirmRel=false;ui.renaming=false;ui.detailOpen=false;sfx('sel');render();window.scrollTo(0,0);},
   town:d=>{const t=TOWN[d.id];if(!townOpen(t))return;state.town=d.id;if(MAPS[d.id]){const s=MAPS[d.id].station;state.ow={map:d.id,x:s.x,y:s.y,dir:s.dir};ui.station=false;}ui.toast=`ミチクサ線で${t.name}へ移動した。`;save();render();const fk='visit_'+d.id;if(STORY[fk]&&!state.flags[fk]){state.flags[fk]=true;save();talk(STORY[fk]);}},
   explore:d=>explore(d.f),
@@ -3826,7 +3826,7 @@ const H={
   gview:()=>{const u=ui.gacha&&ui.gacha.list[0];ui.gacha=null;ui.tab='party';if(u)ui.sel=u.uid;ui.detailOpen=true;render();window.scrollTo(0,0);},
   mission:d=>{dailyRoll();const x=MISSIONS.find(q=>q.k===d.k);if(!x||state.daily.got[x.k]||missionVal(x.k)<x.goal)return;state.daily.got[x.k]=true;addStars(x.rw);ui.toast=`デイリーミッション達成！ 流星石★${x.rw}`;sfx('win');save();render();},
   tower:d=>startTower(+d.n),
-  xchg:()=>{const t=dayKey();if(!state.xchg||state.xchg.d!==t)state.xchg={d:t,n:0};if(state.xchg.n>=5||state.yen<10000)return;state.yen-=10000;state.xchg.n++;addStars(20);sfx('sel');save();render();},
+  xchg:()=>{const t=dayKey();if(!state.xchg||state.xchg.d!==t)state.xchg={d:t,n:0};if(state.xchg.n>=5||state.yen<10000)return;state.yen-=10000;state.xchg.n++;addStars(1);sfx('sel');save();render();},
   awaken0:()=>{ui.awakeAsk=null;render();},
   awaken:()=>{const m=findMon(ui.sel);if(!m)return;const ev=SP[m.sp].evo;if(!ev||m.lv<80||!(state.items.kakusei>0))return;if(ui.awakeAsk!==m.uid){ui.awakeAsk=m.uid;render();return;}
     const before=SP[m.sp].name;state.items.kakusei--;m.sp=ev;m.traits=m.traits.map(t=>t==='shishin'?'sousei':t);if(!m.traits.includes('sousei'))m.traits[0]='sousei';learn(m);const st=calc(m);m.hp=st.hp;m.mp=st.mp;state.owned[ev]=true;state.seen[ev]=true;if(m.shiny)state.shinySeen[ev]=true;ui.awakeAsk=null;sfx('shiny');save();render();
@@ -3837,8 +3837,8 @@ const H={
   bAllLv:()=>{ui.bAllLv=!ui.bAllLv;render();},
   bNew:()=>{ui.bNew=!ui.bNew;render();},
   rest:()=>{advanceTime();ui.toast=`ベンチでひと休み。${TIMES[state.time].n}になった。`;save();render();},
-  req:d=>{const r=REQUESTS.find(x=>x.id===d.id);if(!r||state.reqDone[r.id])return;const m=reqMatch(r.need);if(!m)return;state.reqDone[r.id]=true;addStars(30);const got=giveReward(r.reward)+'・流星石★30';sfx('win');save();talk([[r.from,m.dex?'すごい記録ですね！ お礼を受け取ってください。':`${mName(m)}……！ 見せてくれてありがとう。これはお礼です。`],['',`${got} を受け取った。`]]);},
-  dexms:d=>{const n=+d.n,x=DEX_MS.find(q=>q.n===n),own=dexList().filter(s=>state.owned[s.id]).length;if(!x||state.dexClaim[n]||own<n)return;state.dexClaim[n]=true;addStars(100);ui.toast=`図鑑の記念品として ${giveReward(x.reward)} を受け取った！`;sfx('win');save();render();},
+  req:d=>{const r=REQUESTS.find(x=>x.id===d.id);if(!r||state.reqDone[r.id])return;const m=reqMatch(r.need);if(!m)return;state.reqDone[r.id]=true;addStars(2);const got=giveReward(r.reward)+'・流星石★2';sfx('win');save();talk([[r.from,m.dex?'すごい記録ですね！ お礼を受け取ってください。':`${mName(m)}……！ 見せてくれてありがとう。これはお礼です。`],['',`${got} を受け取った。`]]);},
+  dexms:d=>{const n=+d.n,x=DEX_MS.find(q=>q.n===n),own=dexList().filter(s=>state.owned[s.id]).length;if(!x||state.dexClaim[n]||own<n)return;state.dexClaim[n]=true;addStars(5);ui.toast=`図鑑の記念品として ${giveReward(x.reward)} を受け取った！`;sfx('win');save();render();},
   sound:()=>{state.sound=!state.sound;save();render();sfx('sel');},
   bgm:()=>{state.bgm=!state.bgm;if(state.bgm){try{bgmCtx().resume();}catch(e){}}else bgmStop(),BGM.cur=null;save();render();},
   owA:()=>owA(),
