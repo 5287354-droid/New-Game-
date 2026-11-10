@@ -47,7 +47,7 @@ const MAPS={
     "tTTTTTGPGTTTTTt",
     "tTTTTTGPGTTTTTt",
     "ttttttGPGtttttt"],
-    objs:[['station',5,3,5,2],['lab',0,6,4,3],['house',8,6,3,3],['konbini',11,6,4,3],['sign',8,13],['lamp',4,5],['lamp',10,5],['lamp',6,9]],
+    objs:[['station',5,3,5,2],['lab',0,6,4,3],['house',8,6,3,3],['konbini',11,6,4,3],['sign',8,13],['lamp',4,4],['lamp',10,4],['lamp',6,9]],
     doors:{'7,4':'station','1,8':'lab','9,8':'home','12,8':'konbini'},
     signs:{'8,13':[['','↓ 鎮守の森・裏山 ／ 草むらには魔生物がひそんでいます']]},
     warps:{'7,16':{to:'urayama',x:9,y:19,dir:'up'}},
@@ -130,10 +130,10 @@ const MAPS={
     "BBBBBBDBBSBBDBBBBB",
     "BBBBBBDDDSDDDBBBBB",
     "BBBBBBBBBBBBBBBBBB"],
-    objs:[['shutter',8,1,2,1,'power'],['trash',3,2],['trash',16,4],['trash',1,7],['trash',2,14],['trash',15,14],['trash',6,16],['unit',4,5],['unit',13,11],['lamp',9,8]],
+    objs:[['shutter',8,1,2,1,'power'],['trash',3,2],['trash',3,3],['trash',16,4],['trash',2,14],['trash',3,14],['trash',15,14],['unit',4,5],['unit',8,10],['lamp',9,8]],
     signs:{'7,9':[['','落書き「廃ビルのシャッターは、地下の配電盤で動くらしい」']]},
     warps:{'0,9':{to:'kasumi',x:18,y:16,dir:'left'},'8,1':{to:'haibiru',x:7,y:11,dir:'up',need:'power'},'9,1':{to:'haibiru',x:7,y:11,dir:'up',need:'power'}},
-    npcs:[{id:'cat',x:12,y:9,dir:'left',look:'cat',lines:[['ノラネコ','ニャア。'],['','ネコはゴミ箱のほうをじっと見ている。なにか入っているのかもしれない。']]}],
+    npcs:[{id:'cat',x:16,y:6,dir:'up',look:'cat',lines:[['ノラネコ','ニャア。'],['','ネコはゴミ箱のほうをじっと見ている。なにか入っているのかもしれない。']]}],
     spawn:{x:1,y:9,dir:'right'}},
   chika:{town:'kasumi',name:'旧地下鉄のトンネル',field:'chika',ground:'floor',enc:'Y',rate:.09,dark:'power',rows:[
     "XXXXXXXXXXXXXXXXXXXX",
@@ -190,7 +190,7 @@ const MAPS={
     "tNNNNNNNNNNNNNNNNt",
     "~~~~~~~~~~~~~~~~~~",
     "~~~~~~~~~~~~~~~~~~"],
-    objs:[['station',6,3,7,2],['bath',1,6,5,3],['house',10,6,4,3],['bench',4,10],['board',12,10],['lighthouse',16,11],['lamp',5,5],['lamp',13,5],['lamp',8,10],['parasol',3,12]],
+    objs:[['station',6,3,7,2],['bath',1,6,5,3],['house',10,6,4,3],['bench',4,10],['board',12,10],['lighthouse',16,11],['lamp',5,4],['lamp',13,4],['lamp',8,10],['parasol',3,12]],
     doors:{'9,4':'station','2,8':'sauna','11,8':[['灯台守のシオリ','いらっしゃい。ここは灯台守の家よ。'],['シオリ','朝と夕方は潮が満ちて、昼と夜は引くの。引き潮のときは、砂浜の先の小島まで歩いて渡れるわ。']],'12,10':'board'},
     signs:{'17,10':[['','→ 夜の漁港']],'0,10':[['','← 砂浜と磯']]},
     warps:{'0,9':{to:'hama',x:18,y:4,dir:'left'},'17,9':{to:'gyokou',x:1,y:4,dir:'right'}},
@@ -277,7 +277,7 @@ const MAPS={
     "tGGGGGGGPPGGGGGGGt",
     "tttttttGPPGttttttt",
     "ttttttttPPtttttttt"],
-    objs:[['station',6,3,7,2],['shukubo',1,6,5,3],['chaya',10,6,4,3],['board',4,10],['torii',7,12,4,1],['lamp',5,5],['lamp',13,5],['lamp',7,9]],
+    objs:[['station',6,3,7,2],['shukubo',1,6,5,3],['chaya',10,6,4,3],['board',4,10],['torii',7,12,4,1],['lamp',5,4],['lamp',13,4],['lamp',7,9]],
     doors:{'9,4':'station','2,8':'sauna','11,8':[['茶屋のおかみ','いらっしゃい。お山にのぼる前に、お団子はいかが？'],['おかみ','参道は霧が深いからね。迷ったら、お地蔵さまの見ているほうへ進むんだよ。'],['おかみ','吊り橋は、木の葉が舞いはじめたら風が来る合図。渡るのは、風がやんでからにおし。']],'4,10':'board'},
     signs:{'9,11':[['','↓ 杉林の参道 ／ 天狗岳 奥宮']]},
     warps:{'8,13':{to:'sando',x:8,y:22,dir:'up'},'9,13':{to:'sando',x:8,y:22,dir:'up'}},
@@ -688,8 +688,10 @@ function owDraw(){
   const MW=bg.width,MH=bg.height,VH=OWC.vh;
   let cx=Math.round(px+8-VW*TS/2),cy=Math.round(py+8-VH*TS/2);
   cx=MW<=VW*TS?Math.round((MW-VW*TS)/2):Math.max(0,Math.min(MW-VW*TS,cx));cy=MH<=VH*TS?Math.round((MH-VH*TS)/2):Math.max(0,Math.min(MH-VH*TS,cy));
+  OWC.camX=cx;OWC.camY=cy;OWC.ppx=px-cx+8;OWC.ppy=py-cy+8;
   c.setTransform(OWSCALE,0,0,OWSCALE,0,0);c.imageSmoothingEnabled=false;
   c.fillStyle='#0c1120';c.fillRect(0,0,VW*TS,VH*TS);c.drawImage(bg,-cx,-cy);
+  if(OWC.goal&&OWC.path&&OWC.path.length){const gx=OWC.goal[0]*TS-cx,gy=OWC.goal[1]*TS-cy,a=.5+Math.sin(Date.now()/150)*.3;c.strokeStyle=`rgba(242,177,60,${a})`;c.lineWidth=1;c.strokeRect(gx+1.5,gy+1.5,TS-3,TS-3);}
   const F=(x,y,w,h,col)=>{c.fillStyle=P[col]||col;c.fillRect(x-cx,y-cy,w,h);};
   /* 状態で変わる物 */
   for(const ob of m.objs){if(!owObjOn(ob))continue;const [k,x,y,w=1,h=1,flag]=ob;const X=x*TS,Y=y*TS;
@@ -783,17 +785,18 @@ function owTryMove(dir){
 function owArrive(){
   const m=owMap(),o=state.ow,w=m.warps&&m.warps[o.x+','+o.y],here=m.rows[o.y][o.x];
   state.owSteps=(state.owSteps||0)+1;dailyInc('walk');if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
-  if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
+  if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];owCancelPath();ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
   if(m.rings){const rg=m.rings.find(r=>(r[0]===o.x&&r[1]===o.y)||(r[2]===o.x&&r[3]===o.y));if(rg){const to=rg[0]===o.x&&rg[1]===o.y?[rg[2],rg[3]]:[rg[0],rg[1]];o.x=to[0];o.y=to[1];OWC.held=null;OWC.mv=null;sfx('shiny');ui.toast='キノコの輪に足をふみ入れると、ふわりと体がうき上がった……';render();return;}}
-  if(here==='Q'){OWC.stuck=performance.now()+650;OWC.held=null;ui.toast='クモの糸にからまった！';render();}
+  if(here==='Q'){OWC.stuck=performance.now()+650;OWC.held=null;owCancelPath();ui.toast='クモの糸にからまった！';render();}
   const enc=m.enc||'T';
   if(enc.includes(here)&&state.party.some(x=>x.hp>0)){
     const rate=(m.rate||.11)*(state.lure>0?1.8:1);if(!enc.includes(here))return;
-    if(Math.random()<rate){OWC.held=null;OWC.mv=null;save();owEncounter(m.field);return;}
+    if(Math.random()<rate){OWC.held=null;OWC.mv=null;owCancelPath();save();owEncounter(m.field);return;}
   }
   if(state.owSteps%10===0)save();
 }
 function owTimePass(msg){
+  owCancelPath();
   const before=owTideHigh();advanceTime();const m=owMap(),o=state.ow;let t=(msg||'')+`${TIMES[state.time].n}になった。`;
   if(MAPS[state.ow.map]&&TOWN[m.town]&&m.town==='shiomi'&&before!==owTideHigh())t+=owTideHigh()?' 潮が満ちてきた。':' 潮が引いてきた。';
   if(m.rows[o.y][o.x]==='U'&&owTideHigh()&&m.tideSafe){state.ow={map:state.ow.map,...m.tideSafe};OWC.mv=null;OWC.held=null;t+=' 波に押しもどされて、岸にもどった！';}
@@ -876,6 +879,51 @@ function owA(){
   if(m.items&&m.items[k]){state.owItems=state.owItems||{};const id=state.ow.map+k;if(!state.owItems[id]){state.owItems[id]=true;const it=m.items[k];state.items[it]=(state.items[it]||0)+1;sfx('shiny');save();talk([['',`${ITEMS[it].n}を拾った！`]]);}return;}
   if(m.doors&&m.doors[k]){owDoor(m.doors[k]);}
 }
+/* ---- タップで歩く ---- */
+function owCancelPath(){OWC.path=null;OWC.goal=null;OWC.pathAct=null;}
+function owTapLimit(m){if(m.fog)return 3;if(m.dim)return 4;if(m.dark&&!owFlag(m.dark))return 2;return 99;}
+function owFindPath(m,sx,sy,goals){
+  const W=m.rows[0].length,Hh=m.rows.length,key=(x,y)=>y*W+x,prev=new Map([[key(sx,sy),null]]),q=[[sx,sy]];
+  const isGoal=(x,y)=>goals.some(g=>g[0]===x&&g[1]===y);
+  if(isGoal(sx,sy))return {path:[],end:[sx,sy]};
+  while(q.length){const [x,y]=q.shift();for(const [d,[dx,dy]] of Object.entries(OWD)){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=W||ny>=Hh)continue;const k=key(nx,ny);if(prev.has(k))continue;
+      const goal=isGoal(nx,ny);if(!goal&&((m.warps&&m.warps[nx+','+ny])||(m.doors&&m.doors[nx+','+ny])))continue;if(owSolid(m,nx,ny))continue;
+      prev.set(k,[x,y,d]);if(goal){const path=[];let c=[nx,ny];while(true){const pv=prev.get(key(c[0],c[1]));if(!pv)break;path.unshift(pv[2]);c=[pv[0],pv[1]];}return {path,end:[nx,ny]};}
+      q.push([nx,ny]);if(prev.size>2500)return null;}}
+  return null;
+}
+function owTap(tx,ty){
+  const m=owMap(),o=state.ow;if(!m||ui.dlg||B)return;
+  if(OWC.fish){owFishPull();return;}
+  if(m.mirror){ui.toast='鏡の中では、思った場所へうまく進めない……(十字キーで歩こう)';render();return;}
+  if(tx===o.x&&ty===o.y){owA();return;}
+  const dist=Math.abs(tx-o.x)+Math.abs(ty-o.y),lim=owTapLimit(m);
+  if(Math.hypot(tx-o.x,ty-o.y)>lim+.5){ui.toast=m.fog?'霧で先が見えない……':'暗くて先が見えない……';render();return;}
+  const dirTo=(ax,ay,bx,by)=>bx>ax?'right':bx<ax?'left':by>ay?'down':'up';
+  /* となりのマスなら、その方向へ1歩(岩を押す・扉に入る・ワープ) */
+  if(dist===1){const d=dirTo(o.x,o.y,tx,ty);const npc=owNpcs(m).some(n=>n.x===tx&&n.y===ty),obj=m.objs.filter(owObjOn).some(([kk,ox,oy,w=1,h=1])=>tx>=ox&&tx<ox+w&&ty>=oy&&ty<oy+h&&!['manhole','ladder','shell','cave','ring','fusuma'].includes(kk));
+    const sea=(m.rows[ty]||'')[tx]==='~',door=m.doors&&m.doors[tx+','+ty],item=m.items&&m.items[tx+','+ty]&&!(state.owItems&&state.owItems[state.ow.map+tx+','+ty]),sign=m.signs&&m.signs[tx+','+ty];
+    if((npc||obj||sea||item||sign)&&!(door&&d==='up')){o.dir=d;owA();return;}
+    OWC.path=[d];OWC.goal=[tx,ty];OWC.pathAct=null;OWC.pathMap=state.ow.map;return;}
+  const free=!owSolid(m,tx,ty)&&!(m.doors&&m.doors[tx+','+ty]);
+  let goals,act=null;
+  if(free)goals=[[tx,ty]];
+  else if(m.doors&&m.doors[tx+','+ty]){goals=[[tx,ty+1]];act={dir:'up',step:true};}
+  else{goals=Object.entries(OWD).map(([d,[dx,dy]])=>[tx-dx,ty-dy,d]).filter(([x,y])=>!owSolid(m,x,y)||(x===o.x&&y===o.y));act={target:[tx,ty]};}
+  const r=owFindPath(m,o.x,o.y,goals);
+  if(!r){ui.toast='そこへは行けないようだ。';render();return;}
+  if(r.path.length>lim+1&&lim<99){ui.toast=m.fog?'霧で先が見えない……':'暗くて先が見えない……';render();return;}
+  if(act&&act.target)act.dir=dirTo(r.end[0],r.end[1],tx,ty);
+  OWC.path=r.path;OWC.goal=[tx,ty];OWC.pathAct=act;OWC.pathMap=state.ow.map;
+}
+function owPathStep(){
+  if(!OWC.path)return false;const m=owMap();
+  if(OWC.pathMap!==state.ow.map||ui.dlg||B){owCancelPath();return false;}
+  if(!OWC.path.length){const a=OWC.pathAct;owCancelPath();if(a){if(a.step)owTryMove(a.dir);else{state.ow.dir=a.dir;owA();}}return true;}
+  const d=OWC.path.shift(),bx=state.ow.x,by=state.ow.y,bm=state.ow.map;owTryMove(d);
+  if(!OWC.mv&&state.ow.x===bx&&state.ow.y===by&&state.ow.map===bm){owCancelPath();}
+  return true;
+}
 function owLoop(ts){
   OWC.raf=requestAnimationFrame(owLoop);
   const cv=document.getElementById('owc');if(!cv){return;}
@@ -885,10 +933,11 @@ function owLoop(ts){
   if(ui.dlg||ui.result||ui.gacha){OWC.held=null;owDraw();return;}
   owCarsStep(m);owFishStep();
   if(m.wind&&owGust()==='gust'&&!OWC.mv&&m.rows[state.ow.y][state.ow.x]==='H'&&performance.now()>(OWC.pushT||0)){OWC.pushT=performance.now()+420;const o=state.ow,by=o.y+1;if(!owSolid(m,o.x,by)){OWC.mv={fx:o.x,fy:o.y,t:0};o.y=by;OWC.held=null;}}if(OWC.fish&&OWC.held){OWC.fish=null;ui.toast='釣りをやめた。';OWC.held=null;render();return;}
-  if(m.cars&&owCarHit(m)){const o=state.ow;const back=o.y<=7?6:9;OWC.mv=null;OWC.held=null;o.y=back;o.dir=back===6?'down':'up';OWC.stuck=performance.now()+500;sfx('sel');ui.toast='プップー！ 危ない！ 信号を守ろう。';render();return;}
+  if(m.cars&&owCarHit(m)){owCancelPath();const o=state.ow;const back=o.y<=7?6:9;OWC.mv=null;OWC.held=null;o.y=back;o.dir=back===6?'down':'up';OWC.stuck=performance.now()+500;sfx('sel');ui.toast='プップー！ 危ない！ 信号を守ろう。';render();return;}
   const sp=OWC.dash?.17:.09;
-  if(OWC.mv){OWC.mv.t+=sp;OWC.anim++;if(OWC.mv.t>=1){OWC.mv=null;owArrive();if(OWC.held&&!B&&!ui.dlg)owTryMove(OWC.held);}}
-  else if(OWC.held)owTryMove(OWC.held);
+  if(OWC.mv){OWC.mv.t+=sp;OWC.anim++;if(OWC.mv.t>=1){OWC.mv=null;owArrive();if(OWC.held&&!B&&!ui.dlg)owTryMove(OWC.held);else if(OWC.path&&!B&&!ui.dlg)owPathStep();}}
+  else if(OWC.held){owCancelPath();owTryMove(OWC.held);}
+  else if(OWC.path)owPathStep();
   owDraw();
 }
 function owEnsureLoop(){if(!OWC.raf)OWC.raf=requestAnimationFrame(owLoop);}
@@ -903,7 +952,7 @@ function renderOverworld(){
       <div class="dpad">${['up','left','right','down'].map(d=>`<button class="dp dp-${d}" data-owdir="${d}" aria-label="${{up:'上',down:'下',left:'左',right:'右'}[d]}">${{up:'▲',down:'▼',left:'◀',right:'▶'}[d]}</button>`).join('')}<span class="dp-c"></span></div>
       <div class="abtn"><button class="ob ob-b" data-owb="1" aria-label="Bボタン(押しているあいだ走る)">B</button><button class="ob ob-a" data-act="owA" aria-label="Aボタン(調べる・話す)">A</button></div>
     </div>
-    <p class="small muted ow-help">十字キーで歩く ・ Aで話す・調べる ・ Bを押しながら走る(キーボード: 矢印 / Z / X)</p>
+    <p class="small muted ow-help">マップをタップでその場所へ・押し続けると指の方へ歩く ・ 十字キーでも歩ける ・ Aで話す・調べる ・ Bで走る(キーボード: 矢印 / Z / X)</p>
   </section>`;
 }
 function renderStationIn(){
@@ -920,6 +969,21 @@ function renderInside(){
   return head('建物','');
 }
 /* 入力 */
+(function(){
+  let tp=null;
+  const tileAt=(cv,e)=>{const r=cv.getBoundingClientRect(),s=r.width/(VW*TS);return [Math.floor(((e.clientX-r.left)/s+OWC.camX)/TS),Math.floor(((e.clientY-r.top)/s+OWC.camY)/TS)];};
+  const dirAt=(cv,e)=>{const r=cv.getBoundingClientRect(),s=r.width/(VW*TS),dx=(e.clientX-r.left)/s-OWC.ppx,dy=(e.clientY-r.top)/s-OWC.ppy;if(Math.abs(dx)<6&&Math.abs(dy)<6)return null;return Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');};
+  document.addEventListener('pointerdown',e=>{const cv=e.target.closest&&e.target.closest('#owc');if(!cv||!owActive())return;e.preventDefault();
+    tp={id:e.pointerId,x:e.clientX,y:e.clientY,t:performance.now(),hold:false,cv,last:e};
+    try{cv.setPointerCapture(e.pointerId);}catch(_){}
+    setTimeout(()=>{if(tp&&!tp.hold&&tp.id===e.pointerId&&!ui.dlg&&!B&&!OWC.fish){const m=owMap();if(m&&m.mirror)return;tp.hold=true;owCancelPath();OWC.held=dirAt(tp.cv,tp.last);}},280);});
+  document.addEventListener('pointermove',e=>{if(!tp||e.pointerId!==tp.id)return;tp.last=e;
+    if(!tp.hold&&Math.hypot(e.clientX-tp.x,e.clientY-tp.y)>14&&!ui.dlg&&!B&&!OWC.fish){const m=owMap();if(m&&!m.mirror){tp.hold=true;owCancelPath();}}
+    if(tp.hold)OWC.held=dirAt(tp.cv,e);});
+  const end=e=>{if(!tp||e.pointerId!==tp.id)return;const t=tp;tp=null;if(t.hold){OWC.held=null;return;}
+    if(ui.dlg){H.dlgNext();return;}const [x,y]=tileAt(t.cv,e);owTap(x,y);};
+  document.addEventListener('pointerup',end);document.addEventListener('pointercancel',e=>{if(tp&&e.pointerId===tp.id){tp=null;OWC.held=null;}});
+})();
 (function(){
   const keyDir={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
   document.addEventListener('keydown',e=>{if(!owActive()||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
