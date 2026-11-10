@@ -2059,9 +2059,9 @@ function curBanner(){return BANNERS.find(b=>b.sp===state.gban)||BANNERS[0];}
 function addStars(n,why){state.stars=(state.stars||0)+n;if(why)ui.starNote=`★${n} ${why}`;}
 function firstOwn(id){if(!state.owned[id]&&SP[id]&&!SP[id].gacha)addStars(1,'はじめてなかまにした種族');}
 function dailyRoll(){const t=dayKey();if(!state.daily||state.daily.d!==t)state.daily={d:t,ex:0,win:0,br:0,got:{}};}
-function dailyInc(k){if(!state||!state.started)return;dailyRoll();state.daily[k]=(state.daily[k]||0)+1;}
-const MISSIONS=[{k:'ex',n:'探索する',goal:10,rw:3},{k:'win',n:'戦闘で勝つ',goal:5,rw:3},{k:'br',n:'配合する',goal:1,rw:3},{k:'all',n:'上の3つをすべて受け取る',goal:3,rw:5}];
-const missionVal=k=>k==='all'?['ex','win','br'].filter(x=>state.daily.got[x]).length:(state.daily[k]||0);
+function dailyInc(k,n=1){if(!state||!state.started)return;dailyRoll();state.daily[k]=(state.daily[k]||0)+n;}
+const MISSIONS=[{k:'walk',n:'マップを歩く(歩数)',goal:300,rw:3},{k:'win',n:'戦闘で勝つ',goal:5,rw:3},{k:'br',n:'配合する',goal:1,rw:3},{k:'all',n:'上の3つをすべて受け取る',goal:3,rw:5}];
+const missionVal=k=>k==='all'?['walk','win','br'].filter(x=>state.daily.got[x]).length:(state.daily[k]||0);
 const missionReady=()=>{dailyRoll();return MISSIONS.filter(x=>!state.daily.got[x.k]&&missionVal(x.k)>=x.goal).length;};
 function loginBonus(){
   if(!state.started)return null;
@@ -2932,7 +2932,7 @@ function owTryMove(dir){
 }
 function owArrive(){
   const m=owMap(),o=state.ow,w=m.warps&&m.warps[o.x+','+o.y],here=m.rows[o.y][o.x];
-  state.owSteps=(state.owSteps||0)+1;if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
+  state.owSteps=(state.owSteps||0)+1;dailyInc('walk');if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
   if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
   if(here==='Q'){OWC.stuck=performance.now()+650;OWC.held=null;ui.toast='クモの糸にからまった！';render();}
   const enc=m.enc||'T';
@@ -4238,7 +4238,7 @@ function cmdPanel(){
 /* ========== 探索 ========== */
 function explore(fid){
   const t=TOWN[state.town],f=t.fields.find(x=>x.id===fid);if(!f)return;
-  state.steps=(state.steps||0)+1;dailyInc('ex');
+  state.steps=(state.steps||0)+1;dailyInc('walk',30);
   let tmsg='';if(state.steps>=4){advanceTime();tmsg=`時間が過ぎて、${TIMES[state.time].n}になった。`;}
   if(Math.random()<.12){
     let msg;

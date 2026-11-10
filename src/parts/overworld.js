@@ -491,7 +491,7 @@ function owTryMove(dir){
 }
 function owArrive(){
   const m=owMap(),o=state.ow,w=m.warps&&m.warps[o.x+','+o.y],here=m.rows[o.y][o.x];
-  state.owSteps=(state.owSteps||0)+1;if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
+  state.owSteps=(state.owSteps||0)+1;dailyInc('walk');if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
   if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
   if(here==='Q'){OWC.stuck=performance.now()+650;OWC.held=null;ui.toast='クモの糸にからまった！';render();}
   const enc=m.enc||'T';
@@ -644,3 +644,4 @@ function owResize(){
 window.addEventListener('resize',()=>owResize());
 if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>owResize());
 document.addEventListener('contextmenu',e=>{if(!/INPUT|TEXTAREA/.test(e.target.tagName))e.preventDefault();});
+
