@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="7c96f79402";</script>
+<script>window.JG_APP=true;window.JG_VER="45c8e7f433";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -597,6 +597,8 @@ img,canvas{-webkit-user-drag:none;user-drag:none}
 @media (min-width:700px){.shell .battle .bc.foe .seal{--s:108px;--i:96px}.shell .battle .bc.foe.mighty .seal{--s:150px;--i:144px}.shell .side.mates .seal{display:grid}}
 .cmd.locked{opacity:.45;pointer-events:none;transition:opacity .2s}
 .battle .side.foes{transition:none}
+.danger-zone{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.danger-zone summary{cursor:pointer}.danger-zone[open]{display:flex;flex-direction:column;gap:8px}
+.rword{background:var(--bg);border:1px solid var(--danger);border-radius:6px;padding:6px 10px;width:8em;font-size:16px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fusion{display:none}.gcard,.gtitle,.gbtns{opacity:1!important}.gstar,.gflash{display:none}}
 </style>
 
@@ -3128,9 +3130,7 @@ function renderHeader(){
 }
 function renderTab(){if(ui.tab==='map'&&MAPS[state.town]){owEnsureState();return ui.station?renderStationIn():ui.inside?renderInside():renderOverworld();}return ({map:renderMap,party:renderParty,breed:renderBreed,gacha:renderGacha,tower:renderTower,dex:renderDex,shop:renderShop}[ui.tab]||renderMap)();}
 function renderFoot(){
-  return `<div class="foot"><span class="small muted"><span id="cloudStat" class="cloudstat">${cloudStatusText()}</span><br>配合 ${state.breeds||0}回 ・ 依頼 ${Object.keys(state.reqDone).length}/${REQUESTS.length} ・ 配合杯 ${Object.keys(state.cups).length}/${CUPS.length}</span><span class="row">${ui.confirmReset
-    ?`<span class="small muted">セーブデータを消して最初からはじめます(クラウドの自動セーブも消えます。手動バックアップは残ります)</span><button class="btn sm" data-act="reset0">やめる</button><button class="btn sm danger" data-act="reset2">消して最初から</button>`
-    :`<button class="btn sm primary" data-act="transfer">セーブ管理</button><button class="btn sm ghost" data-act="reset1">データを消す</button>`}</span></div>`;
+  return `<div class="foot"><span class="small muted"><span id="cloudStat" class="cloudstat">${cloudStatusText()}</span><br>配合 ${state.breeds||0}回 ・ 依頼 ${Object.keys(state.reqDone).length}/${REQUESTS.length} ・ 配合杯 ${Object.keys(state.cups).length}/${CUPS.length}</span><span class="row"><button class="btn sm primary" data-act="transfer">セーブ管理</button></span></div>`;
 }
 
 /* ----- データの引き継ぎ(別の端末へ) ----- */
@@ -3165,7 +3165,12 @@ function renderTransfer(){
     <h4>2. 引き継ぎコードを読み込む</h4>
     <textarea id="importCode" rows="3" placeholder="MKR1: から始まるコードを貼りつける" aria-label="読み込むコード">${esc(ui.tin||'')}</textarea>
     <div class="row">${ui.tconfirm?`<span class="small">いまのデータは上書きされます${ui.tfile?'(ファイル: '+esc(ui.tfile)+')':''}。</span><button class="btn danger" data-act="importCode">上書きして読み込む</button><button class="btn sm" data-act="importCancel">やめる</button>`:`<button class="btn" data-act="importAsk">読み込む</button>`}</div>
-    ${ui.terr?`<p class="small" style="color:var(--danger)">${esc(ui.terr)}</p>`:''}</section>`;
+    ${ui.terr?`<p class="small" style="color:var(--danger)">${esc(ui.terr)}</p>`:''}
+    <details class="danger-zone"><summary class="small muted">データを消して最初からはじめる</summary>
+      <p class="small">セーブデータをすべて消して、最初からはじめます。クラウドの自動セーブも消え、元にはもどせません(ファイルに保存したバックアップや、書き出した引き継ぎコードは残ります)。</p>
+      <label class="small" for="resetWord">本当に消すときは「けす」と入力してください</label>
+      <div class="row"><input id="resetWord" class="rword" autocomplete="off" value="${esc(ui.rword||'')}" placeholder="けす"><button class="btn danger" data-act="reset2" ${ui.rword==='けす'?'':'disabled'}>すべて消す</button></div>
+    </details></section>`;
 }
 
 /* ----- 探索(町) ----- */
@@ -4189,9 +4194,7 @@ const H={
   closeResult:()=>{ui.result=null;render();},
   dex:d=>{ui.dexSel=d.id;render();scrollTop0();},
   buy:d=>{const it=ITEMS[d.id];if(state.yen<it.p)return;state.yen-=it.p;state.items[d.id]=(state.items[d.id]||0)+1;sfx('sel');save();render();},
-  reset1:()=>{ui.confirmReset=true;render();},
-  reset0:()=>{ui.confirmReset=false;render();},
-  reset2:()=>{if(CLOUD.db)cloudRef('main').delete().catch(()=>{});state=fresh();B=null;Object.assign(ui,{tab:'map',sel:null,bA:null,bB:null,bSlot:'A',inh:[],trs:[],toast:'',confirmRel:false,dexSel:null,result:null,confirmReset:false,dlg:null,renaming:false,cats:[]});save();render();},
+  reset2:()=>{if(ui.rword!=='けす')return;ui.rword='';if(CLOUD.db)cloudRef('main').delete().catch(()=>{});state=fresh();B=null;Object.assign(ui,{tab:'map',sel:null,bA:null,bB:null,bSlot:'A',inh:[],trs:[],toast:'',confirmRel:false,dexSel:null,result:null,confirmReset:false,dlg:null,renaming:false,cats:[]});save();render();},
   tgt:d=>{if(!B)return;B.target=+d.i;render();},
   catk:()=>setCmd({k:'atk',tgt:B.target}),
   cguard:()=>setCmd({k:'guard'}),
@@ -4212,6 +4215,7 @@ document.addEventListener('click',e=>{
   if(B&&BATTLE_ACTS.has(el.dataset.act)&&battleLocked())return;
   const f=H[el.dataset.act];if(f)f(el.dataset,el);
 });
+document.addEventListener('input',e=>{if(e.target.id!=='resetWord')return;ui.rword=e.target.value.trim();const b=document.querySelector('[data-act=reset2]');if(b)b.disabled=ui.rword!=='けす';});
 document.addEventListener('change',e=>{
   if(e.target.id!=='fileLoad'||!e.target.files||!e.target.files[0])return;
   const f=e.target.files[0];f.text().then(t=>{ui.tin=t;ui.tfile=f.name;ui.terr='';try{readCode(t);ui.tconfirm=true;}catch(er){ui.terr=er.message;ui.tconfirm=false;}render();});
