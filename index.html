@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="a57bcac86f";</script>
+<script>window.JG_APP=true;window.JG_VER="d2f4d428ee";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -3923,6 +3923,7 @@ function migrate(){
   if(state.bgm==null)state.bgm=true;
   if(state.stars==null)state.stars=0;
   for(const k in d)if(state[k]==null)state[k]=d[k];
+  if(!state.flags.star20){state.flags.star20=true;if(state.started){const a=state.stars||0,b=Math.floor(a/20);state.stars=b;ui.starMig={a,b};}}
   allMons().forEach(m=>{if(m.shiny)state.shinySeen[m.sp]=true;});
   if(state.started)state.flags.intro=true;
 }
@@ -3935,6 +3936,7 @@ function start(data){
   if(state.started&&!state.flags.v2){state.flags.v2=true;save();talk(STORY.v2news,()=>gachaRetro());}
   else if(state.started&&!state.flags.gacha)gachaRetro();
   if(state.started){const lb=loginBonus();if(lb){ui.toast=`ログインボーナス ★${lb.g}(${lb.streak}日連続${lb.streak%7===0?' ・ 7日ごとのボーナス！':''})`;render();}}
+  if(ui.starMig){const {a,b}=ui.starMig;ui.starMig=null;save();if(!ui.dlg)talk([['ハザマ所長','星降りの祠の様子がおかしい……。流星石の輝きが、すっかり弱まってしもうた。'],['',`流星石が ★${a.toLocaleString()} から ★${b.toLocaleString()} になった。(ルール変更で、流星石の量が1/20になりました)`]]);}
 }
 try{if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(()=>({state}));}catch(e){}
 if(window.claude&&window.claude.hot&&window.claude.hot.ready)window.claude.hot.ready(start);
