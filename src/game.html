@@ -3924,7 +3924,7 @@ function predict(a,b){
 /* 左右を入れかえると血統配合になるか */
 const swapLineage=(a,b,pr)=>!pr.special&&!pr.lineage&&SP[a.sp].fam===SP[b.sp].fam&&SP[b.sp].rank>=LINEAGE_RANK;
 const kidPlus=(a,b,pr,cat)=>Math.min(99,childPlus(a,b)+(cat.includes('kettou')&&pr.lineage?2:0));
-const childPlus=(a,b)=>Math.min(99,Math.max(1,a.plus+b.plus)+(SP[a.sp].fam==='metal'||SP[b.sp].fam==='metal'?2:0));
+const childPlus=(a,b)=>Math.min(99,a.plus+b.plus+1+(SP[a.sp].fam==='metal'||SP[b.sp].fam==='metal'?2:0));
 const skillSlots=p=>Math.min(5,2+Math.floor(p/4));
 const traitSlots=p=>p>=8?2:1;
 function inhPool(a,b){
@@ -4114,7 +4114,7 @@ function renderBreed(){
       <li><b>世代ボーナス</b>: 配合で世代を重ねるほど、すべての能力が伸びる(1世代ごとに1.5%、第10世代で最大15%)。</li>
       <li><b>メタル系</b>: 親にすると子の+値がさらに2上がる。メタルボディは受け継がれない。</li>
       <li><b>4体配合</b>: 親だけでなく、祖父母(親の親)が条件になる配合もある。</li>
-      <li><b>+値</b>: 両親の+値の合計(+3と+3なら+6。+0どうしでも最低+1)。+値が上がるほど能力とレベル上限が伸びる。</li>
+      <li><b>+値</b>: 両親の+値の合計に、さらに+1(+2と+0なら+3、+2と+1なら+4、+0どうしなら+1)。配合すれば必ず+値が上がる。+値が上がるほど能力とレベル上限が伸びる。</li>
       <li><b>才能・性格</b>: 才能は能力ごとにどちらかの親から受け継ぎ、少しゆらいで伸びることが多い。性格は4割ずつどちらかの親から、2割で新しい性格になる。</li>
       <li><b>氷属性</b>: 流氷岬の魔生物が使う。竜系に特に効き、植物系・鳥系・虫系にも効きやすい。水棲系には効きにくい。</li>
       <li><b>ゆらぎ</b>: 系統配合では、まれに祖父母の姿で生まれる(隔世遺伝)ことや、ひとつ上のランクに化ける(突然変異)ことがある。</li>
