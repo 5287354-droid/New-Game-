@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="ea77bf700f";</script>
+<script>window.JG_APP=true;window.JG_VER="447929a0fc";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -3968,7 +3968,7 @@ function owAval(L){const len=L.y1-L.y0+1,sweep=len*85+500,t=(Date.now()+(L.off||
 function owSeaFall(m,msg){const o=state.ow,s=OWC.lastSafe&&OWC.lastSafe.map===o.map?OWC.lastSafe:{x:m.spawn.x,y:m.spawn.y};
   OWC.mv=null;OWC.held=null;OWC.slide=null;owCancelPath();OWC.crack=null;owHurt(.12);if(m.cold)state.owCold=Math.min(m.cold-1,(state.owCold||0)+15);o.x=s.x;o.y=s.y;sfx('sel');save();render();
   talk([['',msg],['','つめたい海から、なんとかはい上がった……(なかまのHPが減って、体が冷えた)']]);}
-function owCrevasse(m,msg){const o=state.ow,f=state.owFire&&state.owFire.map===o.map?state.owFire:{x:m.spawn.x,y:m.spawn.y,dir:m.spawn.dir};
+function owCrevasse(m,msg){if(!owFireOK(state.owFire))state.owFire=null;const o=state.ow,f=state.owFire&&state.owFire.map===o.map?state.owFire:{x:m.spawn.x,y:m.spawn.y,dir:m.spawn.dir};
   OWC.mv=null;OWC.held=null;owCancelPath();owHurt(.15);if(m.cold)state.owCold=Math.min(m.cold-1,(state.owCold||0)+15);o.x=f.x;o.y=f.y;o.dir=f.dir||'down';sfx('sel');save();render();
   talk([['',msg],['','……気がつくと、焚き火のそばに寝かされていた。(なかまのHPが減った)']]);}
 function owIceStep(m,now){
@@ -4122,8 +4122,13 @@ function owColdAdd(m,n){
   if(v>=.75&&!OWC.coldWarn){OWC.coldWarn=true;ui.toast=m.heat?'暑さで頭がくらくらする……湧き水で体を冷やそう！':'体が冷えきってきた……焚き火であたたまろう！';render();}
   if(v<.75)OWC.coldWarn=false;return false;}
 function owWarm(msg){state.owCold=0;OWC.coldWarn=false;const o=state.ow;state.owFire={map:o.map,x:o.x,y:o.y,dir:o.dir};save();}
+/* 目ざめる場所(焚き火・湧き水)が、いまのマップでも正しいか確かめる。古いセーブの場所が壁の中になっていたら使わない */
+function owFireOK(f){if(!f||!MAPS[f.map])return false;const m=MAPS[f.map],c=(m.rows[f.y]||'')[f.x];if(c===undefined||OW_SOLID.includes(c)||'av~u?&$'.includes(c))return false;
+  return m.objs.some(([k,x,y,w=1,h=1])=>(k==='takibi'||k==='izumi')&&f.x>=x-1&&f.x<=x+w&&f.y>=y-1&&f.y<=y+h);}
+function owStuck(m,o){const c=(m.rows[o.y]||'')[o.x];if(c===undefined)return true;if(c==='O')return !(m.rocks&&owRocks(m).filled[o.x+','+o.y]);if(c==='~')return m.ground!=='snow';return OW_SOLID.includes(c);}
 function owFreeze(){
-  const m=owMap(),f=state.owFire&&MAPS[state.owFire.map]&&MAPS[state.owFire.map].town===m.town?state.owFire:{map:m.town,...MAPS[m.town].spawn};
+  if(!owFireOK(state.owFire))state.owFire=null;
+  const m=owMap(),f=state.owFire&&MAPS[state.owFire.map].town===m.town?state.owFire:{map:m.town,...MAPS[m.town].spawn};
   OWC.mv=null;OWC.held=null;OWC.slide=null;OWC.crack=null;OWC.rk=null;OWC.fish=null;owCancelPath();owHurt(.2);state.owCold=0;OWC.coldWarn=false;
   state.ow={map:f.map,x:f.x,y:f.y,dir:f.dir||'down'};sfx('sel');save();render();
   owVolcReset();owTorchOut();
@@ -4298,6 +4303,7 @@ function owLoop(ts){
   owCarsStep(m);owFishStep();
   if(m.wind&&owGust()==='gust'&&!OWC.mv&&m.rows[state.ow.y][state.ow.x]==='H'&&performance.now()>(OWC.pushT||0)){OWC.pushT=performance.now()+420;const o=state.ow,by=o.y+1;if(!owSolid(m,o.x,by)){OWC.mv={fx:o.x,fy:o.y,t:0};o.y=by;OWC.held=null;}}if(OWC.fish&&OWC.held){OWC.fish=null;ui.toast='釣りをやめた。';OWC.held=null;render();return;}
   if(m.cars&&owCarHit(m)){owCancelPath();const o=state.ow;const back=o.y<=7?6:9;OWC.mv=null;OWC.held=null;o.y=back;o.dir=back===6?'down':'up';OWC.stuck=performance.now()+500;sfx('sel');ui.toast='プップー！ 危ない！ 信号を守ろう。';render();return;}
+  if(!OWC.mv&&!OWC.ride&&!OWC.fly&&owStuck(m,state.ow)){const sp=m.spawn;OWC.held=null;OWC.slide=null;owCancelPath();state.ow={map:state.ow.map,x:sp.x,y:sp.y,dir:sp.dir||'down'};if(!owFireOK(state.owFire))state.owFire=null;ui.toast='(動けない場所にいたので、入口へもどりました)';save();render();return;}
   if((m.ground==='volcano'||m.ground==='snow')&&owVolcStep(m)){owDraw();return;}
   if(OWC.ride){if(!OWC.mv)owRideNext(m);else{OWC.mv.t+=.24;if(OWC.mv.t>=1){OWC.mv=null;owRideNext(m);}}owDraw();return;}
   const hereT=(m.rows[state.ow.y]||'')[state.ow.x];
