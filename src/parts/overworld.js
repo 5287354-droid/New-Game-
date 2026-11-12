@@ -72,7 +72,7 @@ const MAPS={
     "ttTTGPGWWWWWGGtt",
     "ttTTGPGWWWWWGTtt",
     "ttTTGPPGWWWGTTtt",
-    "ttTTGGPGGGGTTTtt",
+    "PPTTGGPGGGGTTTtt",
     "tttGGGPPPGGTTTtt",
     "ttGGTTGGPGGGGGtt",
     "ttGTTTTGPGGTTGtt",
@@ -83,7 +83,7 @@ const MAPS={
     "tttttttttPtttttt"],
     objs:[['hokora',5,1,5,1],['torii',6,5,3,1],['sign',11,18]],
     signs:{'11,18':[['','↑ 鎮守の祠 ／ 森の奥には「ぬし」が棲むという']],'7,1':[['','古い祠だ。ぬしをまつっているらしい。']]},
-    warps:{'9,20':{to:'komorebi',x:7,y:15,dir:'up'}},
+    warps:{'0,12':{to:'okumori',x:42,y:20,dir:'left',need:'boss:komorebi',lock:'森の奥は、木の根がからみあって進めない。(鎮守の森のぬしを鎮めると、道がひらくらしい)'},'9,20':{to:'komorebi',x:7,y:15,dir:'up'}},
     npcs:[{id:'nushi',x:7,y:3,dir:'down',look:'boss',sp:'tsukinowa',text:'胸の月が光る大グマが、こちらをにらんでいる！'}],
     items:{'13,4':'onigiri','3,9':'tane'},
     spawn:{x:9,y:19,dir:'up'}},
@@ -152,13 +152,13 @@ const MAPS={
     "XYYYYYYYYYYYYYYYYXXX",
     "XYYXXXXXXXXXXXXXXXXX",
     "XYYXXXXXXXXXXXXXXXXX",
-    "XYYYYYYYYYYYYYFFFFFX",
+    "XYYYYYYYYYYYYYFFFFFF",
     "XYYYYYYYYYYYYYFFFFFX",
     "XXXXXXXXXXXXXXFFFFFX",
     "XXXXXXXXXXXXXXXXXXXX"],
     objs:[['ladder',1,1],['lever',18,2,1,1,'lever1'],['shutter',9,6,1,2,'lever1'],['panel',17,10,1,1,'power'],['train',14,12,4,1]],
     signs:{'17,10':[['','配電盤だ。']]},
-    warps:{'1,1':{to:'kasumi',x:3,y:15,dir:'up',msg:'はしごを登って、地上に出た。'}},
+    warps:{'19,10':{to:'kanjou',x:1,y:20,dir:'right',need:'boss:kasumi',lock:'さびた鉄のとびらが閉まっている。(霞ヶ丘のぬしを鎮めると、開くらしい)'},'1,1':{to:'kasumi',x:3,y:15,dir:'up',msg:'はしごを登って、地上に出た。'}},
     spawn:{x:2,y:2,dir:'down'}},
   haibiru:{town:'kasumi',name:'廃ビル 最上階',field:'biru',ground:'floor',enc:'Q',rate:.25,rows:[
     "XXXXXXXXXXXXXXX",
@@ -208,7 +208,7 @@ const MAPS={
     "tNNNNNNNNNNNNNNNNNNt",
     "tNEEENNNNNNNEEENNNNt",
     "tNEEEENNNNNEEEEENNNt",
-    "tNNNNNNNNNNNNNNNNNNN",
+    "NNNNNNNNNNNNNNNNNNNN",
     "tNNEErrNNNNNrrEENNNt",
     "~~NNUUUUUUUUUUUUNN~~",
     "~~~UUUUUUUUUUUUUU~~~",
@@ -222,7 +222,7 @@ const MAPS={
     "~~~~~~~~~~~rrNrrr~~~"],
     objs:[['pool',3,2],['pool',13,3],['pool',15,2],['sign',18,5],['cave',13,15],['shell',6,13]],
     signs:{'18,5':[['','潮見浜の干潟 ／ 朝と夕方は潮が満ちます。沖の小島へは、引き潮(昼・夜)のときに']]},
-    warps:{'19,4':{to:'shiomi',x:1,y:9,dir:'right'},'13,15':{to:'doukutsu',x:7,y:12,dir:'up',need:'boss:shiomi',lock:'洞窟の入口は、大きな波にあらわれていて近づけない。漁港の大蟹が鎮まれば……'}},
+    warps:{'0,4':{to:'nanpasen',x:54,y:6,dir:'left',need:'boss:shiomi',lock:'西の浜は、波が高くて進めない。(漁港の大蟹が鎮まれば……)'},'19,4':{to:'shiomi',x:1,y:9,dir:'right'},'13,15':{to:'doukutsu',x:7,y:12,dir:'up',need:'boss:shiomi',lock:'洞窟の入口は、大きな波にあらわれていて近づけない。漁港の大蟹が鎮まれば……'}},
     items:{'7,12':'kai','15,14':'tsuki'},
     spawn:{x:18,y:4,dir:'left'}},
   gyokou:{town:'shiomi',name:'夜の漁港',field:'gyokou',ground:'city',enc:'K',rate:.06,fish:{lv:[20,26],table:[['utsuboyami',3],['chouchin',2,'n'],['happoudako',1.5],['kurageru',2],['fukuredoku',2],['rurione',.3,'n']]},rows:[
@@ -354,7 +354,7 @@ const MAPS={
     "ttTGGGGLGGGGTtt",
     "ttTGGLLLLLGGTtt",
     "ttTGGLLLLLGGTtt",
-    "ttTGGLLLLLGGTtt",
+    "ttTGGLLLLLGGTPP",
     "ttTGGLLLLLGGTtt",
     "ttTGGLLLLLGGTtt",
     "ttTTTGGLGGTTTtt",
@@ -363,7 +363,7 @@ const MAPS={
     "tttttttLttttttt"],
     objs:[['honden',5,0,5,2],['barrier',6,3,3,1,'kitsune'],['toro',7,6,1,1,'N'],['toro',7,10,1,1,'S'],['toro',5,8,1,1,'W'],['toro',9,8,1,1,'E'],['stele',11,9]],
     signs:{'11,9':[['','古い石碑だ。'],['','「狐火は 日ののぼる方より しずむ方へ。ふもとを照らし、いただきに至る」']]},
-    warps:{'7,14':{to:'keiryu',x:9,y:1,dir:'down'}},
+    warps:{'14,8':{to:'shugendo',x:1,y:50,dir:'right',need:'boss:tengu',lock:'しめなわが張られていて、先へ進めない。(天狗岳のぬしに認められると、通れるらしい)'},'7,14':{to:'keiryu',x:9,y:1,dir:'down'}},
     npcs:[{id:'nushi',x:7,y:2,dir:'down',look:'boss',sp:'kokonobi',text:'奥宮の鳥居の向こうで、九本の尾に狐火が灯った！'}],
     spawn:{x:7,y:13,dir:'up'}},
   /* ---- マヨイガ ---- */
@@ -379,13 +379,13 @@ const MAPS={
     "t.....GPPG.....GGt",
     "tPPPPPPPPPPPPPPPPt",
     "tGG**GGGPPGGG**GGt",
-    "tGGGGGGGPPGGGGGGGt",
+    "tGGGGGGGPPGGGGGGGP",
     "tttttttGPPGttttttt",
     "ttttttttPPtttttttt"],
     objs:[['station',6,3,7,2],['bath',1,6,5,3],['kominka',10,6,5,3],['board',15,10],['torii',7,12,4,1],['lamp',5,4],['lamp',13,4],['lamp',7,9],['lamp',11,9]],
     doors:{'9,4':'station','2,8':'sauna','12,8':'yashiki','15,10':'board'},
     signs:{'0,6':[['','← 霧の竹林']],'9,11':[['','↓ 千本鳥居 ／ 鳥居をくぐるあいだ、けっして後ろをふり返ってはならない']]},
-    warps:{'0,5':{to:'chikurin',x:16,y:12,dir:'left'},'17,5':{to:'kagami',x:1,y:10,dir:'right'},'8,13':{to:'senbon',x:5,y:1,dir:'down'},'9,13':{to:'senbon',x:5,y:1,dir:'down'}},
+    warps:{'17,11':{to:'kairou',x:1,y:24,dir:'right',need:'boss:mayoiga',lock:'かべに、開かないふすまがある。(マヨイガのぬしを鎮めると、開くらしい)'},'0,5':{to:'chikurin',x:16,y:12,dir:'left'},'17,5':{to:'kagami',x:1,y:10,dir:'right'},'8,13':{to:'senbon',x:5,y:1,dir:'down'},'9,13':{to:'senbon',x:5,y:1,dir:'down'}},
     npcs:[{id:'aoi',x:13,y:9,dir:'down',look:'aoi'},{id:'fox',x:5,y:10,dir:'right',look:'fox',lines:[['狐の面の子','……人の子？ めずらしいね。'],['狐の面の子','竹林の輪っかは、ぼくらの通り道。輪から輪へ、ひとっとびさ。'],['狐の面の子','夜になると、竹林の奥で一本だけ光る竹があるよ。']]},
       {id:'oldman',x:16,y:7,dir:'left',look:'obaa',lines:[['里の古老','この里の屋敷は、ふすまを開けるたびに、ちがう部屋が現れる。'],['古老','座敷わらしに会えたら、運がいいぞ。']]}],
     spawn:{x:9,y:5,dir:'down'},station:{x:9,y:5,dir:'down'}},
@@ -492,6 +492,282 @@ const MAPS={
     npcs:[{id:'nushi',x:5,y:19,dir:'up',look:'boss',sp:'nue',text:'千本鳥居の奥。虎の手足と蛇の尾をもつ影が、トラツグミの声で鳴いた！'},
       {id:'ura',x:5,y:24,dir:'up',look:'boss',sp:'sorakujira',ura:true,text:'雲の海を、山より大きな影がゆっくりと泳いでいく……！'}],
     spawn:{x:5,y:1,dir:'down'}},
+  /* ---- 奥地(大型アップデート) ---- */
+  okumori:{town:'komorebi',name:'大楠の迷い森',field:'urayama',ground:'forest',enc:'T',rate:.09,lvUp:3,fallMsg:'ザブン！ 丸太からすべり落ちて、川に落ちた！',takara:{saino:1,tane:3,yen:3000},
+    rows:[
+    "tttttttttttttttttttttttttttttttttttttttttttt",
+    "ttttttttttttttttttttttttWWWWWttttttttttttttt",
+    "ttttttttttttttttttttttttWWWWWttttttttttttttt",
+    "ttttttttTGGGGtGGGGGGGGGGWWWWWttttttttttttttt",
+    "ttttttttTGGGTtTGTGTGGGGGWWWWWttttttttttttttt",
+    "ttttttttTGGGTtTTGGGTTGTGWWWWWttttttttttttttt",
+    "ttttttttGGGGTtGGTGGTGGGGWWWWWGGGtttttttttttt",
+    "ttttttttGTGTGOTGTGTGGGGGWWWWWGGGtttttttttttt",
+    "ttttttttGTGTGtGGGTGGGGGGaaaaaGGGtttttttttttt",
+    "ttttttttGGTTGtTGGGGGTTGGWWWWWGGGtttttttttttt",
+    "ttttttttGTGGGtGGTTTTGGGGWWWWWGGGtttttttttttt",
+    "ttttttttGGTGGtTTGGTGTTGGWWWWWGGGtttttttttttt",
+    "ttttttttTGGGGtGGTGGTGTGGWWWWWGGGtttttttttttt",
+    "ttttttttttttttttttttttttWWWWWGGGtttttttttttt",
+    "ttGGTGGGGGGGttttttttttttWWWWWGGGTGGGTTTTTGGt",
+    "ttGGGTTGGGGTttttttttttttWWWWWGGGGTGTGTTGGGGt",
+    "ttTGGGGTGGGTttGGGGGGGTTGWWWWWGGGTTGGTTGGTTTt",
+    "ttGGGTTGTGTGttGGTGGGGGGGWWWWWGGGGGTTGTGGGTGt",
+    "ttGTGTGTTGGGttGTGGGGGGTGWWWWWGGGGGTTGGGGGTGt",
+    "ttGGGTTGGGTTttTGGGTGTTGGWWWWWGGGGTGTGTGGGGGt",
+    "ttttttttttttttTGTGTTGGGGWWWWWGGGGGGGPPPPPPPP",
+    "ttttttttttttttGTGTGGGTGGWWWWWGGGGGGGGGTTGGGt",
+    "ttGGGGGGGGGGttTGGGTGGGGGWWWWWGGGGGTTGGTGTGGt",
+    "ttGGGGGGGGGGttGGGGGTGGGGWWWWWGGGTGGGGGGGTGTt",
+    "ttGGGGGGGGGGttGTTTTGTGGGWWWWWGGGGTGTGTTGGTGt",
+    "ttGGGGGGGGGGttttttttttttWWWWWGGGGGTTGTTGGGGt",
+    "ttGGGGGGGGGGttttttttttttWWWWWGGGTTGTGGGGGGTt",
+    "ttGGGGGGGGGGttttttttttttWWWWWGGGtttttttttttt",
+    "ttttttttGGTTGGGGGGGGGGTGWWWWWGGGtttttttttttt",
+    "ttttttttGTGGGGTGGTGGGGGGWWWWWGGGtttttttttttt",
+    "ttttttttGGTGGTGGGGGGGGGGWWWWWGGGtttttttttttt",
+    "ttttttttTGTGTTGGTGGGGGTGWWWWWGGGtttttttttttt",
+    "ttttttttGTGGGTGTGTGTGTTGvvvvvGGGtttttttttttt",
+    "ttttttttGGGGGGTTGGGGTGGGWWWWWGGGtttttttttttt",
+    "ttttttttGGGGGGGTGGGGGGGGWWWWWGGGtttttttttttt",
+    "ttttttttGGGGTTGTTTGGTTTGWWWWWttttttttttttttt",
+    "ttttttttGTTGGTGTGGGGTGGGWWWWWttttttttttttttt",
+    "ttttttttTGTTGGGGGGGGGGGGWWWWWttttttttttttttt",
+    "ttttttttttttttttttttttttWWWWWttttttttttttttt",
+    "tttttttttttttttttttttttttttttttttttttttttttt"],
+    objs:[["ring", 15, 22], ["ring", 9, 17], ["ring", 4, 15], ["ring", 10, 34], ["ring", 9, 6], ["ring", 6, 25], ["takara", 4, 23, 1, 1, "okumoriT"], ["sign", 40, 19], ["bench", 33, 25]],
+    signs:{"40,19": [["", "大楠の迷い森 ／ 川は、丸太の渡しに乗ってこえる"], ["", "朝と昼は蓮の葉、夕方と夜は蛍の石が、川に道をつくる"], ["", "キノコの輪は、森のべつの場所につながっている"]]},
+    warps:{"43,20": {"to": "urayama", "x": 1, "y": 12, "dir": "right"}},
+    items:{"20,4": "tane", "21,36": "bansoko", "3,18": "tea", "10,24": "saino"},
+    rocks:[[16, 7]],
+    floats:[{"path": [[28, 20], [24, 20]], "w": 1, "h": 1, "step": 800, "off": 0}],
+    rings:[[15, 22, 9, 17], [4, 15, 10, 34], [9, 6, 6, 25]],
+    npcs:[{"id": "kikori", "x": 34, "y": 16, "dir": "down", "look": "salary", "lines": [["きこり", "この森の奥には、町ができる前から立っている大楠があるんだ。"], ["きこり", "だが、まっすぐ歩いてもたどりつけん。キノコの輪を、正しい順にくぐるんだ。"], ["きこり", "北の岸には朝か昼、南の岸には夕方か夜にしか渡れんぞ。そこのベンチで待つといい。"]]}],
+    spawn:{"x": 42, "y": 20, "dir": "left"}},
+  kanjou:{town:'kasumi',name:'旧環状線',field:'chika',ground:'floor',enc:'Y',rate:.1,lvUp:4,cave:true,takara:{saino:2,kettou:1,yen:8000},
+    rows:[
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXFFFFFFFFFFFFFFFFFXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXFFYYYYYYYYYYYYYFFXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXFFYYYYYYYYYYYYYFFXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXFFFFFFFFFFFFFFFFFXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXFFFFFFFFcFFFFFFFFXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXX+++++++++++++++++++++++++++++++++++++XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFFFX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "XFFFFXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "XFFFFXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "XFFFFXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "FFFFc++++XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX++++cYYX",
+    "XFFFFXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "XFFFFXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "XFFFFXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFYYX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXFFFX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXX",
+    "XXXXXXXX+++++++++++++++++++++++++++++++++++++XXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXFFFFFFFFFFcFFFFFFFFFFXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXFFFFFFFFFFFFFFFFFFFFFXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXFFYYYYYYYYYYYYYYYYYFFXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXFFYYYYYYYYYYYYYYYYYFFXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"],
+    objs:[["point", 20, 4, 1, 1, "k2"], ["point", 50, 14, 1, 1, "k1"], ["takara", 17, 36, 1, 1, "kanjouT"], ["sign", 2, 18], ["train", 28, 1, 4, 1], ["panel", 33, 4, 1, 1, "kanjouL"]],
+    signs:{"2,18": [["", "旧環状線 ／ 乗り場でAを押すと、トロッコが走り出す"], ["", "行き先は、線路の分かれ道の向きで決まる。切りかえレバーは、北の駅と東の車庫にある"]]},
+    warps:{"0,20": {"to": "chika", "x": 18, "y": 10, "dir": "left"}},
+    items:{"19,1": "drink", "50,26": "saino", "35,38": "tea", "1,23": "bansoko"},
+    points:{"8,20": {"flag": "k1", "a": {"right": "up", "down": "left", "up": "left"}, "b": {"right": "down", "down": "down", "up": "up"}}, "26,8": {"flag": "k2", "a": {"right": "up", "left": "up", "down": "right"}, "b": {"right": "right", "left": "left", "down": "left"}}, "44,20": {"flag": "k3x", "a": {"down": "right", "up": "right", "left": "up"}, "b": {"down": "right", "up": "right", "left": "up"}}, "26,32": {"flag": "k4x", "a": {"left": "down", "right": "down", "up": "left"}, "b": {"left": "down", "right": "down", "up": "left"}}},
+    npcs:[{"id": "tetsu", "x": 3, "y": 22, "dir": "up", "look": "salary", "lines": [["鉄道好きの会社員", "ここは、むかしの環状線のあとなんです。トロッコがまだ動くんですよ。"], ["会社員", "南の駅に、開業記念の品がねむっているらしいんですが……どうしても、北か東の駅に着いてしまうんです。"]]}],
+    spawn:{"x": 1, "y": 20, "dir": "right"}},
+  nanpasen:{town:'shiomi',name:'沖の岩礁と難破船',field:'hama',ground:'sand',enc:'EU',rate:.07,lvUp:5,tideSafe:{x:50,y:6,dir:'left'},orca:{kind:'tako',every:4500,chars:'K?'},fallMsg:'ザブン！ いかだからすべり落ちて、海に落ちた！',fish:{lv:[22,27],table:[['nyaame',3],['kurageru',3],['fukuredoku',2],['iroumiushi',2]]},takara:{tenpu:1,kai:3,yen:15000},
+    rows:[
+    "tttttttttttttttttttttttttttttttttttttttttttttttttttttttt",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NNNNNNNNNNN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NNNENNNNNNN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NNNNNNNNNNN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NNNNEENNNNN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NENNNNNNNNNN",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NNNNENNNENN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NNENNNNNNNN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~NNNNNNNNNNN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UUUUUUUUUUUUUUUNNNNNNENNN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UUUUUUUUUUUUUUUNNNENNNNNN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UUUUUUUUUUUUUUUNNENNNNENN~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UUUUUU~~~~~UUUU~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UUUUUU~~~~~UUUU~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UUUUUU~~~~~UUUU~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UUUUUU~~~~~UUUU~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UUUUUU~~~~~UUUU~~~~~~~~~~~",
+    "~~~~KKKKKKKKKKKK~~~~~~~~~~~~~~UUUUUUUUUUUUUUU~~~~~~~~~~~",
+    "~~~~KKKK~~~~KKKK~~~~~~~~~~~~~~U~~~~UUUUUUUUUU~~~~~~~~~~~",
+    "~~~~KKKK~~~~KKKK~~~~~~~~~~~~~~U~~~~UUUUUUUUUU~~~~~~~~~~~",
+    "~~~~KKKKKKKKK?KK~~~~~~~~~~~~~~U~~~~UUUUUUUUUU~~~~~~~~~~~",
+    "~~~~KKK???KKK?KK~~~~~~~~~~NNNNNNN~~UUUUUUUUUU~~~~~~~~~~~",
+    "~~~~KKKKKKKKKKKK~~~~~~~~~~NNNNNNNUUUUUUUUUUUU~~~~~~~~~~~",
+    "~~~~K?KKKKKKKKKK~~~~~~~~~~NNNNNNNUUUUUUUUUUUU~~~~~~~~~~~",
+    "~~~~K?KKKK???KKK~~~~~~~~~~NNNNNNN~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~KKKKKKKKKKKK~~~~~~~~~~NNNNNNN~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~KK???KKKKKKK~~~~~~~~~~NNNNNNN~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~KKKKK?KKKKKK~~~~~~~~~~NNNNNNN~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~KKKKKKKKKKKK~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~KKKKKK??KKKK~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~KKKKKKKKKKKK~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~KKKKKKKKKKKK~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~NNNNN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~NNNNN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~NNNNN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~NNNNN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~NNNNN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+    "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"],
+    objs:[["takara", 5, 19, 1, 1, "nanpaT"], ["sign", 52, 5], ["bench", 47, 3], ["shell", 28, 24], ["bench", 30, 27]],
+    signs:{"52,5": [["", "沖の岩礁 ／ 干潮(昼と夜)のあいだだけ、干潟を歩いて岩礁へ渡れる"], ["", "岩礁から先は、流れるいかだに乗る。難破船の床板はくさっている。立ち止まるな"], ["", "甲板に黒い影が見えたら、大ダコの足がくる"]]},
+    warps:{"55,6": {"to": "hama", "x": 1, "y": 4, "dir": "right"}},
+    items:{"22,35": "kai", "14,31": "kakusei", "53,11": "tea", "27,27": "drink", "4,32": "saino"},
+    floats:[{"path": [[25, 25], [16, 25]], "w": 2, "h": 1, "step": 700, "off": 0}, {"path": [[12, 33], [12, 36], [19, 36]], "w": 1, "h": 1, "step": 650, "off": 1500}],
+    npcs:[{"id": "ryoushi", "x": 49, "y": 8, "dir": "left", "look": "parka", "lines": [["年よりの漁師", "沖に見える難破船はな、むかしの交易船じゃ。船長室に宝があるというが……"], ["漁師", "あそこは大ダコのなわばりじゃ。甲板の下から、足がドーンと突き上げてくる。影を見たらすぐにげろ。"]]}],
+    spawn:{"x": 54, "y": 6, "dir": "left"}},
+  shugendo:{town:'tengu',name:'天狗の修験道',field:'okumiya',ground:'grass',enc:'T',rate:.08,lvUp:3,gale:true,windPush:'L',rest:'P',avalKind:'rock',erupt:{kind:'rock',cycle:24000,calm:16000,every:450},takara:{tenpu:2,kakusei:1,yen:30000},
+    rows:[
+    "tttttttttttttttttttttttttttttttttttttttttttttttttttttttt",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%GGGGGGGGG%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%PPGGGGGGGGGPP%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%PPGGGGGGGGGPP%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%PPGGGGGGGGGPP%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%PPGGGGGGGGG?P%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%PPPP%%%%%%%%%%%?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%^PPP%%%%%%%%%%%?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%PPP^%%%%%%%%%%%?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%%%PPP^%%%?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%%%^PPP%%%?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%%%PPPP%%%?%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%PPPPPPP%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%PPPPPP%%%%%%%%?????%%%%%%%%%%%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%^PPPPP?????%%%?%%%?%%%PPPPPPPPPPP%",
+    "%%%%%%%%%%%%%%%%%%%%%%PPPPPP%%%%?%%%?%%%????PPPPPPPPPPP%",
+    "%%%%%%%%%%%%%%%%%%%%%%PPPPPP%%%%?????%%%%%%%PPPPPPPPPPP%",
+    "%%%%%%%%%%%%%%%%%%%%%%PPPPPP%%%%%%%%?%%%%%%%PPPPPPPPPPP%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%?%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%?%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLr%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLr%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLr%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLr%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLLr%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%LLL%%%%%",
+    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%PPPPPPP%%%",
+    "%tttttttttttttttttttttttttttttttttttttttttttttPPPPPPPtt%",
+    "%GGGGGGGGTttGGGttGTGGTttGGGttGGGGGttGGGttTTGGGTTGGGGGGG%",
+    "%GGGTGGTTGttGGGttGGTGGttGGGttTGGGGttGGGttGGGGGTTGGGGGTG%",
+    "%PPPPPPPPPPPGGGPPPPPPPPPGGGPPPPPPPPPGGGPPPPPPPPPPPPPPPP%",
+    "%GTGGGGGGGttGGGttTGGGGttGGGttGGGGGttGGGttGGGGGGGGGGGGGG%",
+    "%GGGGGGTGGttGGGttGGGGGttGGGttGGGGTttGGGttGGGGGTGGGGGGGG%",
+    "PPPPPPPGGGttGGGttTTGGTttGGGttGGGGTttGGGttTGGTTGGTGGTGGG%",
+    "%GTGGTGGGTttGGGttGGGGGttGGGttTGGGGttGGGttGGGGGGTTTGGGGG%",
+    "%GGGGGGGGGttGGGttGGGGTttGGGttGGGGGttGGGttGGTGGTGGGTGGGG%",
+    "%TTGGGGGTGttGGGttGGTGGttGGGttGTGTGttGGGttGTGTTGGGGGGGGG%",
+    "%GGGGGGGGTGGTGGGGGGGTGGTGGGTGTGGGGGTGTGGGTGGGGGGGGGTGGG%",
+    "tttttttttttttttttttttttttttttttttttttttttttttttttttttttt"],
+    objs:[["takara", 16, 2, 1, 1, "shugenT"], ["jizo", 3, 49, 1, 1, "right"], ["sign", 5, 49], ["stele", 47, 45], ["toro", 45, 19, 1, 1, "x"], ["bench", 53, 20]],
+    signs:{"5,49": [["", "天狗の修験道 ／ 沢では落石、尾根では天狗風、その先は崩れ橋と風の飛び石"], ["", "風がふいたら、岩の東がわに身をかくせ。崩れ橋では立ち止まるな"]], "47,45": [["", "「風の尾根。天狗風は東からふく。岩かげに入らぬ者は、谷へ落ちる」"]]},
+    warps:{"0,50": {"to": "okumiya", "x": 13, "y": 8, "dir": "left"}},
+    items:{"3,53": "tea", "53,53": "drink", "52,19": "saino", "24,20": "kakusei", "7,9": "tane", "36,23": "tenpu"},
+    jumps:{"22,18": [16, 14], "14,14": [8, 10], "17,13": [23, 17], "6,10": [12, 5], "9,11": [15, 15]},
+    aval:[{"x0": 12, "x1": 14, "y0": 45, "y1": 53, "period": 6000, "off": 0, "out": {"x": 13, "y": 54}}, {"x0": 24, "x1": 26, "y0": 45, "y1": 53, "period": 7000, "off": 2200, "out": {"x": 25, "y": 54}}, {"x0": 36, "x1": 38, "y0": 45, "y1": 53, "period": 5600, "off": 3900, "out": {"x": 37, "y": 54}}],
+    npcs:[{"id": "tengu2", "x": 18, "y": 3, "dir": "down", "look": "fox", "lines": [["山の天狗", "ほう……ここまで登ってきたか。なかなかの足だ。"], ["天狗", "そこの箱は、修験をなしとげた者へのほうびだ。持っていくがよい。"], ["天狗", "帰りは、東の崩れ橋を一気にかけ下りよ。ふり返るでないぞ。"]]}],
+    spawn:{"x": 1, "y": 50, "dir": "right"}},
+  kairou:{town:'mayoiga',name:'裏座敷・鬼火の回廊',field:'senbon',ground:'floor',enc:'M',rate:.035,lvUp:3,cave:true,torch:46,saidan:['shokuNW','shokuNE','shokuSW','shokuSE'],saidanDone:'kairouDone',takara:{tenpu:2,kakusei:2,yen:40000},
+    rows:[
+    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
+    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
+    "JJMMMMMMJJJJJJJJJJJJMMMMMMMMMMMJJJJJJJJJMMMMMMJJ",
+    "JJMMMMMMJJJJJJJJJJJJMMMMMMMMMMMJJJJJJJJJMMMMMMJJ",
+    "JJMMMMMMJJJJJJJJJJJJMMMMMMMMMMMJJJMMMMMMMMMMMMJJ",
+    "JJMMMMMMJJJJJJJJJJJJMMMMMMMMMMMJJJMJJJJJMMMMMMJJ",
+    "JJMMMMMMJJJJJJJJJJJJMMMMMMMMMMMJJJMJJJJJMMMMMMJJ",
+    "JJMMMMMMJJJJJJJJJJJJMMMMMMMMMMMJJJMJJJJJMMMMMMJJ",
+    "JJJJJMJJJJJJJJJJJJJJMMMMMMMMMMMJJJMJJJJJJJJMJJJJ",
+    "JJJJJMJJJJJJJJJJJJJJJJJJMMMJJJJJJJMJJJJJJJJMJJJJ",
+    "JJJJJMJJJJJJJJJJJJJJJJJJJMJJJJJJJJMMMMMMMMMMJJJJ",
+    "JJJJJMJJJJJJJJJJJJJJJJJJJMJJJJJJJJMJJJJJJJJMJJJJ",
+    "JJJMMMMMJJJJJJJJJJJJJJJJJMMMMMMMMMMJJJJJJJJMJJJJ",
+    "JJJMMMMMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJMMMMMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJJJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJJMMMMiJiiiiiJiiJiiiiiiJiJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJJMJJiiiiiiiiiiiJiJiiiiiiJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJJMJJiiiiiiiiiiiiiJiiiiiJJJJJJJJJJJJJJJMJJJJ",
+    "JMMMMMMJJiiiiJiiiiiiiiiiiJiiJJJJJJJJJJJJJJJMJJJJ",
+    "JMMMMMMJJiJiiiiiiiiiiJiiiiiiiJJJJJJJJJJJJJJMJJJJ",
+    "MMMMMMMJJJiiiiiiiiiiiiiiiiiiiJJJJJJJJJJJJJJMJJJJ",
+    "JMMMMMMJJiiiiiJiiiiiiiiiiiiiiJJJJJJJJJJJJJJMJJJJ",
+    "JMMMMMMJJiiiiJiiiiiiJJiJiiiiiJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJJJJJiiiiiiiiiJiiiiJiiiiMJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJJJJJJJJJJJMJJJJ",
+    "JJMMMMMJJJJJJJJJJJJJJJJJJJJJMJJJJJJJJJJJJJJMJJJJ",
+    "JJMMMMMJJJJJJJJJJJJJJJJJJJJJMJJJJJJJJJJJJJJMJJJJ",
+    "JJMMMMMJJJJJJJJJJJJJMMMMMMMMMMMMMJJJJJJJJJJMJJJJ",
+    "JJJJMJJJJJJJJJJJJJJJMMMMMMMMMMMMMJJJJJJJJJJMJJJJ",
+    "JJJJMJJJJJJJJJJJJJJJMMMMMMMMMMMMMJJJJJJJJJJMJJJJ",
+    "JJJJMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMJJJJ",
+    "JJJJMJJJJJJJJJJJJJJJMMMMMMMMMMMMMJJJJJJJJJJMJJJJ",
+    "JJJJMJJJJJJJJJJJJJJJMMMMMMMMMMMMMJJJJJJJJJJMJJJJ",
+    "JJJJMJJJJJJJJJJJJJJJMMMMMMMMMMMMMJJJJJJJJJJMJJJJ",
+    "JJJJMJJJJJJJJJJJJJJJJJJJJJMJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJMJJJJJJJJJJJJJJJJJJJJJMJJJJJJJJJJJJJJJJMJJJJ",
+    "JJMMMMMMJJJJJJJJJJJJJJJJJJMJJJJJJJJJJJJJMMMMMMJJ",
+    "JJMMMMMMJJJJJJJJJJJJJJJJJJMJJJJJJJJJJJJJMMMMMMJJ",
+    "JJMMMMMMJJJJJJJJJJJJJJJJJJMJJJJJJJJJJJJJMMMMMMJJ",
+    "JJMMMMMMJJJJJJJJJJJJJJJJJJMJJJJJJJJJJJJJMMMMMMJJ",
+    "JJMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMJJ",
+    "JJMMMMMMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMMMMMMJJ",
+    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
+    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ"],
+    objs:[["hidane", 26, 33], ["saidan", 2, 2, 1, 1, "shokuNW"], ["saidan", 45, 2, 1, 1, "shokuNE"], ["saidan", 2, 45, 1, 1, "shokuSW"], ["saidan", 45, 45, 1, 1, "shokuSE"], ["barrier", 24, 9, 3, 1, "kairouDone"], ["takara", 25, 3, 1, 1, "kairouT"], ["ring", 3, 30], ["ring", 5, 13], ["ring", 31, 32], ["ring", 41, 10], ["kakejiku", 3, 22]],
+    warps:{"0,24": {"to": "mayoiga", "x": 16, "y": 11, "dir": "left"}},
+    items:{"22,36": "tea", "31,36": "drink", "6,26": "saino", "29,7": "kakusei", "21,7": "tenpu"},
+    rings:[[3, 30, 5, 13], [31, 32, 41, 10]],
+    npcs:[{"id": "warashi2", "x": 5, "y": 23, "dir": "down", "look": "warashi", "lines": [["座敷わらし", "……ここは、うらのおやしき。"], ["座敷わらし", "ろうかはつるつる。すべったら、とまれないよ。"], ["座敷わらし", "まんなかのおにびを、よっつのすみのしょくだいへ。ひは、とおくまでもたないから、ちかみちをさがしてね。"]]}],
+    spawn:{"x": 1, "y": 24, "dir": "right"}},
   /* ---- 流氷岬 ---- */
   ryuhyo:{town:'ryuhyo',name:'流氷岬',ground:'snow',fish:{lv:[56,62],table:[['wakasagin',3],['hoyaboya',2],['gomafu',1.5],['kooriyuurei',1,'n'],['rurione',.4]]},
     rows:[
@@ -1114,7 +1390,7 @@ const OWC={bg:{},img:{},raf:0,cv:null,ctx:null,held:null,dash:false,mv:null,anim
 function owMap(){return MAPS[state.ow&&state.ow.map];}
 function owNpcs(m){return (m.npcs||[]).filter(n=>(n.ura?state.boss[m.town]&&!state.boss[m.town+'_ura']:!(n.look==='boss'&&state.boss[m.town]))&&!(n.night&&state.time!==3)&&!(n.eve&&state.time<2)&&!(n.need&&!owFlag(n.need))&&!(n.room&&n.room!==OWC.room));}
 const owObjOn=o=>!o[7]||o[7]===OWC.room;
-const OW_DYN=['hyouheki','light','lever','shutter','panel','chest','jizo','toro','barrier','zen','kakejiku','kaguya','takibi','point','power','saidan','hidane'];
+const OW_DYN=['takara','hyouheki','light','lever','shutter','panel','chest','jizo','toro','barrier','zen','kakejiku','kaguya','takibi','point','power','saidan','hidane'];
 function owPaint(m,ti){
   const P=OW_PALS[ti],W=m.rows[0].length,Hh=m.rows.length,cv=document.createElement('canvas');cv.width=W*TS;cv.height=Hh*TS;const x0=cv.getContext('2d');
   let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;},rr=n=>Math.floor(rnd()*n);
@@ -1180,9 +1456,22 @@ function owPaint(m,ti){
     if(ch==='O'){vG(x,y);E(x+8,y+9,7,6,'crust2');E(x+8,y+9,6,5,'lava');E(x+7,y+8,3,2,'lava3');return true;}
     if(ch==='r'){vG(x,y);E(x+8,y+10,7,5,'basalt');E(x+7,y+8,6,5,'basalt2');E(x+6,y+6,3,2,'basalt3');return true;}
     return false;};
+  /* 奥地のしかけのタイル(森・地下・海・山・屋敷) */
+  const gimTile=(ch,i,j,x,y)=>{
+    const wat=()=>{if(m.ground==='sand'){R(x,y,TS,TS,'sea');if((i+j)%3===0)R(x+3,y+6,5,1,'sea2');}else{R(x,y,TS,TS,'water');if((i+j)%2)R(x+3,y+5,5,1,'water2');}};
+    if(ch==='a'||ch==='v'){const on=ch==='a'?ti<2:ti>=2;wat();if(on){if(ch==='a'){E(x+8,y+9,7,5,'#3e8a44');E(x+8,y+8,6,4,'#6ac060');R(x+8,y+4,1,5,'#3e8a44');px(x+11,y+6,'#f6c0d8');}else{E(x+8,y+9,6,4,'#283848');E(x+8,y+8,5,3,'#3a5068');px(x+5,y+5,'#e8ff8a');px(x+11,y+7,'#e8ff8a');px(x+8,y+3,'#f4ffc0');}}return true;}
+    if(ch==='i'){R(x,y,TS,TS,'#c89a5a');R(x,y,TS,1,'#a87a40');R(x+2+((i*5)%8),y+4,5,1,'#f0d8a0');R(x+4+((j*3)%7),y+11,6,1,'#e4c080');return true;}
+    if(ch==='?'){if(m.ground==='sand'){R(x,y,TS,TS,'sea');R(x,y+1,TS,14,'#7a5a38');for(let a=0;a<16;a+=4)R(x+a,y+1,1,14,'#4a3420');R(x+5,y+6,3,2,'#2a1c10');px(x+11,y+10,'#2a1c10');}
+      else{R(x,y,TS,TS,'#9fb4cf');R(x+1,y+1,14,13,'#8a8a92');R(x+2,y+2,12,10,'#a4a4ac');R(x+5,y+4,1,5,'#5a5a64');R(x+6,y+8,4,1,'#5a5a64');R(x+10,y+3,1,3,'#5a5a64');}return true;}
+    if(ch==='^'){under(x,y);[[4,4],[10,6],[6,11]].forEach(([a,b])=>{R(x+a,y+b,4,1,'#e8f4ff');R(x+a+1,y+b-1,2,1,'#c8e0f4');});E(x+8,y+9,6,3,'rgba(255,255,255,.25)');return true;}
+    if(ch==='+'||ch==='c'){R(x,y,TS,TS,ch==='c'?'#5a5a64':'#22242e');const h='+c'.includes(at(i-1,j))||'+c'.includes(at(i+1,j)),v='+c'.includes(at(i,j-1))||'+c'.includes(at(i,j+1));
+      if(h){for(let a=1;a<16;a+=5)R(x+a,y+3,2,10,'#5a3a24');R(x,y+4,TS,1,'#9a9aa4');R(x,y+11,TS,1,'#9a9aa4');}if(v){for(let b=1;b<16;b+=5)R(x+3,y+b,10,2,'#5a3a24');R(x+4,y,1,TS,'#9a9aa4');R(x+11,y,1,TS,'#9a9aa4');}return true;}
+    if(ch==='%'){R(x,y,TS,TS,'#9fb4cf');E(x+((i*5)%9)+4,y+((j*7)%8)+5,5,2,'#cfdcec');if((i+j)%3===0)E(x+10,y+12,4,2,'#e4ecf6');if(j>0&&at(i,j-1)!=='%'&&at(i,j-1)!=='?'){R(x,y,TS,3,'#6a6a72');R(x,y+3,TS,2,'#4a4a52');}return true;}
+    return false;};
   for(let j=0;j<Hh;j++)for(let i=0;i<W;i++){const ch=at(i,j),x=i*TS,y=j*TS;
     if(sn&&snowTile(ch,i,j,x,y))continue;
     if(vo&&volcTile(ch,i,j,x,y))continue;
+    if(!sn&&!vo&&'avi?^+c%'.includes(ch)&&gimTile(ch,i,j,x,y))continue;
     if('Gg.t*'.includes(ch)){if(ch==='.')under(x,y);else ground(x,y);}
     if(ch==='*')[[3,4,'flower1'],[10,3,'flower2'],[6,10,'flower2'],[12,11,'flower1']].forEach(([a,b,c])=>{R(x+a,y+b,2,2,c);px(x+a,y+b+2,gk[1]);});
     if(ch==='P'){R(x,y,TS,TS,'path');for(let k=0;k<4;k++)px(x+rr(16),y+rr(16),'path2');if(j>0&&!'P.'.includes(at(i,j-1)))R(x,y,TS,1,'path2');}
@@ -1343,7 +1632,7 @@ function owDraw(){
   c.setTransform(OWSCALE,0,0,OWSCALE,0,0);c.imageSmoothingEnabled=false;
   if(m.erupt&&m.ground==='volcano'&&owErupt(m)!=='calm'){const a=owErupt(m)==='rumble'?1:2;cx+=Math.round((Math.random()-.5)*a*2);cy+=Math.round((Math.random()-.5)*a);}
   c.fillStyle='#0c1120';c.fillRect(0,0,VW*TS,VH*TS);c.drawImage(bg,-cx,-cy);
-  if(m.ground==='volcano'||m.ground==='snow'){if(m.ground==='snow')owIceDraw(c,m,cx,cy,P);owVolcDraw(c,m,cx,cy,P,px,py);}
+  owIceDraw(c,m,cx,cy,P);owVolcDraw(c,m,cx,cy,P,px,py);
   if(OWC.goal&&OWC.path&&OWC.path.length){const gx=OWC.goal[0]*TS-cx,gy=OWC.goal[1]*TS-cy,a=.5+Math.sin(Date.now()/150)*.3;c.strokeStyle=`rgba(242,177,60,${a})`;c.lineWidth=1;c.strokeRect(gx+1.5,gy+1.5,TS-3,TS-3);}
   const F=(x,y,w,h,col)=>{c.fillStyle=P[col]||col;c.fillRect(x-cx,y-cy,w,h);};
   /* 状態で変わる物 */
@@ -1362,6 +1651,7 @@ function owDraw(){
       c.save();c.globalCompositeOperation='lighter';c.fillStyle=`rgba(255,150,60,${state.time>=2?.22:.1})`;c.beginPath();c.arc(X-cx+8,Y-cy+8,(state.time>=2?26:16)+Math.sin(Date.now()/160)*2,0,7);c.fill();c.restore();}
     if(k==='onsen'){c.fillStyle='rgba(240,248,255,.5)';for(let i=0;i<4;i++){const t=(Date.now()/1300+i*.25)%1;c.fillRect(Math.round(X-cx+4+i*(w*TS-8)/3+Math.sin(t*6+i)*2),Math.round(Y-cy+4-t*14),3,2);}}
     if(k==='hyouheki'&&!owFlag(flag)){for(let a=0;a<w;a++)for(let b=0;b<h;b++){const XX=X+a*TS,YY=Y+b*TS;F(XX,YY-6,TS,TS+6,'ice3');F(XX+1,YY-5,14,TS+3,'#a8dcf2');F(XX+3,YY-3,3,12,'ice2');F(XX+9,YY,2,9,'ice2');F(XX,YY-6,TS,2,'snow');}}
+    if(k==='takara'){const op=owFlag(flag);F(X+1,Y+4,14,11,'#8a5a1c');F(X+1,Y+(op?1:4),14,op?3:5,'#c88a2a');F(X+1,Y+9,14,1,'#f2c43a');F(X+7,Y+7,2,4,'#f2e08a');if(!op&&Math.floor(Date.now()/400)%2)F(X+12,Y+2,1,1,'#fff');}
     if(k==='point'){const on=owFlag(flag);F(X+3,Y+10,10,5,'basalt2');F(X+4,Y+11,8,3,'basalt3');F(on?X+9:X+5,Y+2,2,9,'rail');F(on?X+8:X+4,Y,4,3,on?'#5ac8f0':'#f2c43a');}
     if(k==='power'){const on=owFlag(flag);F(X+1,Y-4,14,19,'#5a5a64');F(X+3,Y-2,10,8,'outline');F(X+5,Y+(on?-1:3),6,2,'#e8402c');F(X+7,Y+(on?1:5),2,5,'rail');F(X+4,Y+8,8,1,on?'#5af08a':'#5a2a2a');}
     if(k==='saidan'){const on=owFlag(flag);F(X+1,Y+8,14,8,'basalt2');F(X+2,Y+6,12,3,'basalt3');F(X+4,Y+3,8,4,'crust2');if(on){const fl=Math.floor(Date.now()/110)%3;F(X+5,Y-6+fl,6,9-fl,'lava');F(X+6,Y-3+fl,4,5,'lava3');c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,140,50,.2)';c.beginPath();c.arc(X-cx+8,Y-cy,16,0,7);c.fill();c.restore();}}
@@ -1421,21 +1711,21 @@ function owVolcStep(m){
   const o=state.ow,here=(m.rows[o.y]||'')[o.x],k=o.x+','+o.y;
   if(OWC.fly){OWC.fly.t+=dt/750;if(OWC.fly.t>=1){const f=OWC.fly;OWC.fly=null;o.x=f.tx;o.y=f.ty;sfx('sel');owArrive();}return true;}
   if(OWC.ride)return false;
-  if(m.ground==='snow'&&owIceStep(m,now))return true;
+  if(owIceStep(m,now))return true;
   if(!OWC.mv){
     if((here==='&'||here==='$')&&owFlow(here)==='flow'){owBurn(m,'足もとに溶岩が流れこんできた！');return true;}
     if(here==='!'&&owVent(o.x,o.y)==='on'){owScald(m);return true;}
-    if(here==='^'&&owGeyser()==='on'&&m.jumps&&m.jumps[k]){const [tx,ty]=m.jumps[k];OWC.fly={fx:o.x,fy:o.y,tx,ty,t:0};OWC.held=null;owCancelPath();sfx('shiny');ui.toast='ドドドド……ブシャアアッ！ 間欠泉に吹き飛ばされた！';render();return true;}
-    if(here==='?'&&owBroken(o.x,o.y)){owFallLava(m);return true;}
+    if(here==='^'&&owGeyser()==='on'&&m.jumps&&m.jumps[k]){const [tx,ty]=m.jumps[k];OWC.fly={fx:o.x,fy:o.y,tx,ty,t:0};OWC.held=null;owCancelPath();sfx('shiny');ui.toast=m.ground==='volcano'?'ドドドド……ブシャアアッ！ 間欠泉に吹き飛ばされた！':'ゴオオッ！ 天狗風に乗って、空を飛んだ！';render();return true;}
+    if(here==='?'&&owBroken(o.x,o.y)){if(m.ground==='volcano')owFallLava(m);else if(m.ground==='sand')owSeaFall(m,'バキバキッ！ くさった床板がぬけて、海に落ちた！');else owCliff(m,'ガラガラッ……！ 足場が崩れて、崖から落ちた！');OWC.crumb={};return true;}
   }
   /* 噴石 */
   const er=owErupt(m);OWC.bombs=OWC.bombs||[];
-  if(er==='rumble'&&!OWC.rumbleMsg){OWC.rumbleMsg=true;ui.toast=m.erupt.kind==='icicle'?'ピキ……ピキピキ……！ 天井のつららがきしんでいる。落ちてくるぞ！':'ゴゴゴゴ……！ 山が鳴っている。噴石が来るぞ！';render();}
+  if(er==='rumble'&&!OWC.rumbleMsg){OWC.rumbleMsg=true;ui.toast=m.erupt.kind==='rock'?'ガラ……ガラガラ……！ 上の岩場がくずれそうだ。落石が来るぞ！':m.erupt.kind==='icicle'?'ピキ……ピキピキ……！ 天井のつららがきしんでいる。落ちてくるぞ！':'ゴゴゴゴ……！ 山が鳴っている。噴石が来るぞ！';render();}
   if(er==='calm')OWC.rumbleMsg=false;
   if(er==='erupt'&&now>(OWC.bombT||0)){OWC.bombT=now+(m.erupt.every||330);
     let tx,ty,tries=0;do{if(Math.random()<.35){const [dx,dy]=OWD[o.dir];tx=o.x+(Math.random()<.5?dx:0);ty=o.y+(Math.random()<.5?dy:0);}else{tx=o.x+Math.floor(Math.random()*9)-4;ty=o.y+Math.floor(Math.random()*9)-4;}tries++;}while(tries<6&&(OW_SOLID.includes((m.rows[ty]||'t')[tx]||'t')));
     OWC.bombs.push({x:tx,y:ty,t0:now,land:now+1150});}
-  for(const b of OWC.bombs){if(!b.hit&&now>=b.land){b.hit=true;if(b.x===o.x&&b.y===o.y&&!OWC.ride&&now>(OWC.bombHit||0)){OWC.bombHit=now+700;owHurt(.07);OWC.stuck=now+380;OWC.held=null;owCancelPath();sfx('sel');ui.toast=m.erupt.kind==='icicle'?'ガシャーン！ つららが直撃した！(なかまのHPが減った)':'ドゴォン！ 噴石が直撃した！(なかまのHPが減った)';render();}}}
+  for(const b of OWC.bombs){if(!b.hit&&now>=b.land){b.hit=true;if(b.x===o.x&&b.y===o.y&&!OWC.ride&&now>(OWC.bombHit||0)){OWC.bombHit=now+700;owHurt(.07);OWC.stuck=now+380;OWC.held=null;owCancelPath();sfx('sel');ui.toast=m.erupt.kind==='rock'?'ゴツン！ 落石が直撃した！(なかまのHPが減った)':m.erupt.kind==='icicle'?'ガシャーン！ つららが直撃した！(なかまのHPが減った)':'ドゴォン！ 噴石が直撃した！(なかまのHPが減った)';render();}}}
   OWC.bombs=OWC.bombs.filter(b=>now<b.land+450);
   /* 追ってくる溶岩 */
   const ch=m.chase;
@@ -1467,6 +1757,7 @@ function owRideNext(m){
 /* 火種: 火を運んで祭壇に灯す */
 function owTorchOut(){if(state.owTorch>0){state.owTorch=0;return true;}return false;}
 function owSaidan(m,flag){
+  if(m.ground!=='volcano'){if(owFlag(flag)){talk([['','燭台に、青白い火がともっている。']]);return;}if(!(state.owTorch>0)){talk([['','古い燭台だ。ろうそくに火はついていない。'],['','そえ書き「四すみの燭台に鬼火をともせば、奥の間ひらく」']]);return;}state.owTorch=0;owSetFlag(flag);const al=m.saidan.every(owFlag);sfx(al?'win':'shiny');if(al)owSetFlag(m.saidanDone);save();talk(al?[['','燭台に火をともした！'],['','四つの火がそろった……。どこかで、ふすまの開く音がした。']]:[['','運んできた鬼火で、燭台に火をともした！'],['',`(のこりの燭台: ${m.saidan.filter(f=>!owFlag(f)).length})`]]);return;}
   if(owFlag(flag)){talk([['','祭壇に、あかあかと火が燃えている。']]);return;}
   if(!(state.owTorch>0)){talk([['','古い石の祭壇だ。火をともす皿がある。'],['','そえ書き「四方の祭壇に、山の火をささげよ」']]);return;}
   state.owTorch=0;owSetFlag(flag);const all=m.saidan.every(owFlag);sfx(all?'win':'shiny');if(all)owSetFlag(m.saidanDone);save();
@@ -1475,13 +1766,13 @@ function owVolcDraw(c,m,cx,cy,P,px,py){
   const VH=OWC.vh,x0=Math.max(0,Math.floor(cx/TS)),y0=Math.max(0,Math.floor(cy/TS)),x1=Math.min(m.rows[0].length-1,x0+VW+1),y1=Math.min(m.rows.length-1,y0+VH+1),now=Date.now();
   const F=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x-cx,y-cy,w,h);};
   for(let j=y0;j<=y1;j++)for(let i=x0;i<=x1;i++){const ch=m.rows[j][i],X=i*TS,Y=j*TS;
-    if(ch==='%'){const t=(now/260+i*1.7+j*2.3);if(Math.sin(t)>.55)F(X+((i*5+j*3)%11)+1,Y+((i*3+j*7)%11)+2,3,1,P.lava3);if(Math.sin(t*1.3+2)>.75)F(X+((i*7)%9)+3,Y+((j*5)%9)+4,2,2,P.lava2);}
+    if(ch==='%'&&m.ground==='volcano'){const t=(now/260+i*1.7+j*2.3);if(Math.sin(t)>.55)F(X+((i*5+j*3)%11)+1,Y+((i*3+j*7)%11)+2,3,1,P.lava3);if(Math.sin(t*1.3+2)>.75)F(X+((i*7)%9)+3,Y+((j*5)%9)+4,2,2,P.lava2);}
     else if(ch==='&'||ch==='$'){const s=owFlow(ch);
       if(s==='flow'){F(X,Y,TS,TS,P.lava);const t=now/200+i+j;F(X+((Math.floor(t)*3)%12),Y+((j*5)%12)+1,4,1,P.lava3);F(X+2,Y+((Math.floor(t*1.5)+i)%14),3,1,P.lava2);}
       else if(s==='warn'){const a=.25+Math.abs(Math.sin(now/120))*.4;c.fillStyle=`rgba(255,110,40,${a})`;c.fillRect(X-cx,Y-cy,TS,TS);}}
     else if(ch==='!'){const s=owVent(i,j);if(s!=='off'){c.fillStyle=s==='on'?'rgba(240,246,252,.85)':'rgba(240,246,252,.35)';const h=s==='on'?18:6;for(let q=0;q<4;q++){const tt=(now/300+q*.25)%1;c.fillRect(X-cx+4+q*2+Math.sin(tt*6+q)*2,Y-cy+8-tt*h,4,3);}if(s==='on'){c.fillStyle='rgba(240,246,252,.4)';c.fillRect(X-cx+1,Y-cy-12,14,24);}}}
     else if(ch==='^'){const s=owGeyser();if(s==='warn'){c.fillStyle='rgba(240,246,252,.5)';const b=Math.floor(now/90)%2;c.fillRect(X-cx+5,Y-cy+5-b,6,4);}else if(s==='on'){c.fillStyle='rgba(235,245,255,.85)';const h=28+Math.sin(now/60)*4;c.fillRect(X-cx+4,Y-cy+10-h,8,h);c.fillStyle='rgba(235,245,255,.55)';c.fillRect(X-cx+1,Y-cy+12-h,14,6);c.fillRect(X-cx+2,Y-cy+6,12,6);}}
-    else if(ch==='?'){const b=OWC.crumb&&OWC.crumb[i+','+j];if(b){const d=performance.now()-b;if(d<1000){const sh=d>450?(Math.floor(now/50)%2?1:-1):0;F(X+sh,Y,TS,TS,P.basalt2);F(X+2+sh,Y+3,12,9,P.basalt3);c.strokeStyle=P.lava;c.lineWidth=.6;c.beginPath();c.moveTo(X-cx+3,Y-cy+4);c.lineTo(X-cx+8,Y-cy+8);c.lineTo(X-cx+13,Y-cy+5);c.moveTo(X-cx+8,Y-cy+8);c.lineTo(X-cx+7,Y-cy+13);c.stroke();}else if(d<9000){F(X,Y,TS,TS,P.lava);F(X+3,Y+5,4,1,P.lava3);F(X+9,Y+10,3,1,P.lava2);}}}
+    else if(ch==='?'){const b=OWC.crumb&&OWC.crumb[i+','+j];if(b){const d=performance.now()-b;if(d<1000){const sh=d>450?(Math.floor(now/50)%2?1:-1):0;F(X+sh,Y,TS,TS,P.basalt2);F(X+2+sh,Y+3,12,9,P.basalt3);c.strokeStyle=P.lava;c.lineWidth=.6;c.beginPath();c.moveTo(X-cx+3,Y-cy+4);c.lineTo(X-cx+8,Y-cy+8);c.lineTo(X-cx+13,Y-cy+5);c.moveTo(X-cx+8,Y-cy+8);c.lineTo(X-cx+7,Y-cy+13);c.stroke();}else if(d<9000){if(m.ground==='volcano'){F(X,Y,TS,TS,P.lava);F(X+3,Y+5,4,1,P.lava3);F(X+9,Y+10,3,1,P.lava2);}else{F(X,Y,TS,TS,m.ground==='sand'?P.sea:'#9fb4cf');}}}}
     else if(ch==='c'){if(!(OWC.ride&&state.ow.x===i&&state.ow.y===j)){F(X+1,Y+5,14,8,'#6a4a2a');F(X+2,Y+3,12,3,'#8a6a40');F(X+3,Y+13,3,3,'#1a1a1a');F(X+10,Y+13,3,3,'#1a1a1a');}}
   }
   if(m.points)for(const k in m.points){const [i,j]=k.split(',').map(Number);if(i<x0||i>x1||j<y0||j>y1)continue;const pt=m.points[k],sl=owFlag(pt.flag)?pt.b:pt.a,d=typeof sl==='string'?sl:(sl.down||Object.values(sl)[0]),[dx,dy]=OWD[d];F(i*TS+6,j*TS+6,4,4,'#f2c43a');F(i*TS+6+dx*5,j*TS+6+dy*5,4,4,'#f2c43a');F(i*TS+7+dx*8,j*TS+7+dy*8,2,2,'#fff2a0');}
@@ -1512,17 +1803,20 @@ function owAval(L){const len=L.y1-L.y0+1,sweep=len*85+500,t=(Date.now()+(L.off||
   if(t<ws)return {st:'idle'};if(t<ws+1600)return {st:'warn'};return {st:'sweep',front:L.y0+Math.floor((t-ws-1600)/85)};}
 function owSeaFall(m,msg){const o=state.ow,s=OWC.lastSafe&&OWC.lastSafe.map===o.map?OWC.lastSafe:{x:m.spawn.x,y:m.spawn.y};
   OWC.mv=null;OWC.held=null;OWC.slide=null;owCancelPath();OWC.crack=null;owHurt(.12);if(m.cold)state.owCold=Math.min(m.cold-1,(state.owCold||0)+15);o.x=s.x;o.y=s.y;sfx('sel');save();render();
-  talk([['',msg],['','つめたい海から、なんとかはい上がった……(なかまのHPが減って、体が冷えた)']]);}
+  talk([['',msg],['',m.ground==='snow'?'つめたい海から、なんとかはい上がった……(なかまのHPが減って、体が冷えた)':'ずぶぬれになって、岸にはい上がった……(なかまのHPが減った)']]);}
 function owCrevasse(m,msg){if(!owFireOK(state.owFire))state.owFire=null;const o=state.ow,f=state.owFire&&state.owFire.map===o.map?state.owFire:{x:m.spawn.x,y:m.spawn.y,dir:m.spawn.dir};
   OWC.mv=null;OWC.held=null;owCancelPath();owHurt(.15);if(m.cold)state.owCold=Math.min(m.cold-1,(state.owCold||0)+15);o.x=f.x;o.y=f.y;o.dir=f.dir||'down';sfx('sel');save();render();
   talk([['',msg],['','……気がつくと、焚き火のそばに寝かされていた。(なかまのHPが減った)']]);}
+function owCliff(m,msg){const o=state.ow,f=(OWC.lastRest&&OWC.lastRest.map===o.map&&OWC.lastRest)||m.spawn;OWC.mv=null;OWC.held=null;owCancelPath();OWC.crumb={};owHurt(.12);o.x=f.x;o.y=f.y;owTorchOut();sfx('sel');save();render();
+  talk([['',msg],['','……気がつくと、手前の道にたおれていた。(なかまのHPが減った)']]);}
 function owIceStep(m,now){
   const o=state.ow,here=(m.rows[o.y]||'')[o.x],k=o.x+','+o.y,chasing=OWC.chase&&OWC.chase.map===o.map;
   /* 流れる流氷: 乗っていると運ばれる */
   if(m.floats){OWC.fpos=OWC.fpos||{};for(let i=0;i<m.floats.length;i++){const f=m.floats[i],p=owFloatPos(f),old=OWC.fpos[i];OWC.fpos[i]=p;
       if(old&&(old[0]!==p[0]||old[1]!==p[1])&&!OWC.mv&&o.x>=old[0]&&o.x<old[0]+(f.w||1)&&o.y>=old[1]&&o.y<old[1]+(f.h||1)){const nx=o.x+p[0]-old[0],ny=o.y+p[1]-old[1];OWC.mv={fx:o.x,fy:o.y,t:0};o.x=nx;o.y=ny;OWC.carry=true;return false;}}}
   if(!OWC.mv){
-    if(here==='~'&&!owFloatAt(m,o.x,o.y)){owSeaFall(m,'ザブン！ 流氷からすべり落ちて、海に落ちた！');return true;}
+    if('~W'.includes(here)&&m.floats&&!owFloatAt(m,o.x,o.y)){owSeaFall(m,m.fallMsg||'ザブン！ 流氷からすべり落ちて、海に落ちた！');return true;}
+    if((here==='a'||here==='v')&&!owFloeOn(here)&&m.ground!=='snow'){owSeaFall(m,'足もとの道が消えて、水に落ちた！');return true;}
     if(owHole(o.x,o.y)){owSeaFall(m,'ザブン！ 割れた氷の穴に落ちた！');return true;}
   }
   /* シャチ */
@@ -1532,21 +1826,22 @@ function owIceStep(m,now){
       if(ok(o.x,o.y)&&Math.random()<.55)c=[o.x,o.y];else for(let t=0;t<12&&!c;t++){const x=o.x+Math.floor(Math.random()*7)-3,y=o.y+Math.floor(Math.random()*7)-3;if(ok(x,y))c=[x,y];}
       if(c)OWC.orcas.push({x:c[0],y:c[1],t0:now,hit:now+1500});}
     for(const a of OWC.orcas){if(!a.done&&now>=a.hit){a.done=true;OWC.holes=OWC.holes||{};OWC.holes[a.x+','+a.y]=now+6500;sfx('sel');
-        if(a.x===o.x&&a.y===o.y){owSeaFall(m,'ドバァッ！ 氷の下からシャチが突き上げてきた！');return true;}}}
+        if(a.x===o.x&&a.y===o.y){owSeaFall(m,m.orca.kind==='tako'?'バキィッ！ 甲板の下から、大ダコの足が突き上げてきた！':'ドバァッ！ 氷の下からシャチが突き上げてきた！');return true;}}}
     OWC.orcas=OWC.orcas.filter(a=>now<a.hit+700);}
   /* 雪崩 */
-  if(m.aval&&!OWC.mv)for(const L of m.aval){const s=owAval(L);if(s.st==='sweep'&&o.x>=L.x0&&o.x<=L.x1&&(o.y===s.front||o.y===s.front-1)&&now>(OWC.avT||0)){OWC.avT=now+1200;owHurt(.1);if(m.cold)state.owCold=Math.min(m.cold-1,(state.owCold||0)+10);OWC.held=null;owCancelPath();o.x=L.out.x;o.y=L.out.y;o.dir='up';sfx('sel');save();render();talk([['','ゴオオオオ……！！'],['','雪崩にのみこまれて、斜面の下まで押し流された！(なかまのHPが減った)']]);return true;}}
+  if(m.aval&&!OWC.mv)for(const L of m.aval){const s=owAval(L);if(s.st==='sweep'&&o.x>=L.x0&&o.x<=L.x1&&(o.y===s.front||o.y===s.front-1)&&now>(OWC.avT||0)){OWC.avT=now+1200;owHurt(.1);if(m.cold)state.owCold=Math.min(m.cold-1,(state.owCold||0)+10);OWC.held=null;owCancelPath();o.x=L.out.x;o.y=L.out.y;o.dir='up';sfx('sel');save();render();talk(m.avalKind==='rock'?[['','ガラガラガラ……！！'],['','落石にまきこまれて、沢の下まで転がり落ちた！(なかまのHPが減った)']]:[['','ゴオオオオ……！！'],['','雪崩にのみこまれて、斜面の下まで押し流された！(なかまのHPが減った)']]);return true;}}
   /* 地吹雪で押し流される */
-  if(m.windPush&&m.blizzard&&owBliz()==='storm'&&!OWC.mv&&m.windPush.includes(here)&&now>(OWC.windT||0)){OWC.windT=now+480;
-    const sh=OW_SOLID.includes((m.rows[o.y]||'')[o.x+1]||'t')&&(m.rows[o.y]||'')[o.x+1]!=='O';
+  if(m.windPush&&((m.blizzard&&owBliz()==='storm')||(m.gale&&owGust()==='gust'))&&!OWC.mv&&m.windPush.includes(here)&&now>(OWC.windT||0)){OWC.windT=now+480;
+    const sc=(m.rows[o.y]||'')[o.x+1]||'t',sh=OW_SOLID.includes(sc)&&sc!=='O'&&sc!=='%';
     if(!sh){const nx=o.x-1,nc=(m.rows[o.y]||'')[nx];
+      if(nc==='%'){owCliff(m,'ビュウウウッ！ 天狗風にあおられて、崖から足をふみ外した！');return true;}
       if(nc==='O'&&!(m.rocks&&owRocks(m).filled[nx+','+o.y])){owCrevasse(m,'ビュオオオッ！ 地吹雪にあおられて、クレバスに落ちてしまった！');return true;}
-      if(!owSolid(m,nx,o.y)){OWC.mv={fx:o.x,fy:o.y,t:0};o.x=nx;OWC.held=null;owCancelPath();if(now>(OWC.windMsg||0)){OWC.windMsg=now+2500;ui.toast='ビュオオオ！ 地吹雪に押し流される！ 木や岩のかげ(東側)に入ろう！';render();}}}}
+      if(!owSolid(m,nx,o.y)){OWC.mv={fx:o.x,fy:o.y,t:0};o.x=nx;OWC.held=null;owCancelPath();if(now>(OWC.windMsg||0)){OWC.windMsg=now+2500;ui.toast=m.gale?'ビュウウウ！ 天狗風に押し流される！ 岩のかげ(東側)に入ろう！':'ビュオオオ！ 地吹雪に押し流される！ 木や岩のかげ(東側)に入ろう！';render();}}}}
   return false;
 }
 function owIceDraw(c,m,cx,cy,P){
   const now=Date.now(),tn=performance.now(),VH=OWC.vh;const F=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x-cx,y-cy,w,h);};
-  if(m.floats)m.floats.forEach(f=>{const [px,py]=owFloatPos(f),X=px*TS,Y=py*TS,w=(f.w||1)*TS,h=(f.h||1)*TS;F(X+1,Y+3,w-2,h-2,P.floe2);F(X+1,Y+1,w-2,h-4,P.floe);F(X+3,Y+3,w-8,2,P.ice2);F(X+w-6,Y+h-7,3,2,P.snow2);
+  if(m.floats)m.floats.forEach(f=>{const [px,py]=owFloatPos(f),X=px*TS,Y=py*TS,w=(f.w||1)*TS,h=(f.h||1)*TS;if(m.ground==='snow'){F(X+1,Y+3,w-2,h-2,P.floe2);F(X+1,Y+1,w-2,h-4,P.floe);F(X+3,Y+3,w-8,2,P.ice2);F(X+w-6,Y+h-7,3,2,P.snow2);}else{F(X+1,Y+3,w-2,h-3,'#4a3420');F(X+1,Y+1,w-2,h-4,'#8a6a40');for(let a=4;a<w-2;a+=5)F(X+a,Y+1,1,h-4,'#5a4028');F(X+2,Y+2,w-4,1,'#a88a58');}
     c.fillStyle='rgba(255,255,255,.5)';const r=(now/200)%6;c.fillRect(X-cx-1-r/3,Y-cy+h/2,1,2);c.fillRect(X-cx+w+r/3,Y-cy+h/2-2,1,2);});
   if(OWC.holes)for(const kk in OWC.holes){if(tn>=OWC.holes[kk])continue;const [hx,hy]=kk.split(',').map(Number);F(hx*TS,hy*TS,TS,TS,P.isea);F(hx*TS+2,hy*TS+2,12,12,P.crack);F(hx*TS+4,hy*TS+5,6,2,P.isea2);}
   for(const a of OWC.orcas||[]){const X=a.x*TS-cx,Y=a.y*TS-cy;
@@ -1554,7 +1849,7 @@ function owIceDraw(c,m,cx,cy,P){
     else{const p=(tn-a.hit)/700;c.fillStyle='#1a1a24';c.beginPath();c.ellipse(X+8,Y+4-p*6,5,7,0,0,7);c.fill();c.fillStyle='#f2f2f2';c.fillRect(X+5,Y+4-p*6,6,3);c.fillStyle=`rgba(230,245,255,${.9-p})`;for(let q=0;q<6;q++)c.fillRect(X+8+Math.cos(q)*p*14,Y+6+Math.sin(q*1.7)*p*8-p*6,2,2);}}
   if(m.aval)for(const L of m.aval){const s=owAval(L),X0=L.x0*TS,Wd=(L.x1-L.x0+1)*TS;
     if(s.st==='warn'){c.fillStyle='rgba(255,255,255,.6)';for(let q=0;q<5;q++)c.fillRect(X0-cx+((q*37+now/9)%Wd),L.y0*TS-cy+((q*13+now/40)%14),2,2);}
-    if(s.st==='sweep'){const Y=s.front*TS;c.fillStyle='rgba(244,248,252,.95)';c.fillRect(X0-cx,Math.max(L.y0*TS,Y-TS*2)-cy,Wd,Y+TS-Math.max(L.y0*TS,Y-TS*2));
+    if(s.st==='sweep'){const Y=s.front*TS;c.fillStyle=m.avalKind==='rock'?'rgba(110,100,92,.95)':'rgba(244,248,252,.95)';c.fillRect(X0-cx,Math.max(L.y0*TS,Y-TS*2)-cy,Wd,Y+TS-Math.max(L.y0*TS,Y-TS*2));
       c.fillStyle='rgba(255,255,255,.8)';for(let q=0;q<10;q++)c.fillRect(X0-cx+((q*29+now/5)%Wd),Y+TS-cy+((q*7+now/30)%10),3,2);c.fillStyle='rgba(200,215,230,.6)';c.fillRect(X0-cx,Y+TS-cy-2,Wd,2);}}
 }
 /* 雪: ふる雪・地吹雪・オーロラ */
@@ -1601,7 +1896,7 @@ const OWD={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
 function owSolid(m,x,y){
   const ch=(m.rows[y]||'')[x];if(ch===undefined)return true;
   if(owHole(x,y))return true;
-  if(ch==='O'&&m.rocks&&owRocks(m).filled[x+','+y]){}else if(ch==='~'&&m.floats&&owFloatAt(m,x,y)){}else if(OW_SOLID.includes(ch))return true;
+  if(ch==='O'&&m.rocks&&owRocks(m).filled[x+','+y]){}else if('~W'.includes(ch)&&m.floats&&owFloatAt(m,x,y)){}else if(OW_SOLID.includes(ch))return true;
   if(ch==='U'&&owTideHigh())return true;
   if((ch==='a'||ch==='v')&&!owFloeOn(ch))return true;
   if(ch==='?'&&owBroken(x,y))return true;
@@ -1640,7 +1935,7 @@ function owArrive(){
   const m=owMap(),o=state.ow,w=m.warps&&m.warps[o.x+','+o.y],here=m.rows[o.y][o.x];
   state.owSteps=(state.owSteps||0)+1;dailyInc('walk');if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
   if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];OWC.slide=null;OWC.crack=null;owVolcReset();owTorchOut();if(w.setFlag)owSetFlag(w.setFlag);if(!MAPS[w.to].cold)state.owCold=0;owCancelPath();ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
-  if(!'&$?!^~u'.includes(here)&&!owHole(o.x,o.y))OWC.lastSafe={map:o.map,x:o.x,y:o.y};
+  if(!'&$?!^~uWav'.includes(here)&&!owHole(o.x,o.y)){OWC.lastSafe={map:o.map,x:o.x,y:o.y};if(m.rest&&m.rest.includes(here))OWC.lastRest={map:o.map,x:o.x,y:o.y};}
   if(here==='?'){OWC.crumb=OWC.crumb||{};const ck=o.x+','+o.y,b=OWC.crumb[ck];if(!b||performance.now()-b>=9000)OWC.crumb[ck]=performance.now();}
   if(state.owTorch>0){state.owTorch--;if(!state.owTorch){ui.toast='火種が燃えつきてしまった……';render();}}
   if(m.cold&&here!=='i'&&!(OWC.chase&&OWC.chase.map===o.map)){if(owColdAdd(m,here==='y'?2:1))return;}
@@ -1670,7 +1965,7 @@ function owWarm(msg){state.owCold=0;OWC.coldWarn=false;const o=state.ow;state.ow
 /* 目ざめる場所(焚き火・湧き水)が、いまのマップでも正しいか確かめる。古いセーブの場所が壁の中になっていたら使わない */
 function owFireOK(f){if(!f||!MAPS[f.map])return false;const m=MAPS[f.map],c=(m.rows[f.y]||'')[f.x];if(c===undefined||OW_SOLID.includes(c)||'av~u?&$'.includes(c))return false;
   return m.objs.some(([k,x,y,w=1,h=1])=>(k==='takibi'||k==='izumi')&&f.x>=x-1&&f.x<=x+w&&f.y>=y-1&&f.y<=y+h);}
-function owStuck(m,o){const c=(m.rows[o.y]||'')[o.x];if(c===undefined)return true;if(c==='O')return !(m.rocks&&owRocks(m).filled[o.x+','+o.y]);if(c==='~')return m.ground!=='snow';return OW_SOLID.includes(c);}
+function owStuck(m,o){const c=(m.rows[o.y]||'')[o.x];if(c===undefined)return true;if(c==='O')return !(m.rocks&&owRocks(m).filled[o.x+','+o.y]);if(c==='~'||c==='W')return !(m.floats||m.ground==='snow');return OW_SOLID.includes(c);}
 function owFreeze(){
   if(!owFireOK(state.owFire))state.owFire=null;
   const m=owMap(),f=state.owFire&&MAPS[state.owFire.map].town===m.town?state.owFire:{map:m.town,...MAPS[m.town].spawn};
@@ -1719,7 +2014,7 @@ function owEncounter(fid){
   const t=TOWN[state.town],f=t.fields.find(x=>x.id===fid);if(!f)return;
   const n=Math.min(f.max,wpick([{w:6,v:1},{w:3,v:2},{w:1,v:3}]).v);
   const tb=f.table.filter(([,,tm])=>timeOK(tm,state.time)).map(([s,w])=>({w,s}));
-  const foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(f.lv[0],f.lv[1])]);
+  const up=(owMap()&&owMap().lvUp)||0,foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(f.lv[0],f.lv[1])+up]);
   const mrate=.035*((state.lure||0)>0?4:1);if(state.lure>0)state.lure--;
   if(Math.random()<mrate)foes[0]=[pick(TOWNS.indexOf(t)>=2?['haganetsubu','gintachi']:['haganetsubu','koganetsubu','koganetsubu']),ri(f.lv[0],f.lv[1])];
   ui.toast='';startBattle(foes,{field:`${t.name}・${f.name}`,scene:f.scene});
@@ -1763,6 +2058,8 @@ function owA(){
     if(kk==='point'){state.owFlags=state.owFlags||{};state.owFlags[flag]=!state.owFlags[flag];sfx('sel');save();talk([['','ポイントのレバーを切りかえた！'],['','ガシャン……どこかで線路の分かれ道が動いた。']]);return;}
     if(kk==='power'){if(owFlag(flag)){talk([['','動力のレバーは上がったままだ。遠くで機械がうなっている。']]);return;}owSetFlag(flag);sfx('win');save();talk([['','古い硫黄鉱山の、動力のレバーだ。'],['','力いっぱい引き上げた……！'],['','ゴウン、ゴウン……。谷じゅうのトロッコの線路に、電気が通った！']]);return;}
     if(kk==='izumi'){owWarm();sfx('heal');talk([['','岩のあいだから、冷たい湧き水が出ている。'],['','顔をあらって、ごくごく飲んだ。体の熱がひいていく……'],['','(暑さがなくなった。暑さでたおれたときは、ここで目をさます)']]);return;}
+    if(kk==='takara'){if(owFlag(flag)){talk([['','大きな宝箱は、もう空っぽだ。']]);return;}owSetFlag(flag);const tk=m.takara||{tenpu:1};Object.entries(tk).forEach(([it,n])=>{if(it==='yen')state.yen+=n;else state.items[it]=(state.items[it]||0)+n;});sfx('win');save();talk([['','奥地の大きな宝箱を開けた！'],['',Object.entries(tk).map(([it,n])=>it==='yen'?`${n}円`:`${ITEMS[it].n}×${n}`).join('、')+'を手に入れた！']]);return;}
+    if(kk==='hidane'&&m.ground!=='volcano'){state.owTorch=m.torch||40;sfx('shiny');talk([['','青白い鬼火が、ゆらゆらと燃えている。'],['','手燭に火をうつした！'],['',`(${m.torch||40}歩のあいだ、火を運べる)`]]);return;}
     if(kk==='hidane'){state.owTorch=m.torch||40;sfx('shiny');talk([['','地面の割れ目から、山の火が噴き出している。'],['','たいまつに火をうつした！'],['',`(${m.torch||40}歩のあいだ、火を運べる。噴気をあびると消える)`]]);return;}
     if(kk==='saidan'){owSaidan(m,flag);return;}
     if(kk==='kansoku'){talk([['','火山観測所だ。地震計の針が、ずっと小さくゆれている。']]);return;}
@@ -1849,7 +2146,7 @@ function owLoop(ts){
   if(m.wind&&owGust()==='gust'&&!OWC.mv&&m.rows[state.ow.y][state.ow.x]==='H'&&performance.now()>(OWC.pushT||0)){OWC.pushT=performance.now()+420;const o=state.ow,by=o.y+1;if(!owSolid(m,o.x,by)){OWC.mv={fx:o.x,fy:o.y,t:0};o.y=by;OWC.held=null;}}if(OWC.fish&&OWC.held){OWC.fish=null;ui.toast='釣りをやめた。';OWC.held=null;render();return;}
   if(m.cars&&owCarHit(m)){owCancelPath();const o=state.ow;const back=o.y<=7?6:9;OWC.mv=null;OWC.held=null;o.y=back;o.dir=back===6?'down':'up';OWC.stuck=performance.now()+500;sfx('sel');ui.toast='プップー！ 危ない！ 信号を守ろう。';render();return;}
   if(!OWC.mv&&!OWC.ride&&!OWC.fly&&owStuck(m,state.ow)){const sp=m.spawn;OWC.held=null;OWC.slide=null;owCancelPath();state.ow={map:state.ow.map,x:sp.x,y:sp.y,dir:sp.dir||'down'};if(!owFireOK(state.owFire))state.owFire=null;ui.toast='(動けない場所にいたので、入口へもどりました)';save();render();return;}
-  if((m.ground==='volcano'||m.ground==='snow')&&owVolcStep(m)){owDraw();return;}
+  if(owVolcStep(m)){owDraw();return;}
   if(OWC.ride){if(!OWC.mv)owRideNext(m);else{OWC.mv.t+=.24;if(OWC.mv.t>=1){OWC.mv=null;owRideNext(m);}}owDraw();return;}
   const hereT=(m.rows[state.ow.y]||'')[state.ow.x];
   const sp=OWC.slide?.2:hereT==='y'||(OWC.mv&&(m.rows[OWC.mv.fy]||'')[OWC.mv.fx]==='y')?.05:(OWC.dash||(OWC.chase&&OWC.chase.map===state.ow.map))?.17:.09;
