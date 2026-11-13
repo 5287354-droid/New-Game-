@@ -2137,6 +2137,12 @@ function owPaint(m,ti){
   if(ti>=2){const lamps=m.objs.filter(o=>o[0]==='lamp');x0.globalCompositeOperation='lighter';
     for(const [,x,y] of lamps){const cx=x*TS+8,cy=y*TS+12;[[26,.10],[16,.14],[8,.2]].forEach(([r,a])=>{x0.fillStyle=`rgba(255,200,110,${ti===3?a:a*.5})`;x0.beginPath();x0.arc(cx,cy,r,0,7);x0.fill();});}
     x0.globalCompositeOperation='source-over';}
+  /* 仕上げ: 壁や木の足もとに影を落として、奥行きを出す */
+  {const tall='tXJRBAhrVwqk',isT=(i,j)=>{const c=at(i,j);return c!==undefined&&tall.includes(c)||c==='.'},open=(i,j)=>{const c=at(i,j);return c!==undefined&&!isT(i,j)&&!'~W%'.includes(c);};
+    for(let j=0;j<Hh;j++)for(let i=0;i<W;i++){if(!open(i,j))continue;const x=i*TS,y=j*TS;
+      if(isT(i,j-1)){const g=x0.createLinearGradient(0,y,0,y+7);g.addColorStop(0,'rgba(8,10,24,.34)');g.addColorStop(1,'rgba(8,10,24,0)');x0.fillStyle=g;x0.fillRect(x,y,TS,7);}
+      if(isT(i-1,j)){const g=x0.createLinearGradient(x,0,x+4,0);g.addColorStop(0,'rgba(8,10,24,.2)');g.addColorStop(1,'rgba(8,10,24,0)');x0.fillStyle=g;x0.fillRect(x,y,4,TS);}
+      else if(isT(i-1,j-1)&&!isT(i,j-1)){x0.fillStyle='rgba(8,10,24,.12)';x0.fillRect(x,y,3,3);}}}
   return cv;
 }
 function owBg(m,ti){const k=state.ow.map+ti+(m.dark&&owFlag(m.dark)?'L':'');return OWC.bg[k]||(OWC.bg[k]=owPaint(m,ti));}
