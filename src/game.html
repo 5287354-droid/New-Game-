@@ -587,6 +587,7 @@ img,canvas{-webkit-user-drag:none;user-drag:none}
 .rword{background:var(--bg);border:1px solid var(--danger);border-radius:6px;padding:6px 10px;width:8em;font-size:16px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fusion{display:none}.gcard,.gtitle,.gbtns{opacity:1!important}.gstar,.gflash{display:none}}
 @media (max-width:480px){.top2 .loc-code{display:none}.top2 .loc{color:var(--ink,#eaeef7);font-size:14px}}
+.ow-back{align-self:center;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--muted);font-family:var(--f-disp);font-size:11px;line-height:1.25;text-align:center;cursor:pointer;touch-action:manipulation}.ow-back.on{border-color:#f2b13c;color:#f2b13c}
 /* スマホ: メニューのタブを1行におさめる(横スクロールで見切れないように) */
 @media (max-width:480px){.tabs{gap:4px;overflow:visible}.tabs .tab,.shell .tabs .tab{flex:1 1 auto;min-width:0;padding:8px 3px;font-size:12.5px;letter-spacing:0;white-space:nowrap}}
 </style>
@@ -4925,7 +4926,15 @@ function owToro(id){
   owSetFlag('kitsune');save();sfx('win');talk([['','四つの灯籠に、狐火がそろった！'],['','鳥居をふさいでいた結界が、すうっと消えていく……']]);
 }
 /* 押せる岩: マップに入るたびに元の位置にもどる */
-function owRocks(m){const id=state.ow.map;if(!OWC.rk||OWC.rk.map!==id)OWC.rk={map:id,rocks:(m.rocks||[]).map(r=>r.slice()),filled:{}};return OWC.rk;}
+/* うめた穴は、すべる氷塊の部屋をのぞいて、ずっとうまったまま(帰り道がなくならないように) */
+function owRocks(m){const id=state.ow.map;if(!OWC.rk||OWC.rk.map!==id)OWC.rk={map:id,rocks:(m.rocks||[]).map(r=>r.slice()),filled:m.rockSlide?{}:{...((state.owFilled||{})[id]||{})}};return OWC.rk;}
+function owKeepFill(m,k){if(m.rockSlide)return;state.owFilled=state.owFilled||{};(state.owFilled[state.ow.map]=state.owFilled[state.ow.map]||{})[k]=true;save();}
+/* 駅へもどる: どのマップからでも、町の駅の前へもどれる */
+function owBackToTown(){const m=owMap();if(!m||B||ui.dlg)return;
+  if(OWC.chase&&OWC.chase.map===state.ow.map){ui.owBack=false;ui.toast='いまは、にげるのに必死でもどれない！';render();return;}
+  if(OWC.ride||OWC.fly||OWC.slide)return;
+  if(!ui.owBack){ui.owBack=true;ui.toast='もう一度押すと、町の駅の前へもどります';render();return;}
+  const t=MAPS[m.town],sp=t.station||t.spawn;ui.owBack=false;OWC.mv=null;OWC.held=null;OWC.rk=null;OWC.crack=null;owCancelPath();owVolcReset();owTorchOut();state.owCold=0;state.ow={map:m.town,x:sp.x,y:sp.y,dir:sp.dir||'down'};sfx('sel');ui.toast=t.name+'の駅へもどった';save();render();}
 const owRockAt=(m,x,y)=>m.rocks?owRocks(m).rocks.findIndex(r=>r[0]===x&&r[1]===y):-1;
 /* ---- 移動 ---- */
 const OWD={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
@@ -4952,13 +4961,14 @@ function owTryMove(dir){
   if(m.mirror&&(dir==='left'||dir==='right'))dir=dir==='left'?'right':'left';
   if(m.noLook&&dir==='up'&&o.y>=m.noLook[0]&&o.y<=m.noLook[1]){OWC.held=null;OWC.mv=null;const nb=m.noLookTo||{x:5,y:2};state.ow={map:state.ow.map,x:nb.x,y:nb.y,dir:'down'};save();render();talk([['','思わず、後ろをふり返ってしまった……'],['',m.noLookMsg||'気がつくと、千本鳥居の入口に立っていた。']]);return;}
   if(OWC.ride||OWC.fly)return;
+  ui.owBack=false;
   o.dir=dir;if(performance.now()<OWC.stuck)return;const [dx,dy]=OWD[dir],nx=o.x+dx,ny=o.y+dy;
   if(OWC.fish){OWC.fish=null;ui.toast='釣りをやめた。';render();}
   if(m.wind&&owGust()==='gust'&&((m.rows[ny]||'')[nx]==='H'||(m.rows[o.y]||'')[o.x]==='H')){if(performance.now()>(OWC.windMsg||0)){OWC.windMsg=performance.now()+1500;ui.toast='ビュウウウ！ 風が強くて進めない！';render();}return;}
   const door=m.doors&&m.doors[nx+','+ny];if(door&&dir==='up'){OWC.held=null;owDoor(door);return;}
   const w=m.warps&&m.warps[nx+','+ny];if(w&&w.need&&!owFlag(w.need)){if(w.lock&&performance.now()>(OWC.lockMsg||0)){OWC.lockMsg=performance.now()+1500;OWC.held=null;talk([['',w.lock]]);}return;}
   const ri=owRockAt(m,nx,ny);if(ri>=0&&OWC.slide)return;if(ri>=0){const bx=nx+dx,by=ny+dy,RK=owRocks(m),bch=(m.rows[by]||'')[bx];
-    if(bch==='O'&&!RK.filled[bx+','+by]){RK.rocks.splice(ri,1);RK.filled[bx+','+by]=true;OWC.stuck=performance.now()+250;sfx('win');ui.toast='ズズン……！ 岩が穴にはまって、道ができた！';render();return;}
+    if(bch==='O'&&!RK.filled[bx+','+by]){RK.rocks.splice(ri,1);RK.filled[bx+','+by]=true;owKeepFill(m,bx+','+by);OWC.stuck=performance.now()+250;sfx('win');ui.toast='ズズン……！ 岩が穴にはまって、道ができた！';render();return;}
     if(!owSolid(m,bx,by)&&!(m.warps&&m.warps[bx+','+by])){let fx=bx,fy=by;
       if(m.rockSlide)while((m.rows[fy]||'')[fx]==='i'){const qx=fx+dx,qy=fy+dy,qc=(m.rows[qy]||'')[qx];if(qc==='O'&&!RK.filled[qx+','+qy]){RK.rocks.splice(ri,1);RK.filled[qx+','+qy]=true;OWC.stuck=performance.now()+250;sfx('win');ui.toast='ズズズ……ガコン！ 氷塊が穴にはまった！';render();return;}if(owSolid(m,qx,qy)||(m.warps&&m.warps[qx+','+qy]))break;fx=qx;fy=qy;}
       RK.rocks[ri]=[fx,fy];OWC.stuck=performance.now()+220;sfx('sel');}
@@ -5210,6 +5220,7 @@ function renderOverworld(){
       <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}</span></div>${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
     <div class="ow-pad">
       <div class="dpad">${['up','left','right','down'].map(d=>`<button class="dp dp-${d}" data-owdir="${d}" aria-label="${{up:'上',down:'下',left:'左',right:'右'}[d]}">${{up:'▲',down:'▼',left:'◀',right:'▶'}[d]}</button>`).join('')}<span class="dp-c"></span></div>
+      ${state.ow.map!==m.town?`<button class="ow-back${ui.owBack?' on':''}" data-act="owBack" aria-label="町の駅へもどる">${ui.owBack?'もう一度で<br>もどる':'駅へ<br>もどる'}</button>`:''}
       <div class="abtn"><button class="ob ob-b" data-owb="1" aria-label="Bボタン(押しているあいだ走る)">B</button><button class="ob ob-a" data-act="owA" aria-label="Aボタン(調べる・話す)">A</button></div>
     </div>
     <p class="small muted ow-help">マップをタップでその場所へ・押し続けると指の方へ歩く ・ 十字キーでも歩ける ・ Aで話す・調べる ・ Bで走る(キーボード: 矢印 / Z / X)</p>
@@ -6512,6 +6523,7 @@ const H={
   sound:()=>{state.sound=!state.sound;save();render();sfx('sel');},
   bgm:()=>{state.bgm=!state.bgm;if(state.bgm){try{bgmCtx().resume();}catch(e){}}else bgmStop(),BGM.cur=null;save();render();},
   owA:()=>owA(),
+  owBack:()=>owBackToTown(),
   fs:()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{});}catch(e){}},
   owLeave:()=>{ui.inside=null;sfx('sel');render();},
   owExit:()=>{ui.station=false;ui.inside=null;const s=MAPS[state.town].station;state.ow={map:state.town,x:s.x,y:s.y,dir:s.dir};sfx('sel');save();render();},
