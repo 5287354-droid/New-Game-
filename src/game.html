@@ -3354,7 +3354,7 @@ const MAPS={
     aval:[{"x0": 40, "x1": 42, "y0": 1, "y1": 9, "period": 7000, "off": 0, "out": {"x": 41, "y": 10}}, {"x0": 44, "x1": 46, "y0": 1, "y1": 9, "period": 8200, "off": 2500, "out": {"x": 45, "y": 10}}, {"x0": 50, "x1": 52, "y0": 1, "y1": 9, "period": 6400, "off": 4100, "out": {"x": 51, "y": 10}}, {"x0": 54, "x1": 56, "y0": 1, "y1": 9, "period": 7600, "off": 1200, "out": {"x": 55, "y": 10}}],
     npcs:[{"id": "matagi", "x": 18, "y": 4, "dir": "left", "look": "matagi", "gift": "tsuruhashi", "giftLines": [["マタギのじいさん", "……ん？ こんな奥まで、よう来たのう。"], ["じいさん", "流氷の海の氷山を越えたいとな。ならば、これを持っていけ。"], ["", "つるはしをもらった！ 氷の壁をくだけるようになった。"], ["じいさん", "氷山のほら穴は、氷の迷路じゃ。氷のかたまりは、押すと氷の上をどこまでもすべっていく。よく考えて押すことじゃ。"]], "lines": [["マタギのじいさん", "氷のかたまりは、押すとすべる。穴に落とせば道になる。"], ["じいさん", "つららが鳴りだしたら、足もとの影をよく見るんじゃぞ。"]]}, {"id": "deshi", "x": 55, "y": 46, "dir": "left", "look": "parka", "lines": [["マタギの弟子", "師匠はこの森のいちばん奥、凍った川の向こうの小屋にいます。"], ["弟子", "クレバスは、雪玉をころがし落とせば渡れます。雪玉はかべにつけたら動かせません。そのときは森を出なおしてください。"]]}],
     spawn:{"x": 62, "y": 44, "dir": "left"}},
-  hyoukai:{town:'ryuhyo',name:'流氷の海',field:'hyoukai',ground:'snow',enc:'Tyav',rate:.07,cold:110,floes:true,tideSafe:{x:10,y:5,dir:'down'},orca:{every:4500,chars:'iu'},chase:{style:'ice',done:'kaisho',speed:186,restart:{x:55,y:64,dir:'up'}},fish:{lv:[60,66],table:[['gomafu',3],['wakasagin',2],['hoyaboya',2],['todoroki',1],['kooriyuurei',1.5,'n'],['rurione',.6]]},
+  hyoukai:{town:'ryuhyo',name:'流氷の海',field:'hyoukai',ground:'snow',enc:'Tyav',rate:.07,cold:110,floes:true,tideSafe:{x:10,y:5,dir:'down'},orca:{every:4500,chars:'iu'},chase:{style:'ice',done:'kaisho',speed:250,restart:{x:55,y:64,dir:'up'}},fish:{lv:[60,66],table:[['gomafu',3],['wakasagin',2],['hoyaboya',2],['todoroki',1],['kooriyuurei',1.5,'n'],['rurione',.6]]},
     rows:[
     "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt",
     "tGyGGGGGGGyGGyGGTGGGGTyTGGGGGTGTGGGTGGGGGGGTGGGGGTTyGGyGGGGTTTGt",
@@ -3703,7 +3703,7 @@ const MAPS={
     points:{"34,24": {"flag": "pt1", "a": {"down": "down", "up": "left", "right": "down"}, "b": {"down": "left", "up": "up", "right": "up"}}, "34,12": {"flag": "pt2", "a": {"down": "down", "up": "up", "left": "up"}, "b": {"down": "right", "up": "right", "left": "down"}}},
     npcs:[{"id": "yuya", "x": 8, "y": 50, "dir": "right", "look": "obaa", "lines": [["湯治場のおかみ", "地獄谷は、とにかく暑いよ。湧き水でこまめに体を冷やしなさい。"], ["おかみ", "北の噴気の通り道は、蒸気のやむ間をよく見て、少しずつ進むんだよ。"]]}],
     spawn:{"x": 1, "y": 48, "dir": "right"}},
-  yougandou:{town:'hinoshima',name:'溶岩洞',field:'jigokudani',ground:'volcano',enc:'G',rate:.035,cold:80,heat:true,cave:true,chase:{done:'dasshutsu',speed:230,restart:{x:19,y:47,dir:'right'}},
+  yougandou:{town:'hinoshima',name:'溶岩洞',field:'jigokudani',ground:'volcano',enc:'G',rate:.035,cold:80,heat:true,cave:true,chase:{done:'dasshutsu',speed:270,restart:{x:19,y:47,dir:'right'}},
     rows:[
     "tttPtttttttttttttttttttttttttttttttttttttttt",
     "tGGGGGG%%%%%%%%%%%%%%%%%%%%%%%%%%%tttttttttt",
@@ -4272,7 +4272,7 @@ const MAPS={
     patrols:[{"path": [[14, 12], [30, 12]], "step": 300, "off": 0, "hold": 2, "kind": "hitodama"}, {"path": [[28, 21], [16, 21]], "step": 300, "off": 800, "hold": 2, "kind": "hitodama"}, {"path": [[16, 28], [28, 28]], "step": 300, "off": 400, "hold": 2, "kind": "hitodama"}],
     npcs:[{"id": "nushi", "x": 22, "y": 36, "dir": "up", "look": "boss", "sp": "yomotsuorochi", "text": "川の向こうの坂から、山のような大蛇がずるりと身をのり出した！"}],
     spawn:{"x": 22, "y": 1, "dir": "down"}},
-  sakanoue:{town:'yomi',name:'ひらさかの上',field:'sakanoue',ground:'yomi',enc:'T',rate:.08,cold:90,light:true,gale:true,windPush:'L',rest:'P',avalKind:'rock',chase:{style:'yomi',dir:'down',start:'machibi',done:'yomikaeri',speed:160,restart:{x:20,y:5,dir:'down'}},
+  sakanoue:{town:'yomi',name:'ひらさかの上',field:'sakanoue',ground:'yomi',enc:'T',rate:.08,cold:90,light:true,gale:true,windPush:'L',rest:'P',avalKind:'rock',chase:{style:'yomi',dir:'down',start:'machibi',done:'yomikaeri',speed:190,restart:{x:20,y:5,dir:'down'}},
     rows:[
     "tttttttttttttttttttttttttttttttttttttttt",
     "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
@@ -4795,8 +4795,8 @@ function owVolcStep(m){
   const ch=m.chase;
   if(ch&&(ch.start?owFlag(ch.start):state.boss[m.town])&&!owFlag(ch.done)){const dn=ch.dir==='down',y0=dn?0:m.rows.length-1;
     if(!OWC.chase||OWC.chase.map!==o.map){OWC.chase={map:o.map,y:y0,acc:-1500};OWC.held=null;owCancelPath();talk(ch.style==='yomi'?[['','……灯が、ふっとゆれた。'],['','坂の上の闇から、無数の黒い手がのびてくる！ 黄泉の者たちが目をさました！'],['','坂をかけ下りろ！ ふもとの鳥居まで、にげるんだ！'],['','(桃を持っていれば、Aで投げて追っ手を押しもどせる)']]:ch.style==='ice'?[['','ピシッ……ミシミシミシ……！！'],['','王者が暴れたせいで、氷原じゅうにひびが走った！'],['','南から氷がくずれてくる！ 北東の船着き場まで、にげろ！'],['','(必死で走る！ うすい氷は同じ所をふまないように)']]:[['','ゴゴゴゴゴ……！！'],['','火口のぬしが倒れたひょうしに、溶岩の流れが変わった！'],['','足もとから溶岩がせり上がってくる！ 東の抜け穴から、上へにげろ！'],['','(必死で走る！ 噴気孔に足を止められないように)']]);return true;}
-    OWC.chase.acc+=16.7;while(OWC.chase.acc>ch.speed){OWC.chase.acc-=ch.speed;OWC.chase.y+=dn?1:-1;}
-    if(dn?o.y<=OWC.chase.y:o.y>=OWC.chase.y){owHurt(.2);OWC.mv=null;OWC.held=null;owCancelPath();OWC.crumb={};const r=ch.restart;state.ow={map:o.map,x:r.x,y:r.y,dir:r.dir};OWC.chase={map:o.map,y:y0,acc:-1500};OWC.peach=0;OWC.momo={};sfx('sel');save();render();talk(ch.style==='yomi'?[['','黒い手に、足をつかまれた……！'],['','……気がつくと、坂の上の灯の下にたおれていた。'],['','(なかまのHPが減った。桃は、また坂に実っている)']]:ch.style==='ice'?[['','足もとの氷がくだけた……！'],['','つめたい海に投げ出された。……気がつくと、王者のいた氷の上にもどっていた。'],['','(なかまのHPが減った)']]:[['','溶岩に追いつかれた……！'],['','あつい……！ 気がつくと、火口のぬしがいた広間にもどっていた。'],['','(なかまのHPが減った)']]);return true;}
+    const spd=ch.speed*(1+.12*Math.min(5,(state.owFails||{})[o.map]||0));OWC.chase.acc+=16.7;while(OWC.chase.acc>spd){OWC.chase.acc-=spd;OWC.chase.y+=dn?1:-1;}
+    if(dn?o.y<=OWC.chase.y:o.y>=OWC.chase.y){state.owFails=state.owFails||{};state.owFails[o.map]=(state.owFails[o.map]||0)+1;owHurt(.2);OWC.mv=null;OWC.held=null;owCancelPath();OWC.crumb={};const r=ch.restart;state.ow={map:o.map,x:r.x,y:r.y,dir:r.dir};OWC.chase={map:o.map,y:y0,acc:-1500};OWC.peach=0;OWC.momo={};sfx('sel');save();render();talk(ch.style==='yomi'?[['','黒い手に、足をつかまれた……！'],['','……気がつくと、坂の上の灯の下にたおれていた。'],['','(なかまのHPが減った。桃は、また坂に実っている)']]:ch.style==='ice'?[['','足もとの氷がくだけた……！'],['','つめたい海に投げ出された。……気がつくと、王者のいた氷の上にもどっていた。'],['','(なかまのHPが減った)']]:[['','溶岩に追いつかれた……！'],['','あつい……！ 気がつくと、火口のぬしがいた広間にもどっていた。'],['','(なかまのHPが減った)']]);return true;}
   }
   return false;
 }
