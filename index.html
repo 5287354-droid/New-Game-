@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="de6cb473b9";</script>
+<script>window.JG_APP=true;window.JG_VER="2ac02745cd";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -3408,7 +3408,7 @@ const MAPS={
     floats:[{"path": [[34, 27], [22, 27]], "w": 2, "h": 2, "step": 650, "off": 0}, {"path": [[15, 31], [15, 40]], "w": 2, "h": 2, "step": 700, "off": 1800}, {"path": [[22, 30], [22, 36], [30, 36]], "w": 1, "h": 1, "step": 560, "off": 900}],
     npcs:[{"id": "nushi", "x": 55, "y": 65, "dir": "left", "look": "boss", "sp": "sakamata", "text": "氷原が大きくゆれた。巨大な背びれが、氷を切り裂いて浮かび上がる！"}, {"id": "gyofu", "x": 26, "y": 2, "dir": "down", "look": "parka", "lines": [["流氷の老漁師", "外海の氷原は、ぜんぶがすべる氷だ。いっぺんすべり出したら止まらねえ。"], ["老漁師", "その先のうすい氷の道は、同じ所を二度ふむと割れる。行き止まりに入りこむなよ。"], ["老漁師", "王者のねぐらは、いちばん南東の氷の上だ。"]]}, {"id": "azarashi", "x": 48, "y": 12, "dir": "down", "look": "kid", "lines": [["アザラシの観察者", "この小島は、夕方と夜の流氷でしか来られないの。"], ["観察者", "外海の流氷は、決まった道を行ったり来たりしているわ。乗る前に、どこへ行くのか見ておくといいよ。"]]}],
     spawn:{"x": 1, "y": 3, "dir": "right"}},
-  hyouketsu:{town:'ryuhyo',name:'氷山の洞窟',field:'hyoukai',ground:'snow',enc:'F',rate:.03,cold:90,cave:true,rockSlide:true,erupt:{kind:'icicle',cycle:15000,calm:9000,every:420},
+  hyouketsu:{town:'ryuhyo',name:'氷山の洞窟',field:'hyoukai',ground:'snow',enc:'F',rate:.03,cold:120,cave:true,rockSlide:true,erupt:{kind:'icicle',cycle:15000,calm:9000,every:420},
     rows:[
     "XXXXXFXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "XXXFFFFFFFFXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -3456,7 +3456,7 @@ const MAPS={
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXFFFFFFFFFFFXXXXXXX",
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXFXXXXXXXXXXXX",
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXFXXXXXXXXXXXX"],
-    objs:[["takibi", 9, 1], ["takibi", 38, 41], ["takibi", 10, 25]],
+    objs:[["takibi", 9, 1], ["takibi", 38, 41], ["takibi", 10, 25], ["takibi", 20, 10], ["takibi", 39, 17], ["takibi", 18, 21], ["takibi", 35, 37], ["modoshi", 7, 0, 1, 1]],
     warps:{"5,0": {"to": "hyoukai", "x": 32, "y": 16, "dir": "down"}, "35,45": {"to": "hyoukai", "x": 40, "y": 26, "dir": "down", "msg": "氷山を抜けて、外海に出た！"}},
     items:{"3,39": "tenpu", "11,38": "saino", "46,20": "drink"},
     rocks:[[15, 8], [8, 8], [30, 16], [32, 18], [31, 19]],
@@ -4376,7 +4376,7 @@ const OWC={bg:{},img:{},raf:0,cv:null,ctx:null,held:null,dash:false,mv:null,anim
 function owMap(){return MAPS[state.ow&&state.ow.map];}
 function owNpcs(m){return (m.npcs||[]).filter(n=>(n.ura?state.boss[m.town]&&!state.boss[m.town+'_ura']:!(n.look==='boss'&&state.boss[m.town]))&&!(n.night&&state.time!==3)&&!(n.eve&&state.time<2)&&!(n.need&&!owFlag(n.need))&&!(n.room&&n.room!==OWC.room));}
 const owObjOn=o=>!o[7]||o[7]===OWC.room;
-const OW_DYN=['tourou','coin','momo','tomoshibi','awa','takara','hyouheki','light','lever','shutter','panel','chest','jizo','toro','barrier','zen','kakejiku','kaguya','takibi','point','power','saidan','hidane'];
+const OW_DYN=['modoshi','tourou','coin','momo','tomoshibi','awa','takara','hyouheki','light','lever','shutter','panel','chest','jizo','toro','barrier','zen','kakejiku','kaguya','takibi','point','power','saidan','hidane'];
 function owPaint(m,ti){
   const P=OW_PALS[ti],W=m.rows[0].length,Hh=m.rows.length,cv=document.createElement('canvas');cv.width=W*TS;cv.height=Hh*TS;const x0=cv.getContext('2d');
   let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;},rr=n=>Math.floor(rnd()*n);
@@ -4672,6 +4672,7 @@ function owDraw(){
       c.save();c.globalCompositeOperation='lighter';c.fillStyle=`rgba(255,150,60,${state.time>=2?.22:.1})`;c.beginPath();c.arc(X-cx+8,Y-cy+8,(state.time>=2?26:16)+Math.sin(Date.now()/160)*2,0,7);c.fill();c.restore();}
     if(k==='onsen'){c.fillStyle='rgba(240,248,255,.5)';for(let i=0;i<4;i++){const t=(Date.now()/1300+i*.25)%1;c.fillRect(Math.round(X-cx+4+i*(w*TS-8)/3+Math.sin(t*6+i)*2),Math.round(Y-cy+4-t*14),3,2);}}
     if(k==='hyouheki'&&!owFlag(flag)){for(let a=0;a<w;a++)for(let b=0;b<h;b++){const XX=X+a*TS,YY=Y+b*TS;F(XX,YY-6,TS,TS+6,'ice3');F(XX+1,YY-5,14,TS+3,'#a8dcf2');F(XX+3,YY-3,3,12,'ice2');F(XX+9,YY,2,9,'ice2');F(XX,YY-6,TS,2,'snow');}}
+    if(k==='modoshi'){F(X+2,Y+2,12,12,'#2c5478');F(X+3,Y+3,10,10,'#3c6890');F(X+5,Y+5,6,1,'#d4f0fb');F(X+5,Y+8,4,1,'#d4f0fb');F(X+5,Y+11,6,1,'#d4f0fb');}
     if(k==='tourou'||k==='tomoshibi'){F(X+5,Y+11,6,5,'#6a6a72');F(X+7,Y+6,2,6,'#6a6a72');F(X+3,Y-2,10,8,'#7a7a84');F(X+2,Y-4,12,2,'#5a5a64');const fl=Math.floor(Date.now()/130)%2;F(X+5,Y,6,4,'#ffb040');F(X+6,Y+1-fl,4,2,'#fff0a0');c.save();c.globalCompositeOperation='lighter';c.fillStyle=k==='tomoshibi'?'rgba(255,190,90,.3)':'rgba(255,170,80,.2)';c.beginPath();c.arc(X-cx+8,Y-cy+2,(k==='tomoshibi'?26:18)+Math.sin(Date.now()/170)*2,0,7);c.fill();c.restore();}
     if(k==='coin'&&!owFlag(flag)){const b=Math.floor(Date.now()/350)%2;F(X+5,Y+7-b,6,6,'#c8a040');F(X+6,Y+8-b,4,4,'#f2d878');F(X+7,Y+9-b,2,2,'#8a6a20');}
     if(k==='momo'&&!(OWC.momo&&OWC.momo[x+','+y])){F(X+7,Y+6,2,10,'#6a4a2a');F(X+2,Y,12,8,'#3e8a4a');F(X+3,Y-2,10,3,'#4aa858');F(X+4,Y+3,4,4,'#ff9ab0');F(X+9,Y+1,4,4,'#ffb0c0');F(X+5,Y+3,1,1,'#fff');}
@@ -4941,7 +4942,9 @@ function owToro(id){
 }
 /* 押せる岩: マップに入るたびに元の位置にもどる */
 /* うめた穴は、すべる氷塊の部屋をのぞいて、ずっとうまったまま(帰り道がなくならないように) */
-function owRocks(m){const id=state.ow.map;if(!OWC.rk||OWC.rk.map!==id)OWC.rk={map:id,rocks:(m.rocks||[]).map(r=>r.slice()),filled:m.rockSlide?{}:{...((state.owFilled||{})[id]||{})}};return OWC.rk;}
+function owRocks(m){const id=state.ow.map;if(!OWC.rk||OWC.rk.map!==id){const sv=m.rockSlide&&state.owRk&&state.owRk[id];OWC.rk=sv?{map:id,rocks:sv.rocks.map(r=>r.slice()),filled:{...sv.filled}}:{map:id,rocks:(m.rocks||[]).map(r=>r.slice()),filled:m.rockSlide?{}:{...((state.owFilled||{})[id]||{})}};}return OWC.rk;}
+/* すべる氷塊の部屋: 氷塊の場所もおぼえておく(たおれても、解いたところからつづけられる) */
+function owKeepRk(m){if(!m.rockSlide||!OWC.rk)return;state.owRk=state.owRk||{};state.owRk[OWC.rk.map]={rocks:OWC.rk.rocks.map(r=>r.slice()),filled:{...OWC.rk.filled}};save();}
 function owKeepFill(m,k){if(m.rockSlide)return;state.owFilled=state.owFilled||{};(state.owFilled[state.ow.map]=state.owFilled[state.ow.map]||{})[k]=true;save();}
 /* 駅へもどる: どのマップからでも、町の駅の前へもどれる */
 function owBackToTown(){const m=owMap();if(!m||B||ui.dlg)return;
@@ -4982,10 +4985,10 @@ function owTryMove(dir){
   const door=m.doors&&m.doors[nx+','+ny];if(door&&dir==='up'){OWC.held=null;owDoor(door);return;}
   const w=m.warps&&m.warps[nx+','+ny];if(w&&w.need&&!owFlag(w.need)){if(w.lock&&performance.now()>(OWC.lockMsg||0)){OWC.lockMsg=performance.now()+1500;OWC.held=null;talk([['',w.lock]]);}return;}
   const ri=owRockAt(m,nx,ny);if(ri>=0&&OWC.slide)return;if(ri>=0){const bx=nx+dx,by=ny+dy,RK=owRocks(m),bch=(m.rows[by]||'')[bx];
-    if(bch==='O'&&!RK.filled[bx+','+by]){RK.rocks.splice(ri,1);RK.filled[bx+','+by]=true;owKeepFill(m,bx+','+by);OWC.stuck=performance.now()+250;sfx('win');ui.toast='ズズン……！ 岩が穴にはまって、道ができた！';render();return;}
+    if(bch==='O'&&!RK.filled[bx+','+by]){RK.rocks.splice(ri,1);RK.filled[bx+','+by]=true;owKeepFill(m,bx+','+by);owKeepRk(m);OWC.stuck=performance.now()+250;sfx('win');ui.toast='ズズン……！ 岩が穴にはまって、道ができた！';render();return;}
     if(!owSolid(m,bx,by)&&!(m.warps&&m.warps[bx+','+by])){let fx=bx,fy=by;
-      if(m.rockSlide)while((m.rows[fy]||'')[fx]==='i'){const qx=fx+dx,qy=fy+dy,qc=(m.rows[qy]||'')[qx];if(qc==='O'&&!RK.filled[qx+','+qy]){RK.rocks.splice(ri,1);RK.filled[qx+','+qy]=true;OWC.stuck=performance.now()+250;sfx('win');ui.toast='ズズズ……ガコン！ 氷塊が穴にはまった！';render();return;}if(owSolid(m,qx,qy)||(m.warps&&m.warps[qx+','+qy]))break;fx=qx;fy=qy;}
-      RK.rocks[ri]=[fx,fy];OWC.stuck=performance.now()+220;sfx('sel');}
+      if(m.rockSlide)while((m.rows[fy]||'')[fx]==='i'){const qx=fx+dx,qy=fy+dy,qc=(m.rows[qy]||'')[qx];if(qc==='O'&&!RK.filled[qx+','+qy]){RK.rocks.splice(ri,1);RK.filled[qx+','+qy]=true;owKeepRk(m);OWC.stuck=performance.now()+250;sfx('win');ui.toast='ズズズ……ガコン！ 氷塊が穴にはまった！';render();return;}if(owSolid(m,qx,qy)||(m.warps&&m.warps[qx+','+qy]))break;fx=qx;fy=qy;}
+      RK.rocks[ri]=[fx,fy];owKeepRk(m);OWC.stuck=performance.now()+220;sfx('sel');}
     return;}
   if(owSolid(m,nx,ny))return;
   const nch=(m.rows[ny]||'')[nx];if((nch==='&'||nch==='$')&&owFlow(nch)!=='crust'){OWC.lavaWait=true;if(performance.now()>(OWC.lavaMsg||0)){OWC.lavaMsg=performance.now()+1400;ui.toast='溶岩が流れている！ 冷えて固まるのを待とう。';render();}return;}
@@ -5118,6 +5121,7 @@ function owA(){
     if(kk==='hyouheki'&&!owFlag(flag)){if(!owFlag('tsuruhashi')){talk([['','分厚い氷の壁がふさいでいる。素手ではびくともしない。'],['','(つるはしがあれば、くだけそうだ)']]);return;}owSetFlag(flag);sfx('win');save();talk([['','つるはしをふりかぶった……！'],['','ガキィン！ ガキィン！ ……バリーン！'],['','氷の壁をくだいた！']]);return;}
     if(kk==='point'){state.owFlags=state.owFlags||{};state.owFlags[flag]=!state.owFlags[flag];sfx('sel');save();talk([['','ポイントのレバーを切りかえた！'],['','ガシャン……どこかで線路の分かれ道が動いた。']]);return;}
     if(kk==='power'){if(owFlag(flag)){talk([['','動力のレバーは上がったままだ。遠くで機械がうなっている。']]);return;}owSetFlag(flag);sfx('win');save();talk([['','古い硫黄鉱山の、動力のレバーだ。'],['','力いっぱい引き上げた……！'],['','ゴウン、ゴウン……。谷じゅうのトロッコの線路に、電気が通った！']]);return;}
+    if(kk==='modoshi'){if(!ui.rkAsk){ui.rkAsk=true;talk([['','氷の壁に、古い文字がきざまれている。'],['','「氷塊をはじめの場所にもどしたい者は、もう一度ここにふれよ」']]);return;}ui.rkAsk=false;if(state.owRk)delete state.owRk[state.ow.map];OWC.rk=null;sfx('sel');save();talk([['','ゴゴゴ……。洞窟じゅうの氷塊が、はじめの場所にもどった。']]);return;}
     if(kk==='tourou'){owWarm();sfx('heal');talk([['','石の灯籠に、あたたかい火がともっている。'],['','提灯に火をもらった。まわりが明るくなった！'],['','(灯がもどった。道を見失ったときは、ここへもどってくる)']]);return;}
     if(kk==='coin'&&!owFlag(flag)){owSetFlag(flag);sfx('win');save();const n=(m.fareAll||[]).filter(owFlag).length;talk([['','草のかげで、古い銭が光っている。'],['',`六文銭のかけらを拾った！(${n}/${(m.fareAll||[]).length})`]]);return;}
     if(kk==='momo'){OWC.momo=OWC.momo||{};if(OWC.momo[k])return;OWC.momo[k]=1;OWC.peach=(OWC.peach||0)+1;sfx('shiny');talk([['','坂のとちゅうに、桃の木が実をつけている。'],['',`桃をひとつ、もいだ。(${OWC.peach}こ)`],['','(追われているとき、Aで投げると追っ手を押しもどせる)']]);return;}
