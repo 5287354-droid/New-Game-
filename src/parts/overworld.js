@@ -2297,6 +2297,13 @@ function owDraw(){
   else if(OWC.ride){const X=Math.round(px-cx),Y=Math.round(py-cy);ents.push({y:py+1,draw:()=>{c.fillStyle='#6a4a2a';c.fillRect(X+1,Y+7,14,8);c.fillStyle='#8a6a40';c.fillRect(X+1,Y+7,14,2);c.fillStyle='#1a1a1a';c.fillRect(X+3,Y+14,3,2);c.fillRect(X+10,Y+14,3,2);}});}
   if(flyH){c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(px-cx+8,py-cy+14,5,2,0,0,7);c.fill();}
   ents.push({y:OWC.ride?py-2:py,draw:()=>owPerson(c,Math.round(px-cx),Math.round(py-cy-flyH)-(OWC.ride?5:1),'me',o.dir,mv?Math.floor(OWC.anim/6)%4===1||Math.floor(OWC.anim/6)%4===3?1:0:0)});
+  {const lead=state.party.find(x=>x.hp>0)||state.party[0];let F=OWC.fol;
+    if(!F||F.map!==o.map||Math.abs(F.x-o.x)+Math.abs(F.y-o.y)>2)F=OWC.fol={map:o.map,x:o.x,y:o.y,pend:null,fl:1};
+    if(mv&&F.pend&&(F.pend.x!==mv.fx||F.pend.y!==mv.fy)){F.x=F.pend.x;F.y=F.pend.y;F.pend=null;}
+    if(!mv&&F.pend){F.x=F.pend.x;F.y=F.pend.y;F.pend=null;}
+    let fx=F.x,fy=F.y;if(mv&&(mv.fx!==o.x||mv.fy!==o.y)){F.pend={x:mv.fx,y:mv.fy};fx=F.x+(mv.fx-F.x)*mv.t;fy=F.y+(mv.fy-F.y)*mv.t;if(mv.fx!==F.x)F.fl=mv.fx>F.x?-1:1;}
+    if(lead&&!OWC.ride&&!flyH&&(F.x!==o.x||F.y!==o.y||F.pend)){const im=owSpriteImg(lead.sp),X=Math.round(fx*TS-cx),Y=Math.round(fy*TS-cy),bob=mv?(Math.floor(OWC.anim/5)%2):0;
+      ents.push({y:fy*TS-1,draw:()=>{c.fillStyle='rgba(0,0,0,.28)';c.beginPath();c.ellipse(X+8,Y+14,6,2,0,0,7);c.fill();if(im.complete){c.save();c.translate(X+8,Y+4-bob);c.scale(F.fl,1);c.drawImage(im,-11,-11,22,22);c.restore();}}});}}
   ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
   const here=m.rows[o.y]&&m.rows[o.y][o.x];
   const lh=m.objs.find(x=>x[0]==='lighthouse');
@@ -2898,4 +2905,3 @@ function owResize(){
 window.addEventListener('resize',()=>owResize());
 if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>owResize());
 document.addEventListener('contextmenu',e=>{if(!/INPUT|TEXTAREA/.test(e.target.tagName))e.preventDefault();});
-
