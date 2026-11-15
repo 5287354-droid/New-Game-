@@ -737,7 +737,7 @@ const MAPS={
     aval:[{"x0": 12, "x1": 14, "y0": 45, "y1": 53, "period": 6000, "off": 0, "out": {"x": 13, "y": 54}}, {"x0": 24, "x1": 26, "y0": 45, "y1": 53, "period": 7000, "off": 2200, "out": {"x": 25, "y": 54}}, {"x0": 36, "x1": 38, "y0": 45, "y1": 53, "period": 5600, "off": 3900, "out": {"x": 37, "y": 54}}],
     npcs:[{"id": "tengu2", "x": 18, "y": 3, "dir": "down", "look": "fox", "lines": [["山の天狗", "ほう……ここまで登ってきたか。なかなかの足だ。"], ["天狗", "そこの箱は、修験をなしとげた者へのほうびだ。持っていくがよい。"], ["天狗", "帰りは、東の崩れ橋を一気にかけ下りよ。ふり返るでないぞ。"]]}],
     spawn:{"x": 1, "y": 50, "dir": "right"}},
-  kairou:{town:'mayoiga',name:'裏座敷・鬼火の回廊',field:'senbon',ground:'floor',enc:'M',rate:.035,lvUp:3,cave:true,torch:46,saidan:['shokuNW','shokuNE','shokuSW','shokuSE'],saidanDone:'kairouDone',takara:{tenpu:2,kakusei:2,yen:40000},
+  kairou:{town:'mayoiga',name:'裏座敷・鬼火の回廊',field:'senbon',ground:'floor',enc:'M',rate:.035,lvUp:3,cave:true,torch:64,saidan:['shokuNW','shokuNE','shokuSW','shokuSE'],saidanDone:'kairouDone',takara:{tenpu:2,kakusei:2,yen:40000},
     rows:[
     "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
     "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ",
@@ -754,11 +754,11 @@ const MAPS={
     "JJJMMMMMJJJJJJJJJJJJJJJJJMMMMMMMMMMJJJJJJJJMJJJJ",
     "JJJMMMMMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
     "JJJMMMMMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
-    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
-    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
-    "JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
-    "JJJJJJJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
-    "JJJJJJMMMMiJiiiiiJiiJiiiiiiJiJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJMJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJMMMMMiJiiiiiJiiJiiiiiiJiJJJJJJJJJJJJJJMJJJJ",
     "JJJJJJMJJiiiiiiiiiiiJiJiiiiiiJJJJJJJJJJJJJJMJJJJ",
     "JJJJJJMJJiiiiiiiiiiiiiJiiiiiJJJJJJJJJJJJJJJMJJJJ",
     "JMMMMMMJJiiiiJiiiiiiiiiiiJiiJJJJJJJJJJJJJJJMJJJJ",
@@ -791,7 +791,7 @@ const MAPS={
     warps:{"0,24": {"to": "mayoiga", "x": 26, "y": 17, "dir": "left"}},
     items:{"22,36": "tea", "31,36": "drink", "6,26": "saino", "29,7": "kakusei", "21,7": "tenpu"},
     rings:[[3, 30, 5, 13], [31, 32, 41, 10]],
-    npcs:[{"id": "warashi2", "x": 5, "y": 23, "dir": "down", "look": "warashi", "lines": [["座敷わらし", "……ここは、うらのおやしき。"], ["座敷わらし", "ろうかはつるつる。すべったら、とまれないよ。"], ["座敷わらし", "まんなかのおにびを、よっつのすみのしょくだいへ。ひは、とおくまでもたないから、ちかみちをさがしてね。"]]}],
+    npcs:[{"id": "warashi2", "x": 5, "y": 23, "dir": "down", "look": "warashi", "lines": [["座敷わらし", "……ここは、うらのおやしき。"], ["座敷わらし", "ろうかはつるつる。すべったら、とまれないよ。"], ["座敷わらし", "まんなかのおにびを、よっつのすみのしょくだいへ。ひは、とおくまでもたないから、ちかみちをさがしてね。"], ["座敷わらし", "ゆかの ひかる わっかに のると、とおくの へやへ とべるよ。きたの へやへは、げんかんの そばの ろうかからも いけるの。"]]}],
     spawn:{"x": 1, "y": 24, "dir": "right"}},
   /* ---- 流氷岬 ---- */
   ryuhyo:{town:'ryuhyo',name:'流氷岬',ground:'snow',fish:{lv:[56,62],table:[['wakasagin',3],['hoyaboya',2],['gomafu',1.5],['kooriyuurei',1,'n'],['rurione',.4]]},
@@ -2297,12 +2297,16 @@ function owDraw(){
   else if(OWC.ride){const X=Math.round(px-cx),Y=Math.round(py-cy);ents.push({y:py+1,draw:()=>{c.fillStyle='#6a4a2a';c.fillRect(X+1,Y+7,14,8);c.fillStyle='#8a6a40';c.fillRect(X+1,Y+7,14,2);c.fillStyle='#1a1a1a';c.fillRect(X+3,Y+14,3,2);c.fillRect(X+10,Y+14,3,2);}});}
   if(flyH){c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(px-cx+8,py-cy+14,5,2,0,0,7);c.fill();}
   ents.push({y:OWC.ride?py-2:py,draw:()=>owPerson(c,Math.round(px-cx),Math.round(py-cy-flyH)-(OWC.ride?5:1),'me',o.dir,mv?Math.floor(OWC.anim/6)%4===1||Math.floor(OWC.anim/6)%4===3?1:0:0)});
-  {const lead=state.party.find(x=>x.hp>0)||state.party[0];let F=OWC.fol;
-    if(!F||F.map!==o.map||Math.abs(F.x-o.x)+Math.abs(F.y-o.y)>2)F=OWC.fol={map:o.map,x:o.x,y:o.y,pend:null,fl:1};
-    if(mv&&F.pend&&(F.pend.x!==mv.fx||F.pend.y!==mv.fy)){F.x=F.pend.x;F.y=F.pend.y;F.pend=null;}
-    if(!mv&&F.pend){F.x=F.pend.x;F.y=F.pend.y;F.pend=null;}
-    let fx=F.x,fy=F.y;if(mv&&(mv.fx!==o.x||mv.fy!==o.y)){F.pend={x:mv.fx,y:mv.fy};fx=F.x+(mv.fx-F.x)*mv.t;fy=F.y+(mv.fy-F.y)*mv.t;if(mv.fx!==F.x)F.fl=mv.fx>F.x?-1:1;}
-    if(lead&&!OWC.ride&&!flyH&&(F.x!==o.x||F.y!==o.y||F.pend)){const im=owSpriteImg(lead.sp),X=Math.round(fx*TS-cx),Y=Math.round(fy*TS-cy),bob=mv?(Math.floor(OWC.anim/5)%2):0;
+  {/* 連れ歩き: 主人公が直前にいたマスを、同じ速さでたどる */
+    const lead=state.party.find(x=>x.hp>0)||state.party[0];let F=OWC.fol;
+    const moving=!!(mv&&(mv.fx!==o.x||mv.fy!==o.y)),ux=moving?mv.fx:o.x,uy=moving?mv.fy:o.y;
+    if(!F||F.map!==o.map)F=OWC.fol={map:o.map,cx:ux,cy:uy,px:ux,py:uy,fl:1};
+    if(F.cx!==ux||F.cy!==uy){const adj=Math.abs(F.cx-ux)+Math.abs(F.cy-uy)===1;F.px=adj?F.cx:ux;F.py=adj?F.cy:uy;F.cx=ux;F.cy=uy;}
+    const step=moving&&Math.abs(o.x-mv.fx)+Math.abs(o.y-mv.fy)===1,k=step?Math.max(0,Math.min(1,mv.t)):0;
+    const fx=F.px+(F.cx-F.px)*k,fy=F.py+(F.cy-F.py)*k;
+    if(step&&F.cx!==F.px)F.fl=F.cx>F.px?-1:1;
+    const hid=F.px===F.cx&&F.py===F.cy||(!moving&&F.px===o.x&&F.py===o.y);
+    if(lead&&!OWC.ride&&!flyH&&!hid){const im=owSpriteImg(lead.sp),X=Math.round(fx*TS-cx),Y=Math.round(fy*TS-cy),bob=step?(Math.floor(OWC.anim/5)%2):0;
       ents.push({y:fy*TS-1,draw:()=>{c.fillStyle='rgba(0,0,0,.28)';c.beginPath();c.ellipse(X+8,Y+14,6,2,0,0,7);c.fill();if(im.complete){c.save();c.translate(X+8,Y+4-bob);c.scale(F.fl,1);c.drawImage(im,-11,-11,22,22);c.restore();}}});}}
   ents.sort((a,b)=>a.y-b.y).forEach(e=>e.draw());
   const here=m.rows[o.y]&&m.rows[o.y][o.x];
