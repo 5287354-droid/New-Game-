@@ -127,7 +127,7 @@ const items = {
   },
   /* 寄り道ボーナス(段0〜5)ごとの1時間あたりの経験値・円、きらり、色違い(通常・きらり・星降り) */
   async bonus(page) {
-    const hours = N ? Math.max(1, Math.round(N / 200)) : 6, res = {};
+    const hours = N ? Math.max(1, Math.round(N / 200)) : 12, res = {};
     for (const [key, map, lv] of [['aze_lv5', 'komorebi', 5], ['urayama_lv8', 'urayama', 8], ['okumori_lv16', 'okumori', 16]]) {
       res[key] = {};
       for (const d of (map === 'komorebi' ? [0] : [0, 1, 2, 3, 5])) {
@@ -157,7 +157,7 @@ const items = {
     const total = cumP + gimmick.pts, totalT = (cumT + gimmick.sec) / 3600;
     const at = target => { const c = cum.find(x => x.p >= target); return c ? c.t : null; };
     const byTown = {}; rows.forEach(r => { const b = byTown[r.town] = byTown[r.town] || { maps: 0, blocks: 0, pts: 0, sec: 0 }; b.maps++; b.blocks += r.blocks; b.pts += r.pts; b.sec += r.sec; });
-    return { rows, cum, byTown, total, totalHours: totalT, ptsPerHour: total / totalT, hoursTo: { 15: at(15), 40: at(40), 80: at(80), 400: at(400), 1000: at(1000), 1500: at(1500), 2000: at(2000) }, order };
+    return { rows, cum, byTown, total, totalHours: totalT, ptsPerHour: total / totalT, hoursTo: { 15: at(15), 40: at(40), 80: at(80), 300: at(300), 400: at(400), 1000: at(1000), 2000: at(2000), 2500: at(2500), 3000: at(3000), 3500: at(3500) }, order };
   },
   /* 地域コンプにかかる時間(町ごと) */
   async region(page) {
@@ -171,7 +171,7 @@ const items = {
   },
   /* 負けの罰: 新ルール(1/4・上限つき)と旧ルール(1/2)の円のたまり方。こもれび町のぬしを倒したあとで測る */
   async penalty(page) {
-    const hours = N ? Math.max(1, Math.round(N / 200)) : 6, res = {};
+    const hours = N ? Math.max(1, Math.round(N / 200)) : 12, res = {};
     for (const [key, map, lv, party] of [['aze_lv5', 'komorebi', 5, 3], ['urayama_lv8', 'urayama', 8, 3], ['urayama_lv11', 'urayama', 11, 3], ['urayama_lv8_solo', 'urayama', 8, 1]]) {
       res[key] = {};
       for (const [label, old] of [['new', false], ['old', true]]) {
@@ -260,15 +260,15 @@ const items = {
 
 (async () => {
   if (!item || (item !== 'all' && !items[item])) { console.error('項目名: ' + Object.keys(items).join(' ') + ' all'); process.exit(1); }
-  const { browser, page } = await open();
   const list = item === 'all' ? ['opening', 'sequence', 'field', 'income', 'shiny', 'scout', 'metal', 'boss', 'wxfind', 'hoshiw', 'bonus', 'points', 'region', 'penalty', 'stars'] : [item];
   for (const it of list) {
     const t = Date.now();
+    const { browser, page } = await open(); /* 項目ごとに新しいページで測る(前の項目の状態を持ちこまない) */
     const r = await items[it](page);
     fs.writeFileSync(path.join(OUT, it + '.json'), JSON.stringify({ item: it, seed: SEED, n: N, params, result: r }, null, 1));
     console.log(`== ${it} (${((Date.now() - t) / 1000).toFixed(1)}s) -> ${path.join(OUT, it + '.json')}`);
     console.log(JSON.stringify(r, (k, v) => typeof v === 'number' ? Math.round(v * 1000) / 1000 : v).slice(0, 1500));
+    await browser.close();
   }
-  await browser.close();
   process.exit(0);
 })().catch(e => { console.error(e); process.exit(1); });

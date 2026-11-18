@@ -1,0 +1,36 @@
+{
+ "item": "metal",
+ "seed": 1,
+ "n": null,
+ "params": {
+  "STEP_S": 0.185,
+  "BATTLE_OVERHEAD_S": 2.4,
+  "AUTO_TURN_S": 0.35,
+  "REST_S": 40,
+  "REST_HP": 0.45,
+  "RAMP_S": 120,
+  "TOUR_X": 2,
+  "GRASS": 1,
+  "GAME": "src/game.html"
+ },
+ "result": {
+  "koganetsubu_lead8": {
+   "fled": 0.905,
+   "killed": 0.0925,
+   "lose": 0.0025,
+   "sec": 7.257324999999996
+  },
+  "haganetsubu_lead8": {
+   "fled": 0.94,
+   "killed": 0.045,
+   "lose": 0.015,
+   "sec": 7.7312249999999905
+  },
+  "haganetsubu_lead14": {
+   "fled": 0.95,
+   "killed": 0.0475,
+   "lose": 0.0025,
+   "sec": 7.867574999999985
+  }
+ }
+}

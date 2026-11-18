@@ -9,6 +9,7 @@
   "REST_S": 40,
   "REST_HP": 0.45,
   "RAMP_S": 120,
+  "TOUR_X": 2,
   "GRASS": 1,
   "GAME": "src/game.html"
  },
@@ -160,7 +161,7 @@
   "mexDay": [
    {
     "id": "star",
-    "stars": 10,
+    "stars": 5,
     "pt": 50
    }
   ],

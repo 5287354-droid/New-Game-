@@ -2921,7 +2921,7 @@ function owBattleGo(foes,opt){
   setTimeout(()=>{OWC.omen=null;if(!B)startBattle(foes,opt);},sh?600:450);
 }
 /* ===== T3: きらり(マップの光。踏むとレア確定・色違い率アップ。同時に1つまで) ===== */
-const owKirariProb=()=>Math.min(.8,.1*(1+.1*(state.detour||0))*(owWxId()==='hoshi'?3:1));
+const owKirariProb=()=>Math.min(.8,.08*(1+.1*(state.detour||0))*(owWxId()==='hoshi'?3:1));
 function owKirariSpawn(m,o){
   const enc=m.enc||'T',seen=new Set([o.x+','+o.y]),q=[[o.x,o.y]],near=[],far=[];
   for(let i=0;i<q.length&&i<1500;i++){const [x,y]=q[i],d=Math.abs(x-o.x)+Math.abs(y-o.y);

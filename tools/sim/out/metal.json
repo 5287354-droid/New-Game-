@@ -8,27 +8,29 @@
   "AUTO_TURN_S": 0.35,
   "REST_S": 40,
   "REST_HP": 0.45,
+  "RAMP_S": 120,
+  "TOUR_X": 2,
   "GRASS": 1,
   "GAME": "src/game.html"
  },
  "result": {
   "koganetsubu_lead8": {
-   "fled": 0.9175,
-   "killed": 0.0775,
-   "lose": 0.005,
-   "sec": 7.22524999999998
+   "fled": 0.7125,
+   "killed": 0.265,
+   "lose": 0.0225,
+   "sec": 13.555124999999991
   },
   "haganetsubu_lead8": {
-   "fled": 0.925,
-   "killed": 0.0525,
-   "lose": 0.0225,
-   "sec": 7.433574999999993
+   "fled": 0.73,
+   "killed": 0.08,
+   "lose": 0.19,
+   "sec": 13.402699999999992
   },
   "haganetsubu_lead14": {
-   "fled": 0.9425,
-   "killed": 0.0575,
-   "lose": 0,
-   "sec": 7.336424999999994
+   "fled": 0.825,
+   "killed": 0.125,
+   "lose": 0.05,
+   "sec": 15.423099999999984
   }
  }
 }
