@@ -2853,9 +2853,13 @@ function renderOverworld(){
     <p class="small muted ow-help">マップをタップでその場所へ・押し続けると指の方へ歩く ・ 十字キーでも歩ける ・ Aで話す・調べる ・ Bで走る(キーボード: 矢印 / Z / X)</p>
   </section>`;
 }
+function wildCard(t){
+  if(!state.boss[t.id])return '';const alive=state.party.some(m=>m.hp>0),bossSp=t.boss.foes[t.boss.foes.length>1?1:0][0];
+  const w=(state.wild||{})[t.id]||0,n=Math.min(5,w+1),rw=WILDRW[n-1];return `<div class="panel boss stack"><div class="row between"><span class="tag warn">ぬしの再戦</span><span class="small muted">${t.boss.title}</span></div><div class="row between"><b>荒ぶるぬし ${'★'.repeat(n)}${'☆'.repeat(5-n)}</b><span class="small muted num">敵Lv${wildLv(Math.max(...t.boss.foes.map(f=>f[1])),n)}前後</span></div><p class="small muted">勝つたびに★がふえて強くなる。★3と★5では、ぬしがなかまになる。</p><p class="small muted">${w>=5?'★5を何度でも。円と、ときどき才能のかけら。':`初勝利: 流星石★${n*10} ・ ${Object.entries(rw).map(([k,v])=>ITEMS[k].n+'×'+v).join(' ・ ')}${n===3?` ・ ${SP[bossSp].name}がなかまに`:n===5?` ・ 色違いの${SP[bossSp].name}がなかまに`:''}`}</p><div><button class="btn danger-fill" data-act="wild" ${alive?'':'disabled'}>荒ぶるぬしに挑む</button></div></div>`;
+}
 function renderStationIn(){
   const h=renderMap(),cut=h.indexOf('<section class="town-grid">');const t=TOWN[state.town];
-  return `${h.slice(0,cut)}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${reqBoard(t)}`;
+  return `${h.slice(0,cut)}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
 }
 /* 建物の中 */
 function renderInside(){
