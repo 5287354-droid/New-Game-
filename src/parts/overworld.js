@@ -2778,7 +2778,7 @@ function footCount(id){const fi=footInfo(id);let n=0;for(let i=0;i<fi.nb;i++)if(
 const footPct=id=>{const fi=footInfo(id);return fi.total?footCount(id)/fi.total:0;};
 const footShow=id=>{const p=footPct(id);return p>=1?100:Math.floor(p*100);};
 function owPoint(n){state.mpt=(state.mpt||0)+n;state.mptAll=(state.mptAll||0)+n;}
-const mchiTitle=()=>(state.mptAll||0)>=1000?'みちくさ名人':'';
+const mchiTitle=()=>(state.mptAll||0)>=2500?'みちくさ名人':'';
 const detourBar=d=>'▮'.repeat(d)+'▯'.repeat(5-d);
 /* マップ左上の小さな札: 踏破率と寄り道の段 */
 function owSubHtml(m){
@@ -2827,9 +2827,9 @@ const detourMul=()=>B&&!B.boss&&!B.cup&&!B.tower&&!B.rival&&!B.trainer?1+.1*Math
 const MEX=[
   {id:'kirakira',n:'きらきらの砂',pt:15,items:{kirakira:1}},
   {id:'kai',n:'色変わりの貝',pt:40,items:{kai:1}},
-  {id:'saino',n:'才能のかけら',pt:80,items:{saino:1},lim:'day'},
-  {id:'star',n:'流星石 ★10',pt:50,stars:10,lim:'day'},
-  {id:'tenpu',n:'天賦の宝珠',pt:400,items:{tenpu:1},lim:'once'}];
+  {id:'saino',n:'才能のかけら',pt:300,items:{saino:1},lim:'day'},
+  {id:'star',n:'流星石 ★5',pt:50,stars:5,lim:'day'},
+  {id:'tenpu',n:'天賦の宝珠',pt:3000,items:{tenpu:1},lim:'once'}];
 function mexLeft(x){
   if(x.lim==='day'){dailyRoll();return state.daily.got['mx:'+x.id]?0:1;}
   if(x.lim==='once')return state.flags['mx:'+x.id]?0:1;return 1;
@@ -2847,7 +2847,7 @@ function renderMchi(){
   const towns=TOWNS.filter(t=>townOpen(t)&&Object.values(MAPS).some(m=>m.town===t.id));
   const rows=t=>Object.entries(MAPS).filter(([,m])=>m.town===t.id).map(([id,m])=>{const p=footShow(id),s=(state.stamps||{})[id]||0;return `<div class="frow"><span class="fn">${esc(m.name)}</span><span class="fb"><i style="width:${p}%"></i></span><b class="num">${p}%</b><span class="fs ${s===2?'gold':s===1?'silv':''}">${s===2?'金':s===1?'銀':'―'}</span></div>`;}).join('');
   const foot=towns.map(t=>`<details class="panel foot-t" style="--tl:${TLC[t.id]||'#ffd21f'}" ${t.id===state.town?'open':''}><summary><b>${t.name}</b></summary><div class="flist">${rows(t)}</div></details>`).join('');
-  return `<div class="panel stack mpt"><div class="row between"><div class="stack tight"><span class="eyebrow">みちくさ点</span><b class="big num">${state.mpt||0}<small>点</small></b></div><div class="stack tight" style="text-align:right"><span class="small muted num">累計 ${state.mptAll||0}点</span><span class="small ${mt?'hl':'muted'}">${mt?'称号「'+mt+'」':'名人まで あと '+(1000-(state.mptAll||0))+'点'}</span></div></div><p class="small muted">新しい区画 +1点 ・ しかけ +5点 ・ 踏破80% +10点 ・ 踏破100% +20点と流星石★3</p></div>
+  return `<div class="panel stack mpt"><div class="row between"><div class="stack tight"><span class="eyebrow">みちくさ点</span><b class="big num">${state.mpt||0}<small>点</small></b></div><div class="stack tight" style="text-align:right"><span class="small muted num">累計 ${state.mptAll||0}点</span><span class="small ${mt?'hl':'muted'}">${mt?'称号「'+mt+'」':'名人まで あと '+(2500-(state.mptAll||0))+'点'}</span></div></div><p class="small muted">新しい区画 +1点 ・ しかけ +5点 ・ 踏破80% +10点 ・ 踏破100% +20点と流星石★3</p></div>
     <div class="panel stack"><h3>交換所</h3><div class="list">${ex}</div></div>
     <div class="panel stack"><div class="row between"><h3>しかけスタンプ</h3><span class="lv num">${nst}/${OW_STAMPS.length}</span></div><div class="mstamps">${grid}</div></div>
     <div class="stack"><h3>足あと帳</h3><p class="small muted">4×4マスの区画を、ぜんぶ歩くと100%。金は100%、銀は80%。</p>${foot}</div>`;
@@ -2881,11 +2881,13 @@ function owFishPull(){
   const n=Math.random()<.25?2:1,foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(OW_LV(fs.lv[0],1.25),OW_LV(fs.lv[1],1.25))]);
   ui.toast='';owStamp('g:fish');save();startBattle(foes,{field:`${t.name}・釣り`,scene:'port'});
 }
-/* はじめの3勝まで: 野生は1体だけ、Lvは先頭のなかま-1まで(こもれび町のぬしを倒したあとは補正なし) */
-function owEarly(foes){
-  if((state.wins||0)>=3||state.boss.komorebi||!foes.length)return foes;
+/* はじめの3勝まで: 野生は1体だけ、Lvは先頭のなかま-1まで(はじめの1戦は-2)。
+   3勝したあとも、あぜ道では、なかまが先頭1体だけのあいだ野生は1体だけ、Lvは先頭-1まで(裏山には補正なし)。こもれび町のぬしを倒したあとは補正なし */
+function owEarly(foes,f){
+  if(state.boss.komorebi||!foes.length)return foes;
   const lead=state.party.find(m=>m.hp>0)||state.party[0];if(!lead)return foes;
-  foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-1));return foes;
+  if((state.wins||0)>=3){if(state.party.length<2&&f&&f.id==='aze'){foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-1));}return foes;}
+  foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-((state.wins||0)<1?2:1)));return foes;
 }
 /* 色違いの率: 通常 1/150、きらり 1/30。星降りは通常 1/75、きらり 1/15 */
 const owShinyP=(wx,kir)=>kir?(wx==='hoshi'?1/15:1/30):(wx==='hoshi'?1/75:1/150);
@@ -2905,7 +2907,7 @@ function owEncounter(fid,kir){
   const mrate=.035*((state.lure||0)>0?4:1);if(state.lure>0)state.lure--;
   if(Math.random()<mrate)foes[0]=[pick(TOWNS.indexOf(t)>=2?['haganetsubu','gintachi']:['haganetsubu','koganetsubu','koganetsubu']),ri(f.lv[0],f.lv[1])];
   if(kir){const k=owKirariFoe(f,wx,up,Math.random());foes[0]=[k[0],k[1]];}
-  owEarly(foes);
+  owEarly(foes,f);
   const shiny=foes.map((_,i)=>Math.random()<owShinyP(wx,!!kir&&i===0));
   ui.toast='';owBattleGo(foes,{field:`${t.name}・${f.name}`,scene:f.scene,shiny,rare:kir?[0]:null});
 }
@@ -2919,7 +2921,7 @@ function owBattleGo(foes,opt){
   setTimeout(()=>{OWC.omen=null;if(!B)startBattle(foes,opt);},sh?600:450);
 }
 /* ===== T3: きらり(マップの光。踏むとレア確定・色違い率アップ。同時に1つまで) ===== */
-const owKirariProb=()=>Math.min(.8,.2*(1+.1*(state.detour||0))*(owWxId()==='hoshi'?3:1));
+const owKirariProb=()=>Math.min(.8,.1*(1+.1*(state.detour||0))*(owWxId()==='hoshi'?3:1));
 function owKirariSpawn(m,o){
   const enc=m.enc||'T',seen=new Set([o.x+','+o.y]),q=[[o.x,o.y]],near=[],far=[];
   for(let i=0;i<q.length&&i<1500;i++){const [x,y]=q[i],d=Math.abs(x-o.x)+Math.abs(y-o.y);

@@ -90,7 +90,7 @@ const items = {
 
   /* 天候限定7体に出会うまで(狙う/狙わない)。時間は分 */
   async wxfind(page) {
-    const n = N || 200, res = {}, bs = 18;
+    const n = N || 100, res = {}, bs = 18;
     const list = [['amayadori', 'komorebi', 'aze'], ['kirigarasu', 'tengu', 'sando'], ['nijimimizu', 'kasumi', 'biru'], ['yukiwata', 'ryuhyo', 'genseirin'], ['haikagura', 'hinoshima', 'kokusa'], ['kumozumi', 'shiomi', 'gyokou'],
       ['hoshikuzume', 'komorebi', 'aze'], ['hoshikuzume', 'tengu', 'sando'], ['hoshikuzume', 'yomi', null]];
     for (const [sp, tw, fid] of list) {
@@ -100,7 +100,7 @@ const items = {
         const rows = await page.evaluate(([sp, tw, f, tg, n, seed, bs]) => SIM.wxFind(sp, tw, f, tg, n, seed, bs), [sp, tw, fld, tg, n, SEED, bs]);
         if (!rows) { o[label] = null; continue; }
         const T = rows.map(r => r.T / 60), f = rows.filter(r => r.found).length;
-        o[label] = { n: rows.length, found: f / rows.length, mean: mean(T), p50: pct(T, .5), p90: pct(T, .9), enc: mean(rows.map(r => r.enc)), waits: mean(rows.map(r => r.waits)) };
+        o[label] = { n: rows.length, found: f / rows.length, mle: f ? sum(T) / f : null /* 打ち切りを考えた平均(指数分布を仮定: 合計時間÷見つけた回数) */, mean: mean(T), p50: pct(T, .5), p90: pct(T, .9), enc: mean(rows.map(r => r.enc)), waits: mean(rows.map(r => r.waits)) };
       }
       res[`${sp}@${tw}`] = { sp, town: tw, field: fld, ...o };
     }

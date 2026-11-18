@@ -119,7 +119,7 @@
   S.fieldWin = async function (starter, mapId, lv, N, seed, o = {}) {
     S.seed(seed); let win = 0, sec = 0, turns = 0, exp = 0, yen = 0, leadHp = 0, ok = 0; const lost = {};
     for (let i = 0; i < N; i++) {
-      S.newGame(starter, { lv, party: o.party, time: o.time }); healAll(); S.place(mapId);
+      S.newGame(starter, { lv, party: o.party, time: o.time }); state.wins = 99; healAll(); S.place(mapId); /* 序盤補正は外して、場所そのものの強さを測る */
       const st = await S.walkToEncounter(); if (st < 0) continue;
       const y0 = state.yen; const r = await S.fight(); if (r.flee) continue; ok++;
       if (r.win) { win++; exp += r.exp; yen += state.yen - y0; } else { const k = r.foes.map(f => f.sp).join('+'); lost[k] = (lost[k] || 0) + 1; }
@@ -237,11 +237,12 @@
     const mapId = Object.keys(MAPS).find(id => MAPS[id].town === townId && MAPS[id].field === fieldId);
     if (!mapId) return null;
     const f = TOWN[townId].fields.find(x => x.id === fieldId);
+    MAPS[mapId].cold = 0; /* 寒さ・暑さの消耗は測らない(凍える・倒れる処理を切る。出会いの回数だけを見る) */
     for (let g = 0; g < N; g++) {
       S.newGame('ibote', { time: Math.floor(Math.random() * 4) }); state.wins = 99; state.boss.komorebi = true; S.place(mapId); state.owSteps = Math.floor(Math.random() * 120);
       let T = 0, enc = 0, found = false, waits = 0;
       const here = () => wxTable(f.table, state.time, wxNow(townId)).some(x => x.s === sp);
-      while (T < 24 * 3600 && !found) {
+      while (T < 6 * 3600 && !found) {
         if (target && !here()) { /* 時間を送る: 草むらの外を歩く(残りの歩数ぶん) */
           const rest = 120 - (state.owSteps || 0); T += rest * P.STEP_S; state.owSteps = 0; advanceTime(); waits++; continue; }
         let i = 0; for (; i < 5000; i++) { owArrive(); if (B || OWC.omen) break; }
@@ -282,7 +283,7 @@
         いまの時間・天気で出る種の重みがいちばん多い探索先で戦い、出ない時間帯は歩いて時間を送る(予報を見て狙う)。
         新しい種に出会ったらスカウト成功率 q で仲間になる(失敗したらまた出会うのを待つ)。戦闘1回ぶんは battleS 秒＋回復の往復。 */
   S.regionTime = function (tid, N, seed, q, battleS) {
-    S.seed(seed); const out = [], L = regList(tid), need = new Set(L.map(x => x.s));
+    S.seed(seed); const out = [], L = regList(tid).filter(x => tid === 'komorebi' || x.sp !== 'hoshikuzume' && x.s !== 'hoshikuzume'), need = new Set(L.map(x => x.s)); /* ホシクズメは全町の最初の探索先に出るが、1体仲間にすればどの町の分も済む(こもれび町でだけ数える) */
     const t = TOWN[tid]; const places = t.fields.map(f => ({ f, max: f.max, cost: P.STEP_S * 9.2 + battleS + .1 * P.REST_S }));
     for (const id in MAPS) { const m = MAPS[id]; if (m.town === tid && m.fish && m.fish.table) places.push({ f: { table: m.fish.table, max: 1 }, max: 1, cost: 8 + battleS + .1 * P.REST_S }); }
     for (let g = 0; g < N; g++) {

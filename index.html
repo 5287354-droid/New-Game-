@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="4a30e3d4b0";</script>
+<script>window.JG_APP=true;window.JG_VER="467464c118";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -866,6 +866,7 @@ const SK={
   shoukaeki:{n:'しょうかえき',mp:6,k:'mag',t:'one',b:16,e:'',debuff:{def:-1},dch:.8,d:'消化液を浴びせ守備を下げる'},
   shinkeidoku:{n:'しんけいどく',mp:6,k:'mag',t:'one',b:12,e:'',st:[['poison',.8],['para',.4]],d:'猛毒。毒とマヒを与える'},
   kiseihoushi:{n:'きせいほうし',mp:8,k:'mag',t:'one',b:14,e:'',st:[['confuse',.85],['poison',.85]],d:'寄生胞子を植えつける'},
+  houshidan:{n:'ほうしだん',mp:2,k:'mag',t:'one',b:11,e:'',st:[['poison',.25]],d:'胞子のかたまりをぶつける。毒にすることがある'},
   maboroshi:{n:'まぼろしほうし',mp:5,k:'stat',t:'all',st:[['confuse',.4]],d:'幻覚の胞子で敵全体を混乱させる'},
   yumemi:{n:'ゆめみほうし',mp:4,k:'stat',t:'one',st:[['sleep',.65]],d:'夢見の胞子で眠らせる'},
   dokunokiri:{n:'どくのきり',mp:4,k:'stat',t:'all',st:[['poison',.55]],d:'毒の霧で敵全体を毒にする'},
@@ -977,7 +978,7 @@ function S(id,name,fam,rank,glyph,motif,desc,base,skills,trait,special){
   SP[id]=o;SPL.push(o);
 }
 S('dokudamin','ドクダミン','plant','F','薬','ドクダミ','「十薬」とも呼ばれる薬草が歩き出した姿。強烈なにおいで外敵を追い払い、葉を煎じた茶で仲間を癒やす。',[16,8,6,7,5,9],[[1,'yakusou'],[6,'kusai'],[14,'dokudamicha']],'shizen');
-S('ibote','イボテ','plant','E','茸','ベニテングタケ','赤い笠に白いイボを散らした歩くキノコ。笠をゆらして撒く胞子を吸うと、ありもしない景色が見えてくる。',[18,12,7,7,6,11],[[1,'maboroshi'],[6,'yumemi'],[12,'dokunokiri'],[22,'akumu']],'houshi');
+S('ibote','イボテ','plant','E','茸','ベニテングタケ','赤い笠に白いイボを散らした歩くキノコ。笠をゆらして撒く胞子を吸うと、ありもしない景色が見えてくる。',[18,12,7,7,6,11],[[1,'houshidan'],[1,'maboroshi'],[6,'yumemi'],[12,'dokunokiri'],[22,'akumu']],'houshi');
 S('tsubokurau','ツボクラウ','plant','C','壺','ウツボカズラ','都心のビルの屋上庭園から逃げ出した食虫植物。人の背丈ほどの捕虫袋で、ネズミもカラスも丸ごと飲みこむ。',[28,14,12,10,6,12],[[1,'marunomi'],[8,'amaimitsu'],[16,'shoukaeki'],[26,'taiyou']],'shizen');
 S('yadoridake','ヤドリダケ','plant','A','宿','冬虫夏草','甲虫に寄生し、その体を乗っ取って歩くキノコ。宿主の怪力と胞子の毒を、両方あやつる。',[44,24,16,14,10,22],[[1,'kiseihoushi'],[1,'maboroshi'],[20,'akumu'],[34,'taiyou']],'mpkaifuku',true);
 S('dobuchu','ドブチュウ','beast','F','鼠','ドブネズミ','霞ヶ丘の地下の下水道に暮らす大ネズミ。何でもかじる前歯は、鉄のフェンスにも穴をあける。',[13,4,8,5,11,4],[[1,'kamitsuki'],[6,'bikin'],[14,'tobikakari']],'subashikoi');
@@ -1870,9 +1871,9 @@ const WX={hare:{n:'晴れ',s:'晴',c:'#ffc94a',t:'H'},kumo:{n:'くもり',s:'曇
 const WXK=Object.keys(WX),WXT={};WXK.forEach(k=>WXT[WX[k].t]=k);
 /* 町ごとの天気の重み(星は夜のあいだだけ足される) */
 const WX_TBL={
-  komorebi:{hare:40,kumo:25,ame:25,kiri:10,hoshi:4},kasumi:{hare:35,kumo:35,ame:25,kiri:5,hoshi:2},shiomi:{hare:40,kumo:20,ame:25,kiri:15,hoshi:4},
-  tengu:{hare:25,kumo:25,ame:15,kiri:30,yuki:5,hoshi:4},mayoiga:{hare:20,kumo:25,ame:20,kiri:35,hoshi:6},ryuhyo:{hare:20,kumo:25,kiri:10,yuki:45,hoshi:6},
-  hinoshima:{hare:35,kumo:20,ame:15,hai:30,hoshi:3},sango:{hare:55,kumo:15,ame:25,kiri:5,hoshi:5},yomi:{hare:10,kumo:30,ame:15,kiri:40,hoshi:8}};
+  komorebi:{hare:40,kumo:25,ame:25,kiri:10,hoshi:20},kasumi:{hare:35,kumo:35,ame:25,kiri:5,hoshi:12},shiomi:{hare:40,kumo:20,ame:25,kiri:15,hoshi:20},
+  tengu:{hare:25,kumo:25,ame:15,kiri:30,yuki:5,hoshi:20},mayoiga:{hare:20,kumo:25,ame:20,kiri:35,hoshi:25},ryuhyo:{hare:20,kumo:25,kiri:10,yuki:45,hoshi:25},
+  hinoshima:{hare:35,kumo:20,ame:15,hai:30,hoshi:15},sango:{hare:55,kumo:15,ame:25,kiri:5,hoshi:22},yomi:{hare:10,kumo:30,ame:15,kiri:40,hoshi:30}};
 /* 家系ごとの出現補正 */
 const WX_MUL={hare:{bird:1.3,plant:1.3},kumo:{beast:1.2,bug:1.2},ame:{aqua:1.6,soft:1.6},kiri:{spirit:1.6,myst:1.3},yuki:{aqua:1.3,beast:1.3},hai:{dragon:1.5,metal:1.2},hoshi:{}};
 const wxMul=(fam,wx)=>(WX_MUL[wx]&&WX_MUL[wx][fam])||1;
@@ -3193,8 +3194,8 @@ _tw({id:'yomi',code:'MK09',name:'黄泉ヶ原',roma:'Yomigahara',kind:'終着駅
 });
 TOWN.hinoshima.fields[2].table.push(['kumanomi',.6]);
 /* T1: 天候限定種を出現表に足す([町, 探索先のid, [種, 重み, タグ]]) */
-[['komorebi','aze','amayadori',2,'R'],['tengu','sando','kirigarasu',2.5,'F'],['kasumi','biru','nijimimizu',1.5,'R'],['ryuhyo','genseirin','yukiwata',2,'S'],['ryuhyo','okanoue','yukiwata',1.5,'S'],
- ['hinoshima','kokusa','haikagura',2.5,'A'],['hinoshima','kakou','haikagura',1.5,'A'],['shiomi','gyokou','kumozumi',2,'nC']].forEach(([tw,fid,s,w,tg])=>TOWN[tw].fields.find(f=>f.id===fid).table.push([s,w,tg]));
+[['komorebi','aze','amayadori',1,'R'],['tengu','sando','kirigarasu',1.2,'F'],['kasumi','biru','nijimimizu',.8,'R'],['ryuhyo','genseirin','yukiwata',1,'S'],['ryuhyo','okanoue','yukiwata',.8,'S'],
+ ['hinoshima','kokusa','haikagura',1.2,'A'],['hinoshima','kakou','haikagura',.8,'A'],['shiomi','gyokou','kumozumi',2,'nC']].forEach(([tw,fid,s,w,tg])=>TOWN[tw].fields.find(f=>f.id===fid).table.push([s,w,tg]));
 TOWNS.forEach(t=>t.fields[0].table.push(['hoshikuzume',1.5,'*']));   /* 星降りの夜は、どの町でも */
 TOWNS.forEach(t=>t.fields.forEach(f=>f.table.forEach(([s,,tm])=>{const x=t.name+'・'+f.name+(tm?`(${TM[tm]})`:'');(HAB[s]=HAB[s]||[]).includes(x)||HAB[s].push(x);})));
 HAB.nijitama=['天狗岳から先の探索先(ごくまれ)'];
@@ -6089,7 +6090,7 @@ function footCount(id){const fi=footInfo(id);let n=0;for(let i=0;i<fi.nb;i++)if(
 const footPct=id=>{const fi=footInfo(id);return fi.total?footCount(id)/fi.total:0;};
 const footShow=id=>{const p=footPct(id);return p>=1?100:Math.floor(p*100);};
 function owPoint(n){state.mpt=(state.mpt||0)+n;state.mptAll=(state.mptAll||0)+n;}
-const mchiTitle=()=>(state.mptAll||0)>=1000?'みちくさ名人':'';
+const mchiTitle=()=>(state.mptAll||0)>=2500?'みちくさ名人':'';
 const detourBar=d=>'▮'.repeat(d)+'▯'.repeat(5-d);
 /* マップ左上の小さな札: 踏破率と寄り道の段 */
 function owSubHtml(m){
@@ -6138,9 +6139,9 @@ const detourMul=()=>B&&!B.boss&&!B.cup&&!B.tower&&!B.rival&&!B.trainer?1+.1*Math
 const MEX=[
   {id:'kirakira',n:'きらきらの砂',pt:15,items:{kirakira:1}},
   {id:'kai',n:'色変わりの貝',pt:40,items:{kai:1}},
-  {id:'saino',n:'才能のかけら',pt:80,items:{saino:1},lim:'day'},
-  {id:'star',n:'流星石 ★10',pt:50,stars:10,lim:'day'},
-  {id:'tenpu',n:'天賦の宝珠',pt:400,items:{tenpu:1},lim:'once'}];
+  {id:'saino',n:'才能のかけら',pt:300,items:{saino:1},lim:'day'},
+  {id:'star',n:'流星石 ★5',pt:50,stars:5,lim:'day'},
+  {id:'tenpu',n:'天賦の宝珠',pt:3000,items:{tenpu:1},lim:'once'}];
 function mexLeft(x){
   if(x.lim==='day'){dailyRoll();return state.daily.got['mx:'+x.id]?0:1;}
   if(x.lim==='once')return state.flags['mx:'+x.id]?0:1;return 1;
@@ -6158,7 +6159,7 @@ function renderMchi(){
   const towns=TOWNS.filter(t=>townOpen(t)&&Object.values(MAPS).some(m=>m.town===t.id));
   const rows=t=>Object.entries(MAPS).filter(([,m])=>m.town===t.id).map(([id,m])=>{const p=footShow(id),s=(state.stamps||{})[id]||0;return `<div class="frow"><span class="fn">${esc(m.name)}</span><span class="fb"><i style="width:${p}%"></i></span><b class="num">${p}%</b><span class="fs ${s===2?'gold':s===1?'silv':''}">${s===2?'金':s===1?'銀':'―'}</span></div>`;}).join('');
   const foot=towns.map(t=>`<details class="panel foot-t" style="--tl:${TLC[t.id]||'#ffd21f'}" ${t.id===state.town?'open':''}><summary><b>${t.name}</b></summary><div class="flist">${rows(t)}</div></details>`).join('');
-  return `<div class="panel stack mpt"><div class="row between"><div class="stack tight"><span class="eyebrow">みちくさ点</span><b class="big num">${state.mpt||0}<small>点</small></b></div><div class="stack tight" style="text-align:right"><span class="small muted num">累計 ${state.mptAll||0}点</span><span class="small ${mt?'hl':'muted'}">${mt?'称号「'+mt+'」':'名人まで あと '+(1000-(state.mptAll||0))+'点'}</span></div></div><p class="small muted">新しい区画 +1点 ・ しかけ +5点 ・ 踏破80% +10点 ・ 踏破100% +20点と流星石★3</p></div>
+  return `<div class="panel stack mpt"><div class="row between"><div class="stack tight"><span class="eyebrow">みちくさ点</span><b class="big num">${state.mpt||0}<small>点</small></b></div><div class="stack tight" style="text-align:right"><span class="small muted num">累計 ${state.mptAll||0}点</span><span class="small ${mt?'hl':'muted'}">${mt?'称号「'+mt+'」':'名人まで あと '+(2500-(state.mptAll||0))+'点'}</span></div></div><p class="small muted">新しい区画 +1点 ・ しかけ +5点 ・ 踏破80% +10点 ・ 踏破100% +20点と流星石★3</p></div>
     <div class="panel stack"><h3>交換所</h3><div class="list">${ex}</div></div>
     <div class="panel stack"><div class="row between"><h3>しかけスタンプ</h3><span class="lv num">${nst}/${OW_STAMPS.length}</span></div><div class="mstamps">${grid}</div></div>
     <div class="stack"><h3>足あと帳</h3><p class="small muted">4×4マスの区画を、ぜんぶ歩くと100%。金は100%、銀は80%。</p>${foot}</div>`;
@@ -6192,11 +6193,13 @@ function owFishPull(){
   const n=Math.random()<.25?2:1,foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(OW_LV(fs.lv[0],1.25),OW_LV(fs.lv[1],1.25))]);
   ui.toast='';owStamp('g:fish');save();startBattle(foes,{field:`${t.name}・釣り`,scene:'port'});
 }
-/* はじめの3勝まで: 野生は1体だけ、Lvは先頭のなかま-1まで(こもれび町のぬしを倒したあとは補正なし) */
-function owEarly(foes){
-  if((state.wins||0)>=3||state.boss.komorebi||!foes.length)return foes;
+/* はじめの3勝まで: 野生は1体だけ、Lvは先頭のなかま-1まで(はじめの1戦は-2)。
+   3勝したあとも、あぜ道では、なかまが先頭1体だけのあいだ野生は1体だけ、Lvは先頭-1まで(裏山には補正なし)。こもれび町のぬしを倒したあとは補正なし */
+function owEarly(foes,f){
+  if(state.boss.komorebi||!foes.length)return foes;
   const lead=state.party.find(m=>m.hp>0)||state.party[0];if(!lead)return foes;
-  foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-1));return foes;
+  if((state.wins||0)>=3){if(state.party.length<2&&f&&f.id==='aze'){foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-1));}return foes;}
+  foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-((state.wins||0)<1?2:1)));return foes;
 }
 /* 色違いの率: 通常 1/150、きらり 1/30。星降りは通常 1/75、きらり 1/15 */
 const owShinyP=(wx,kir)=>kir?(wx==='hoshi'?1/15:1/30):(wx==='hoshi'?1/75:1/150);
@@ -6216,7 +6219,7 @@ function owEncounter(fid,kir){
   const mrate=.035*((state.lure||0)>0?4:1);if(state.lure>0)state.lure--;
   if(Math.random()<mrate)foes[0]=[pick(TOWNS.indexOf(t)>=2?['haganetsubu','gintachi']:['haganetsubu','koganetsubu','koganetsubu']),ri(f.lv[0],f.lv[1])];
   if(kir){const k=owKirariFoe(f,wx,up,Math.random());foes[0]=[k[0],k[1]];}
-  owEarly(foes);
+  owEarly(foes,f);
   const shiny=foes.map((_,i)=>Math.random()<owShinyP(wx,!!kir&&i===0));
   ui.toast='';owBattleGo(foes,{field:`${t.name}・${f.name}`,scene:f.scene,shiny,rare:kir?[0]:null});
 }
@@ -6230,7 +6233,7 @@ function owBattleGo(foes,opt){
   setTimeout(()=>{OWC.omen=null;if(!B)startBattle(foes,opt);},sh?600:450);
 }
 /* ===== T3: きらり(マップの光。踏むとレア確定・色違い率アップ。同時に1つまで) ===== */
-const owKirariProb=()=>Math.min(.8,.2*(1+.1*(state.detour||0))*(owWxId()==='hoshi'?3:1));
+const owKirariProb=()=>Math.min(.8,.1*(1+.1*(state.detour||0))*(owWxId()==='hoshi'?3:1));
 function owKirariSpawn(m,o){
   const enc=m.enc||'T',seen=new Set([o.x+','+o.y]),q=[[o.x,o.y]],near=[],far=[];
   for(let i=0;i<q.length&&i<1500;i++){const [x,y]=q[i],d=Math.abs(x-o.x)+Math.abs(y-o.y);
@@ -7756,7 +7759,7 @@ function explore(fid){
   const foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(f.lv[0],f.lv[1])]);
   const mrate=.035*((state.lure||0)>0?4:1);if(state.lure>0)state.lure--;
   if(Math.random()<mrate){const pool={komorebi:['haganetsubu','koganetsubu','koganetsubu'],kasumi:['haganetsubu','koganetsubu'],shiomi:['haganetsubu','gintachi','gintachi'],tengu:['gintachi','nijitama','nijitama'],mayoiga:['nijitama','nijitama','gintachi'],ryuhyo:['nijitama','gintachi','nijitama'],hinoshima:['gintachi','nijitama','nijitama'],sango:['gintachi','nijitama','ougontsubu'],yomi:['nijitama','ougontsubu','hakugin']}[t.id]||['haganetsubu'];foes[0]=[pick(pool),ri(f.lv[0],f.lv[1])];}
-  owEarly(foes);startBattle(foes,{field:`${t.name}・${f.name}`,scene:f.scene,shiny:foes.map(()=>Math.random()<owShinyP(wx,false))});
+  owEarly(foes,f);startBattle(foes,{field:`${t.name}・${f.name}`,scene:f.scene,shiny:foes.map(()=>Math.random()<owShinyP(wx,false))});
 }
 
 /* ========== 操作 ========== */
