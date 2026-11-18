@@ -138,6 +138,31 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await shot('51_map_komorebi_night');
   });
 
+  /* T1・T3: 空もよう・きらり・色違いの登場 */
+  await step('weather', async () => {
+    const goWx = (w, time, town = 'komorebi') => ev(([w, time, town]) => { B = null; ui.dlg = null; ui.result = null; ui.station = false; ui.inside = null; ui.tab = 'map'; ui.toast = ''; ui.band = null; state.kirari = null;
+      if (!window.__wxNow) window.__wxNow = wxNow; window.wxNow = t => { if (state.wxLog) state.wxLog[w] = true; return w; };
+      state.town = town; state.time = time; const s = MAPS[town].spawn; state.ow = { map: town, x: s.x, y: s.y, dir: 'down' }; OWC.wxAk = null; render(); }, [w, time, town]);
+    for (const [w, tm, nm] of [['ame', 1, '60_wx_rain_day'], ['ame', 3, '61_wx_rain_night'], ['kiri', 1, '62_wx_fog_day'], ['kiri', 3, '63_wx_fog_night'], ['yuki', 1, '64_wx_snow_day'], ['yuki', 3, '65_wx_snow_night'], ['hai', 2, '66_wx_ash_evening'], ['hoshi', 3, '67_wx_starfall_night'], ['kumo', 1, '68_wx_cloudy_day']]) {
+      await goWx(w, tm); await shot(nm, 500);
+    }
+    await goWx('ame', 1); await ev(() => { ui.station = true; render(); }); await shot('69_station_michikusa_dayori', 400);
+    await goWx('hare', 1); await ev(() => { const m = owMap(), o = state.ow; for (let i = 0; i < 20 && !state.kirari; i++) owKirariSpawn(m, o); ui.toast = ''; render(); });
+    await shot('70_kirari_on_map', 300);
+    await ev(() => { const k = state.kirari; state.ow = { map: k.map, x: k.x, y: Math.max(0, k.y - 1), dir: 'down' }; render(); }); await shot('70b_kirari_close', 300);
+    // 色違いの前兆(七色) → 登場フラッシュ
+    await ev(() => { const real = Math.random; Math.random = () => 0.0001; owEncounter(TOWN[state.town].fields[0].id, true); Math.random = real; });
+    await shot('71_shiny_omen', 250);
+    await wait(450); await shot('72_shiny_battle_flash', 80);
+    await ev(() => { if (B) { B.lockUntil = 0; render(); } }); await shot('73_shiny_battle', 900);
+    await ev(() => { B = null; ui.dlg = null; ui.toast = ''; render(); });
+    // 天候限定7体の図鑑
+    await ev(() => { SPL.slice(-7).forEach(s => { state.seen[s.id] = true; state.owned[s.id] = true; }); ui.tab = 'dex'; ui.dexSel = 'hoshikuzume'; render(); }); await shot('74_dex_weather7', 400);
+    await ev(() => { const d = document.createElement('div'); d.id = 'sheet'; d.style.cssText = 'position:fixed;inset:0;z-index:999;background:#000;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px;overflow:auto'; d.innerHTML = SPL.slice(-7).map(s => `<div style="color:#fff;text-align:center;font:12px sans-serif"><img src="${sprite(s.id)}" style="width:170px;height:170px;image-rendering:auto"><br>${s.name}</div>`).join(''); document.body.appendChild(d); });
+    await shot('75_weather7_sheet', 400);
+    await ev(() => { document.getElementById('sheet').remove(); if (window.__wxNow) window.wxNow = window.__wxNow; render(); });
+  });
+
   await browser.close(); server.close();
   const uniq = [...new Set(errors)];
   fs.writeFileSync(path.join(OUT, 'errors.txt'), errors.length ? uniq.map(e => e + ' x' + errors.filter(q => q === e).length).join('\n') + '\n' : '(コンソールエラーなし)\n');

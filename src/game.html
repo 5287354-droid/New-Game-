@@ -2813,7 +2813,7 @@ S('hoshikuzume','ホシクズメ','bird','A','星','ツバメ','流れ星のか�
 /* ART(T1): 天候限定7体の描画定義はここ1か所にまとめてある。本番の絵はモンスター工房が描き直す(いまは flatPainter の仮絵) */
 Object.assign(DRAW,{
   amayadori:g=>{g.e(24,46,17,1.6,'#1e2c4a');g.e(14,42,5,3.2,'#3f9b5a');g.e(34,42,5,3.2,'#3f9b5a');g.e(24,36,13,9,'#4fb36b');g.e(24,39,8,5.5,'#d8f2b8');g.e(24,28,10,7,'#5cc27a');
-    g.l(24,21,24,30,'#6a4a2a',1.2);g.h(24,19,20,12,'#e0463c');for(let i=-2;i<=2;i++)g.l(24,8,24+i*8,19,'#a82a24',.8);g.l(4,19,44,19,'#7a1a18',1);
+    g.l(24,18,24,22,'#6a4a2a',1.2);g.h(24,19,20,12,'#e0463c');for(let i=-2;i<=2;i++)g.l(24,8,24+i*8,19,'#a82a24',.8);g.l(4,19,44,19,'#7a1a18',1);
     g.eye(19,27);g.eye(29,27);g.l(21,33,27,33,'#2a6a3a',1);[[7,26],[41,30],[10,36],[39,22]].forEach(([a,b])=>g.e(a,b,1,1.6,'#7fc3ff'));},
   kirigarasu:g=>{g.e(24,44,16,1.4,'rgba(200,212,235,.5)');g.path([[8,34],[2,40],[10,43]],'rgba(214,224,242,.7)',3);g.path([[12,38],[6,45]],'rgba(214,224,242,.6)',2.5);
     g.p([[14,29],[2,20],[6,34],[16,38]],'#aab6d2');g.e(22,30,12,9,'#b9c4dc');g.e(21,33,8,5,'#d4dcee');g.e(31,22,7,6.5,'#c7d0e6');g.p([[37,20],[46,24],[37,26]],'#6a7390');
@@ -5663,7 +5663,7 @@ function owWeatherNote(){
   if(cur==='hoshi')sfx('kirari');
   return WX_NOTE[cur]||'';
 }
-function owWeatherChip(){const w=WX[wxNow()];return w?`<span class="tchip wx" style="--tc:${w.c}" title="空もよう: ${w.n}"><i></i>${w.n}</span>`:'';}
+function owWeatherChip(){const w=WX[wxNow()];return w?`<span class="tchip wx" style="--tc:${w.c}" title="空もよう: ${w.n}"><i></i>${w.s}</span>`:'';}
 /* 天気の画面効果は屋外のマップだけ(洞窟・屋内・まっ暗な所は出さない) */
 const owWxOutdoor=m=>!!m&&!m.dim&&!m.dark&&!m.cave&&!m.light&&!m.air&&m.ground!=='floor'&&m.ground!=='cave';
 const owWxId=()=>wxNow(owMap()?owMap().town:state.town);
@@ -5768,7 +5768,7 @@ function owBattleGo(foes,opt){
   const sh=(opt.shiny||[]).some(Boolean);
   if(!sh&&!opt.rare){startBattle(foes,opt);return;}
   OWC.held=null;OWC.mv=null;owCancelPath();OWC.stuck=performance.now()+800;OWC.omen={t:performance.now(),sh};
-  if(sh){sfx('shiny');ui.toast=opt.rare?'きらりの光が、七色にゆれた！':'草むらが七色にゆれた！';}else{jingle('rare');ui.toast='きらりの光に、何かがひそんでいる！';}
+  if(sh){sfx('shiny');ui.toast=opt.rare?'光が七色にゆれた！':'草むらが七色にゆれた！';}else{jingle('rare');ui.toast='きらりの光に、何かがひそんでいる！';}
   render();
   setTimeout(()=>{OWC.omen=null;if(!B)startBattle(foes,opt);},sh?600:450);
 }

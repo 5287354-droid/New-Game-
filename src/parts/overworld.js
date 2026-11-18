@@ -2687,7 +2687,7 @@ function owWeatherNote(){
   if(cur==='hoshi')sfx('kirari');
   return WX_NOTE[cur]||'';
 }
-function owWeatherChip(){const w=WX[wxNow()];return w?`<span class="tchip wx" style="--tc:${w.c}" title="空もよう: ${w.n}"><i></i>${w.n}</span>`:'';}
+function owWeatherChip(){const w=WX[wxNow()];return w?`<span class="tchip wx" style="--tc:${w.c}" title="空もよう: ${w.n}"><i></i>${w.s}</span>`:'';}
 /* 天気の画面効果は屋外のマップだけ(洞窟・屋内・まっ暗な所は出さない) */
 const owWxOutdoor=m=>!!m&&!m.dim&&!m.dark&&!m.cave&&!m.light&&!m.air&&m.ground!=='floor'&&m.ground!=='cave';
 const owWxId=()=>wxNow(owMap()?owMap().town:state.town);
@@ -2792,7 +2792,7 @@ function owBattleGo(foes,opt){
   const sh=(opt.shiny||[]).some(Boolean);
   if(!sh&&!opt.rare){startBattle(foes,opt);return;}
   OWC.held=null;OWC.mv=null;owCancelPath();OWC.stuck=performance.now()+800;OWC.omen={t:performance.now(),sh};
-  if(sh){sfx('shiny');ui.toast=opt.rare?'きらりの光が、七色にゆれた！':'草むらが七色にゆれた！';}else{jingle('rare');ui.toast='きらりの光に、何かがひそんでいる！';}
+  if(sh){sfx('shiny');ui.toast=opt.rare?'光が七色にゆれた！':'草むらが七色にゆれた！';}else{jingle('rare');ui.toast='きらりの光に、何かがひそんでいる！';}
   render();
   setTimeout(()=>{OWC.omen=null;if(!B)startBattle(foes,opt);},sh?600:450);
 }
