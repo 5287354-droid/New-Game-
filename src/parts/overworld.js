@@ -1954,7 +1954,7 @@ const OW_DOOR={
   fusuma:()=>{const r=wpick([{w:2,v:'zashiki'},{w:2,v:'feast'},{w:3,v:'ambush'},{w:2,v:'scroll'},{w:1,v:'empty'}]).v;OWC.room=r;state.ow={map:'okunoma',...MAPS.okunoma.spawn};OWC.mv=null;OWC.held=null;sfx('sel');ui.toast='';save();
     const msg={zashiki:'ふすまを開けると、赤い着物の子どもがちょこんと座っていた。',feast:'ふすまを開けると、湯気の立つお膳が用意されていた。だれもいないのに……',ambush:'ふすまを開けると、魔生物が待ちかまえていた！',scroll:'ふすまを開けると、床の間に古い掛け軸がかかった部屋に出た。',empty:'ふすまを開けると、がらんとした部屋だった。さっきとはちがう部屋のようだ……'}[r];
     render();if(r==='ambush'&&state.party.some(x=>x.hp>0))talk([['',msg]],()=>owEncounter('chikurin'));else talk([['',msg]]);},
-  mirror:()=>{const toU=state.ow.map==='kagami',to=toU?'kagami_ura':'kagami';state.ow={map:to,x:15-state.ow.x,y:10,dir:'down'};OWC.mv=null;OWC.held=null;sfx('shiny');save();render();talk(toU?[['','鏡に手をふれると、すうっと吸いこまれた……'],['','鏡の中の世界だ！ 右と左が逆になっている！']]:[['','もとの世界にもどってきた。']]);},
+  mirror:()=>{const toU=state.ow.map==='kagami',to=toU?'kagami_ura':'kagami';state.ow={map:to,x:15-state.ow.x,y:10,dir:'down'};owStamp('g:mirror');owFoot();OWC.mv=null;OWC.held=null;sfx('shiny');save();render();talk(toU?[['','鏡に手をふれると、すうっと吸いこまれた……'],['','鏡の中の世界だ！ 右と左が逆になっている！']]:[['','もとの世界にもどってきた。']]);},
   vend:()=>{if(state.yen<120){talk([['','自動販売機だ。スポーツドリンクが120円で売っている。'],['','……お金が足りない。']]);return;}state.yen-=120;state.items.drink=(state.items.drink||0)+1;sfx('sel');save();talk([['','ガコン！'],['','スポーツドリンクを買った。(120円)']]);},
 };
 const owFlag=k=>k.startsWith('boss:')?!!state.boss[k.slice(5)]:!!(state.owFlags&&state.owFlags[k]);
@@ -2369,7 +2369,7 @@ function owVolcStep(m){
   if(!OWC.mv){
     if((here==='&'||here==='$')&&owFlow(here)==='flow'){owBurn(m,'足もとに溶岩が流れこんできた！');return true;}
     if(here==='!'&&owVent(o.x,o.y)==='on'){owScald(m);return true;}
-    if(here==='^'&&owGeyser()==='on'&&m.jumps&&m.jumps[k]){const [tx,ty]=m.jumps[k];OWC.fly={fx:o.x,fy:o.y,tx,ty,t:0};OWC.held=null;owCancelPath();sfx('shiny');ui.toast=m.ground==='volcano'?'ドドドド……ブシャアアッ！ 間欠泉に吹き飛ばされた！':'ゴオオッ！ 天狗風に乗って、空を飛んだ！';render();return true;}
+    if(here==='^'&&owGeyser()==='on'&&m.jumps&&m.jumps[k]){const [tx,ty]=m.jumps[k];OWC.fly={fx:o.x,fy:o.y,tx,ty,t:0};OWC.held=null;owCancelPath();owStamp('g:geyser');sfx('shiny');ui.toast=m.ground==='volcano'?'ドドドド……ブシャアアッ！ 間欠泉に吹き飛ばされた！':'ゴオオッ！ 天狗風に乗って、空を飛んだ！';render();return true;}
     if(here==='?'&&owBroken(o.x,o.y)){if(m.ground==='volcano')owFallLava(m);else if(m.ground==='sand')owSeaFall(m,'バキバキッ！ くさった床板がぬけて、海に落ちた！');else owCliff(m,'ガラガラッ……！ 足場が崩れて、崖から落ちた！');OWC.crumb={};return true;}
   }
   /* 噴石 */
@@ -2399,7 +2399,7 @@ function owRideStart(m){
   if(m.fareAll&&!m.fareAll.every(owFlag)){talk([['渡し守','……川を渡りたいか。'],['渡し守',`渡し賃は、六文。……彼岸花の原と、この川べりに、六文銭のかけらが落ちているはずだ。(いま${m.fareAll.filter(owFlag).length}/${m.fareAll.length})`]]);return;}
   if(m.power&&!owFlag(m.power)){talk([['','トロッコだ。……動かない。'],['','どこかで動力を入れないといけないらしい。']]);return;}
   const o=state.ow;const ds=Object.entries(OWD).filter(([d,[dx,dy]])=>(m.rows[o.y+dy]||'')[o.x+dx]==='+');if(!ds.length)return;
-  const d=(ds.find(([d])=>d===o.dir)||ds[0])[0];OWC.ride={dir:d,n:0};OWC.held=null;owCancelPath();OWC.bombs=[];sfx('sel');ui.toast=m.canoe?'カヌーをこぎ出した。流れに乗って、すいすい進む！':'ガタン、ゴトン……トロッコが走り出した！';render();owRideNext(m);}
+  const d=(ds.find(([d])=>d===o.dir)||ds[0])[0];OWC.ride={dir:d,n:0};owStamp('g:ride');OWC.held=null;owCancelPath();OWC.bombs=[];sfx('sel');ui.toast=m.canoe?'カヌーをこぎ出した。流れに乗って、すいすい進む！':'ガタン、ゴトン……トロッコが走り出した！';render();owRideNext(m);}
 function owRideNext(m){
   const o=state.ow,r=OWC.ride,back={up:'down',down:'up',left:'right',right:'left'}[r.dir];
   if(r.n>0&&(m.rows[o.y]||'')[o.x]==='c'||r.n>400){OWC.ride=null;ui.toast=m.canoe?'船着き場に着いた。':'キキーッ！ 乗り場に着いた。';render();return;}
@@ -2547,8 +2547,8 @@ function owColdBar(c,m){
   const col=m.air?(v<.5?'#8ae0ff':v<.75?'#f2c43a':'#ff5a4a'):m.heat?(v<.5?'#f2c43a':v<.75?'#ff8a2a':'#ff3a2a'):v<.5?'#8ad0f0':v<.75?'#f2c43a':'#ff5a4a';c.fillStyle=col;c.fillRect(x+8,y,Math.round(w*v),5);
   if(v>=.75&&Math.floor(Date.now()/300)%2){c.fillStyle='rgba(255,90,74,.5)';c.fillRect(x+8,y,w,5);}
 }
-function owWarashi(){const d=dayKey();if(state.owWara===d)return [['座敷わらし','……(にこにこしている)']];state.owWara=d;healAll();sfx('heal');save();return [['座敷わらし','……あそんでくれるの？'],['','座敷わらしと手まりをついて遊んだ。'],['','なかまの疲れが、すっかりとれた！']];}
-function owFeast(){const d=dayKey();if(state.owFeast===d)return [['','お膳は空になっている。']];state.owFeast=d;const it=pick(['onigiri','onigiri','tea','drink','tane']);state.items[it]=(state.items[it]||0)+1;sfx('shiny');save();return [['','お膳の上に、だれかが用意してくれたものがある。'],['',`${ITEMS[it].n}をもらった。`]];}
+function owWarashi(){const d=dayKey();if(state.owWara===d)return [['座敷わらし','……(にこにこしている)']];state.owWara=d;owStamp('g:warashi');healAll();sfx('heal');save();return [['座敷わらし','……あそんでくれるの？'],['','座敷わらしと手まりをついて遊んだ。'],['','なかまの疲れが、すっかりとれた！']];}
+function owFeast(){const d=dayKey();if(state.owFeast===d)return [['','お膳は空になっている。']];state.owFeast=d;owStamp('g:feast');const it=pick(['onigiri','onigiri','tea','drink','tane']);state.items[it]=(state.items[it]||0)+1;sfx('shiny');save();return [['','お膳の上に、だれかが用意してくれたものがある。'],['',`${ITEMS[it].n}をもらった。`]];}
 /* 吊り橋の突風: 7秒ごとに、予兆(木の葉)のあと強い風が吹く */
 function owGust(){const t=Date.now()%7000;return t<4600?'calm':t<5400?'warn':'gust';}
 /* 狐火の灯籠: 東→西→南→北の順に灯す */
@@ -2559,7 +2559,7 @@ function owToro(id){
   OWC.lseq.push(id);const ok=OWC.lseq.every((v,i)=>v===OW_LSEQ[i]);
   if(!ok){OWC.lseq=[];sfx('sel');talk([['','灯籠に火をともした……'],['','ふっ、とすべての狐火が消えた。どこかで狐が笑っている……']]);return;}
   sfx('shiny');if(OWC.lseq.length<4){talk([['','灯籠に、青白い狐火がともった。']]);return;}
-  owSetFlag('kitsune');save();sfx('win');talk([['','四つの灯籠に、狐火がそろった！'],['','鳥居をふさいでいた結界が、すうっと消えていく……']]);
+  owSetFlag('kitsune');owStamp('g:toro');save();sfx('win');talk([['','四つの灯籠に、狐火がそろった！'],['','鳥居をふさいでいた結界が、すうっと消えていく……']]);
 }
 /* 押せる岩: マップに入るたびに元の位置にもどる */
 /* うめた穴は、すべる氷塊の部屋をのぞいて、ずっとうまったまま(帰り道がなくならないように) */
@@ -2572,7 +2572,7 @@ function owBackToTown(){const m=owMap();if(!m||B||ui.dlg)return;
   if(OWC.chase&&OWC.chase.map===state.ow.map){ui.owBack=false;ui.toast='いまは、にげるのに必死でもどれない！';render();return;}
   if(OWC.ride||OWC.fly||OWC.slide)return;
   if(!ui.owBack){ui.owBack=true;ui.toast='もう一度押すと、町の駅の前へもどります';render();return;}
-  const t=MAPS[m.town],sp=t.station||t.spawn;ui.owBack=false;OWC.mv=null;OWC.held=null;OWC.rk=null;OWC.crack=null;owCancelPath();owVolcReset();owTorchOut();state.owCold=0;state.ow={map:m.town,x:sp.x,y:sp.y,dir:sp.dir||'down'};sfx('sel');ui.toast=t.name+'の駅へもどった';save();render();}
+  const t=MAPS[m.town],sp=t.station||t.spawn;ui.owBack=false;OWC.mv=null;OWC.held=null;OWC.rk=null;OWC.crack=null;owCancelPath();owVolcReset();owTorchOut();state.owCold=0;state.ow={map:m.town,x:sp.x,y:sp.y,dir:sp.dir||'down'};owFoot();sfx('sel');ui.toast=t.name+'の駅へもどった';save();render();}
 const owRockAt=(m,x,y)=>m.rocks?owRocks(m).rocks.findIndex(r=>r[0]===x&&r[1]===y):-1;
 /* ---- 移動 ---- */
 const OWD={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
@@ -2618,14 +2618,15 @@ function owTryMove(dir){
 function owArrive(){
   const m=owMap(),o=state.ow,w=m.warps&&m.warps[o.x+','+o.y],here=m.rows[o.y][o.x];
   state.owSteps=(state.owSteps||0)+1;dailyInc('walk');if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
-  if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];OWC.slide=null;OWC.crack=null;if(OWC.chase&&OWC.chase.map===o.map&&m.chase)owSetFlag(m.chase.done);owVolcReset();owTorchOut();if(w.setFlag)owSetFlag(w.setFlag);if(!MAPS[w.to].cold)state.owCold=0;owCancelPath();ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
+  if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};owFoot();OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];OWC.slide=null;OWC.crack=null;if(OWC.chase&&OWC.chase.map===o.map&&m.chase)owSetFlag(m.chase.done);owVolcReset();owTorchOut();if(w.setFlag)owSetFlag(w.setFlag);if(!MAPS[w.to].cold)state.owCold=0;owCancelPath();ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
+  owFoot();owStampTiles(m,o,here);
   if(!'&$?!^~uWav'.includes(here)&&!owHole(o.x,o.y)){OWC.lastSafe={map:o.map,x:o.x,y:o.y};if(m.rest&&m.rest.includes(here))OWC.lastRest={map:o.map,x:o.x,y:o.y};}
   if(here==='?'){OWC.crumb=OWC.crumb||{};const ck=o.x+','+o.y,b=OWC.crumb[ck];if(!b||performance.now()-b>=9000)OWC.crumb[ck]=performance.now();}
   if(state.owTorch>0){state.owTorch--;if(!state.owTorch){ui.toast='火種が燃えつきてしまった……';render();}}
   if(m.cold&&here!=='i'&&!(OWC.chase&&OWC.chase.map===o.map)){if(owColdAdd(m,here==='y'?2:1))return;}
   if(here==='u'){if(owThin(m,o))return;}else if(OWC.crack){OWC.crack=null;ui.toast='うしろで、割れた氷がまた凍りついていく……';render();}
   if(here==='i'){OWC.slide=o.dir;}else if(OW_CUR[here]){OWC.slide=OW_CUR[here];o.dir=OW_CUR[here];}else OWC.slide=null;
-  if(m.rings){const rg=m.rings.find(r=>(r[0]===o.x&&r[1]===o.y)||(r[2]===o.x&&r[3]===o.y));if(rg){const to=rg[0]===o.x&&rg[1]===o.y?[rg[2],rg[3]]:[rg[0],rg[1]];o.x=to[0];o.y=to[1];OWC.held=null;OWC.mv=null;sfx('shiny');ui.toast='キノコの輪に足をふみ入れると、ふわりと体がうき上がった……';render();return;}}
+  if(m.rings){const rg=m.rings.find(r=>(r[0]===o.x&&r[1]===o.y)||(r[2]===o.x&&r[3]===o.y));if(rg){const to=rg[0]===o.x&&rg[1]===o.y?[rg[2],rg[3]]:[rg[0],rg[1]];o.x=to[0];o.y=to[1];OWC.held=null;OWC.mv=null;owStamp('g:ring');sfx('shiny');ui.toast='キノコの輪に足をふみ入れると、ふわりと体がうき上がった……';render();return;}}
   if(OWC.slide)return;
   if(here==='Q'){OWC.stuck=performance.now()+650;OWC.held=null;owCancelPath();ui.toast='クモの糸にからまった！';render();}
   const enc=m.enc||'T';
@@ -2645,7 +2646,7 @@ function owColdAdd(m,n){
   if(v>=1){owFreeze();return true;}
   if(v>=.75&&!OWC.coldWarn){OWC.coldWarn=true;ui.toast=m.light?'提灯の火が小さくなってきた……！ 灯籠で火をもらおう！':m.air?'息が苦しくなってきた……！ 泡のわく場所で息をつごう！':m.heat?'暑さで頭がくらくらする……湧き水で体を冷やそう！':'体が冷えきってきた……焚き火であたたまろう！';render();}
   if(v<.75)OWC.coldWarn=false;return false;}
-function owWarm(msg){state.owCold=0;OWC.coldWarn=false;const o=state.ow;state.owFire={map:o.map,x:o.x,y:o.y,dir:o.dir};save();}
+function owWarm(msg){owStamp('g:warm');state.owCold=0;OWC.coldWarn=false;const o=state.ow;state.owFire={map:o.map,x:o.x,y:o.y,dir:o.dir};save();}
 /* 目ざめる場所(焚き火・湧き水)が、いまのマップでも正しいか確かめる。古いセーブの場所が壁の中になっていたら使わない */
 function owFireOK(f){if(!f||!MAPS[f.map])return false;const m=MAPS[f.map],c=(m.rows[f.y]||'')[f.x];if(c===undefined||OW_SOLID.includes(c)||'av~u?&$'.includes(c))return false;
   return m.objs.some(([k,x,y,w=1,h=1])=>(k==='takibi'||k==='izumi'||k==='awa'||k==='tourou')&&f.x>=x-1&&f.x<=x+w&&f.y>=y-1&&f.y<=y+h);}
@@ -2670,6 +2671,127 @@ function owThin(m,o){
 function owWeatherNote(){return '';}
 function owWeatherChip(){return '';}
 function owBand(text){ui.band={text,c:TIMES[state.time].c,t:Date.now()};}
+/* ===== T2 みちくさ踏破(足あと・スタンプ・みちくさ点・寄り道ボーナス) ===== */
+/* しかけスタンプ16種。id は 'g:' + 名前。取ると +5点 */
+const OW_STAMPS=[
+  ['g:signal','信号','信号が青のあいだに、車道をわたる'],
+  ['g:power','配電盤','止まっている機械の動力レバーを上げる'],
+  ['g:tide','小島','潮が引いたときだけ渡れる小島へ行く'],
+  ['g:fish','釣り','釣りざおで魚を釣り上げる'],
+  ['g:trash','ゴミ箱','ゴミ箱や潮だまりをのぞく'],
+  ['g:ride','トロッコ','トロッコやカヌーに乗る'],
+  ['g:geyser','間欠泉','間欠泉に吹き飛ばされる'],
+  ['g:float','流氷','流れる氷や亀の背に乗る'],
+  ['g:warm','たき火','たき火や湧き水で体を休める'],
+  ['g:gust','突風','吊り橋で、風が出てきても立ちつづける'],
+  ['g:toro','灯籠','灯籠に正しい順番で火をともす'],
+  ['g:ring','キノコの輪','キノコの輪に足をふみ入れる'],
+  ['g:mirror','湖の鏡','鏡の湖で、鏡の中へ入る'],
+  ['g:warashi','座敷わらし','座敷わらしと遊ぶ'],
+  ['g:feast','お膳','お膳のごちそうをいただく'],
+  ['g:aurora','オーロラ','光の橋を渡る']];
+/* 通れない区画の手動リスト {mapId:[区画番号...]}(自動の到達判定でも足りないとき用) */
+const FOOT_SKIP={};
+const FOOT_IN={};let FOOT_IN_OK=false;
+const FOOT_C={};
+function footIn(){if(FOOT_IN_OK)return;FOOT_IN_OK=true;for(const id in MAPS){const w=MAPS[id].warps;if(w)for(const k in w){const v=w[k];(FOOT_IN[v.to]=FOOT_IN[v.to]||[]).push([v.x,v.y]);}}}
+/* 4x4マスの区画に分け、スポーン・入口から歩いて行ける区画だけを数える(結果はキャッシュ) */
+function footInfo(id){
+  if(FOOT_C[id])return FOOT_C[id];
+  const m=MAPS[id],R=m.rows.length,C=Math.max(...m.rows.map(r=>r.length)),bw=Math.ceil(C/4),bh=Math.ceil(R/4);footIn();
+  const seen=new Uint8Array(R*C),st=[];
+  const ok=(x,y)=>{const ch=(m.rows[y]||'')[x];if(ch===undefined)return false;if(!OW_SOLID.includes(ch))return true;return((ch==='~'||ch==='W')&&(m.floats||m.ground==='snow'))||(ch==='O'&&!!m.rocks)||ch==='+';};
+  const add=(x,y)=>{if(x>=0&&y>=0&&x<C&&y<R&&!seen[y*C+x]&&ok(x,y)){seen[y*C+x]=1;st.push(x,y);}};
+  if(m.spawn)add(m.spawn.x,m.spawn.y);if(m.station)add(m.station.x,m.station.y);
+  (FOOT_IN[id]||[]).forEach(([x,y])=>add(x,y));
+  (m.rings||[]).forEach(r=>{add(r[0],r[1]);add(r[2],r[3]);});
+  Object.values(m.jumps||{}).forEach(j=>add(j[0],j[1]));
+  [m.fallTo,m.tideSafe].forEach(p=>{if(p)add(p.x,p.y);});
+  while(st.length){const y=st.pop(),x=st.pop();add(x+1,y);add(x-1,y);add(x,y+1);add(x,y-1);}
+  const nb=bw*bh,valid=new Uint8Array(nb),skip=FOOT_SKIP[id]||[];let total=0;
+  for(let y=0;y<R;y++)for(let x=0;x<C;x++)if(seen[y*C+x]){const i=(y>>2)*bw+(x>>2);if(!valid[i]&&!skip.includes(i)){valid[i]=1;total++;}}
+  return FOOT_C[id]={bw,bh,nb,valid,total};
+}
+function footBit(id,i){const s=state.foot&&state.foot[id];if(!s)return false;return !!(((parseInt(s[i>>2],16)||0)>>(i&3))&1);}
+function footSetBit(id,i,fi){let s=state.foot[id]||'';const n=Math.ceil(fi.nb/4);if(s.length<n)s=s.padEnd(n,'0');const k=i>>2,c=(parseInt(s[k],16)||0)|(1<<(i&3));state.foot[id]=s.slice(0,k)+c.toString(16)+s.slice(k+1);}
+function footCount(id){const fi=footInfo(id);let n=0;for(let i=0;i<fi.nb;i++)if(fi.valid[i]&&footBit(id,i))n++;return n;}
+const footPct=id=>{const fi=footInfo(id);return fi.total?footCount(id)/fi.total:0;};
+const footShow=id=>{const p=footPct(id);return p>=1?100:Math.floor(p*100);};
+function owPoint(n){state.mpt=(state.mpt||0)+n;state.mptAll=(state.mptAll||0)+n;}
+const mchiTitle=()=>(state.mptAll||0)>=1000?'みちくさ名人':'';
+const detourBar=d=>'▮'.repeat(d)+'▯'.repeat(5-d);
+/* マップ左上の小さな札: 踏破率と寄り道の段 */
+function owSubHtml(m){
+  const id=state.ow.map,hub=id===m.town,pct=footShow(id),d=state.detour||0;
+  return `${hub?`<button class="ow-foot ow-mchi" data-act="mchi" aria-label="みちくさ帳を開く">踏破 ${pct}% ・ みちくさ帳</button>`:`<span class="ow-foot">踏破 ${pct}%</span>`}${hub?'':`<span class="ow-detour num">寄り道 ${detourBar(d)} +${d*10}%</span>`}`;
+}
+function owFootUi(glow){const m=owMap();if(!m)return;const s=document.querySelector('.ow-sub');if(!s)return;s.innerHTML=owSubHtml(m);if(glow){const f=s.querySelector('.ow-foot');if(f){f.classList.add('glow');setTimeout(()=>f.classList.remove('glow'),1400);}}}
+/* いまの位置の区画に足あとをつける(初めての区画なら +1点、寄り道の段、踏破スタンプ)。駅のあるマップでは寄り道が0に戻る */
+function owFoot(){
+  const o=state&&state.ow,m=o&&MAPS[o.map];if(!m||!m.rows)return;
+  if(!state.foot)state.foot={};
+  if(o.map===m.town){state.detour=0;state.detourN=0;}
+  const fi=footInfo(o.map),i=(o.y>>2)*fi.bw+(o.x>>2);
+  if(!fi.valid[i]||footBit(o.map,i))return;
+  footSetBit(o.map,i,fi);owPoint(1);
+  if(o.map!==m.town){state.detourN=(state.detourN||0)+1;const d=Math.min(5,Math.floor(state.detourN/10));if(d>(state.detour||0)){state.detour=d;owStampFx('d','寄り道 '+d+'段',`経験値と円 +${d*10}%`);}}
+  const n=footCount(o.map),p=n/fi.total;state.stamps=state.stamps||{};
+  if(p>=.8&&!state.stamps[o.map]){state.stamps[o.map]=1;owPoint(10);owStampFx('s','踏破 80%',`${m.name} +10点`);}
+  if(p>=1&&state.stamps[o.map]!==2){state.stamps[o.map]=2;owPoint(20);addStars(3);owStampFx('o','踏破 100%',`${m.name} +20点 ・ 流星石★3`);}
+  owFootUi(n%5===0);
+}
+/* スタンプの演出: 押された札が落ちてくる(2秒)。戦闘中などマップが見えないときは順番待ちにして、マップにもどってから出す */
+function stampHtml(e){return `<div class="ow-stamp k-${e.kind}" role="status"><div class="stp"><small>${e.kind==='g'?'しかけスタンプ':e.kind==='d'?'寄り道ボーナス':'みちくさ踏破'}</small><b>${esc(e.title)}</b><span>${esc(e.sub)}</span></div></div>`;}
+function owStampFx(kind,title,sub){ui.stampQ=ui.stampQ||[];ui.stampQ.push({kind,title,sub});sfx('stamp');owStampShow();}
+function owStampShow(){
+  if(ui.stampCur||!ui.stampQ||!ui.stampQ.length)return;const cv=document.querySelector('.ow-cv');if(!cv)return;
+  const e=ui.stampCur=ui.stampQ.shift();cv.insertAdjacentHTML('beforeend',stampHtml(e));
+  setTimeout(()=>{if(ui.stampCur===e)ui.stampCur=null;const x=document.querySelector('.ow-stamp');if(x)x.remove();owStampShow();},2000);}
+/* しかけスタンプ: 初めてのときだけ +5点 */
+function owStamp(id){
+  if(!state.stamps)state.stamps={};if(state.stamps[id])return false;
+  const d=OW_STAMPS.find(x=>x[0]===id);if(!d)return false;
+  state.stamps[id]=1;owPoint(5);owStampFx('g',d[1],'しかけスタンプ +5点');save();return true;
+}
+/* 歩いてたどりついたマスで起きるしかけスタンプ */
+function owStampTiles(m,o,here){
+  if(m.cars&&m.cars.lanes&&m.cars.lanes.some(l=>l.y===o.y)&&owPedGreen()!=='stop')owStamp('g:signal');
+  if(here==='U'&&!owTideHigh())owStamp('g:tide');
+  if('~W'.includes(here)&&m.floats&&owFloatAt(m,o.x,o.y))owStamp('g:float');
+  if(m.wind&&here==='H'&&owGust()!=='calm')owStamp('g:gust');
+  if(m.aurora&&(here==='a'||here==='v')&&owFloeOn(here))owStamp('g:aurora');
+}
+/* 寄り道ボーナスの倍率(野生戦だけ)。ぬし・配合杯・ライバル・塔では 1 */
+const detourMul=()=>B&&!B.boss&&!B.cup&&!B.tower&&!B.rival&&!B.trainer?1+.1*Math.min(5,state.detour||0):1;
+/* みちくさ帳の交換品 */
+const MEX=[
+  {id:'kirakira',n:'きらきらの砂',pt:15,items:{kirakira:1}},
+  {id:'kai',n:'色変わりの貝',pt:40,items:{kai:1}},
+  {id:'saino',n:'才能のかけら',pt:80,items:{saino:1},lim:'day'},
+  {id:'star',n:'流星石 ★10',pt:50,stars:10,lim:'day'},
+  {id:'tenpu',n:'天賦の宝珠',pt:400,items:{tenpu:1},lim:'once'}];
+function mexLeft(x){
+  if(x.lim==='day'){dailyRoll();return state.daily.got['mx:'+x.id]?0:1;}
+  if(x.lim==='once')return state.flags['mx:'+x.id]?0:1;return 1;
+}
+function mexBuy(id){
+  const x=MEX.find(q=>q.id===id);if(!x||(state.mpt||0)<x.pt||!mexLeft(x))return false;
+  state.mpt-=x.pt;if(x.lim==='day')state.daily.got['mx:'+x.id]=1;if(x.lim==='once')state.flags['mx:'+x.id]=true;
+  for(const [k,n] of Object.entries(x.items||{}))state.items[k]=(state.items[k]||0)+n;if(x.stars)addStars(x.stars);
+  save();return true;
+}
+function renderMchi(){
+  dailyRoll();const mt=mchiTitle(),nst=OW_STAMPS.filter(d=>state.stamps[d[0]]).length;
+  const ex=MEX.map(x=>{const left=mexLeft(x),can=(state.mpt||0)>=x.pt&&left;return `<div class="mex ${left?'':'done'}"><div class="stack tight"><b>${x.n}</b><span class="small muted num">${x.pt}点${x.lim==='day'?' ・ 1日1回':x.lim==='once'?' ・ 1回だけ':''}</span></div><button class="btn sm ${can?'primary':''}" data-act="mex" data-id="${x.id}" ${can?'':'disabled'}>${left?'交換する':x.lim==='day'?'今日は済み':'交換済み'}</button></div>`;}).join('');
+  const grid=OW_STAMPS.map(d=>{const g=state.stamps[d[0]];return `<div class="mst ${g?'got':''}"><span class="mk">${g?'済':'？'}</span><div class="stack tight"><b>${g?d[1]:'？？？'}</b><span class="small muted">${d[2]}</span></div></div>`;}).join('');
+  const towns=TOWNS.filter(t=>townOpen(t)&&Object.values(MAPS).some(m=>m.town===t.id));
+  const rows=t=>Object.entries(MAPS).filter(([,m])=>m.town===t.id).map(([id,m])=>{const p=footShow(id),s=(state.stamps||{})[id]||0;return `<div class="frow"><span class="fn">${esc(m.name)}</span><span class="fb"><i style="width:${p}%"></i></span><b class="num">${p}%</b><span class="fs ${s===2?'gold':s===1?'silv':''}">${s===2?'金':s===1?'銀':'―'}</span></div>`;}).join('');
+  const foot=towns.map(t=>`<details class="panel foot-t" style="--tl:${TLC[t.id]||'#ffd21f'}" ${t.id===state.town?'open':''}><summary><b>${t.name}</b></summary><div class="flist">${rows(t)}</div></details>`).join('');
+  return `<div class="panel stack mpt"><div class="row between"><div class="stack tight"><span class="eyebrow">みちくさ点</span><b class="big num">${state.mpt||0}<small>点</small></b></div><div class="stack tight" style="text-align:right"><span class="small muted num">累計 ${state.mptAll||0}点</span><span class="small ${mt?'hl':'muted'}">${mt?'称号「'+mt+'」':'名人まで あと '+(1000-(state.mptAll||0))+'点'}</span></div></div><p class="small muted">新しい区画 +1点 ・ しかけ +5点 ・ 踏破80% +10点 ・ 踏破100% +20点と流星石★3</p></div>
+    <div class="panel stack"><h3>交換所</h3><div class="list">${ex}</div></div>
+    <div class="panel stack"><div class="row between"><h3>しかけスタンプ</h3><span class="lv num">${nst}/${OW_STAMPS.length}</span></div><div class="mstamps">${grid}</div></div>
+    <div class="stack"><h3>足あと帳</h3><p class="small muted">4×4マスの区画を、ぜんぶ歩くと100%。金は100%、銀は80%。</p>${foot}</div>`;
+}
 function owTimePass(msg){
   owCancelPath();
   const before=owTideHigh();advanceTime();const m=owMap(),o=state.ow;let t=msg||'';const bt=[`${TIMES[state.time].n}になった`];
@@ -2697,7 +2819,7 @@ function owFishPull(){
   if(f.phase!=='bite'){ui.toast='早すぎた！ 魚に気づかれた。';render();return;}
   const m=owMap(),t=TOWN[m.town],fs=m.fish,tb=fs.table.filter(([,,tm])=>timeOK(tm,state.time)).map(([s,w])=>({w,s}));
   const n=Math.random()<.25?2:1,foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(OW_LV(fs.lv[0],1.25),OW_LV(fs.lv[1],1.25))]);
-  ui.toast='';save();startBattle(foes,{field:`${t.name}・釣り`,scene:'port'});
+  ui.toast='';owStamp('g:fish');save();startBattle(foes,{field:`${t.name}・釣り`,scene:'port'});
 }
 /* はじめの3勝まで: 野生は1体だけ、Lvは先頭のなかま-1まで(こもれび町のぬしを倒したあとは補正なし) */
 function owEarly(foes){
@@ -2719,7 +2841,7 @@ function owTrash(k,kind){
   const pool=kind==='pool',nm=pool?'潮だまり':'ゴミ箱';if(pool&&owTideHigh()){talk([['','潮だまりだ。いまは潮が満ちていて、中がよく見えない。']]);return;}
   const d=dayKey();if(!state.owTrash||state.owTrash.d!==d)state.owTrash={d,u:{}};
   const id=state.ow.map+k;if(state.owTrash.u[id]){talk([['',`${nm}だ。今日はもう何もなさそうだ。`]]);return;}
-  state.owTrash.u[id]=true;const r=Math.random();
+  state.owTrash.u[id]=true;owStamp('g:trash');const r=Math.random();
   const look=`${nm}をのぞきこんだ……`;
   if(r<.3&&state.party.some(x=>x.hp>0)){save();talk([['',look],['','なにかが飛び出してきた！']],()=>owEncounter(owMap().field));return;}
   if(r<.75){const it=pool?pick(['tea','bansoko','drink','tea','bansoko','bansoko','tea','kai']):pick(['bansoko','bansoko','tea','drink','onigiri']);state.items[it]=(state.items[it]||0)+1;sfx('shiny');save();talk([['',look],['',pool?`${ITEMS[it].n}を見つけた！`:`${ITEMS[it].n}が捨てられていた。もらっておこう。`]]);return;}
@@ -2752,7 +2874,7 @@ function owA(){
     if(kk==='lighthouse'){talk([['',m.town==='ryuhyo'?'岬の灯台だ。流氷の季節は、夜通し海を照らしている。':'潮見浜の灯台だ。夜になると、海を照らす。']]);return;}
     if(kk==='hyouheki'&&!owFlag(flag)){if(!owFlag('tsuruhashi')){talk([['','分厚い氷の壁がふさいでいる。素手ではびくともしない。'],['','(つるはしがあれば、くだけそうだ)']]);return;}owSetFlag(flag);sfx('win');save();talk([['','つるはしをふりかぶった……！'],['','ガキィン！ ガキィン！ ……バリーン！'],['','氷の壁をくだいた！']]);return;}
     if(kk==='point'){state.owFlags=state.owFlags||{};state.owFlags[flag]=!state.owFlags[flag];sfx('sel');save();talk([['','ポイントのレバーを切りかえた！'],['','ガシャン……どこかで線路の分かれ道が動いた。']]);return;}
-    if(kk==='power'){if(owFlag(flag)){talk([['','動力のレバーは上がったままだ。遠くで機械がうなっている。']]);return;}owSetFlag(flag);sfx('win');save();talk([['','古い硫黄鉱山の、動力のレバーだ。'],['','力いっぱい引き上げた……！'],['','ゴウン、ゴウン……。谷じゅうのトロッコの線路に、電気が通った！']]);return;}
+    if(kk==='power'){if(owFlag(flag)){talk([['','動力のレバーは上がったままだ。遠くで機械がうなっている。']]);return;}owSetFlag(flag);owStamp('g:power');sfx('win');save();talk([['','古い硫黄鉱山の、動力のレバーだ。'],['','力いっぱい引き上げた……！'],['','ゴウン、ゴウン……。谷じゅうのトロッコの線路に、電気が通った！']]);return;}
     if(kk==='modoshi'){if(!ui.rkAsk){ui.rkAsk=true;talk([['','氷の壁に、古い文字がきざまれている。'],['','「氷塊をはじめの場所にもどしたい者は、もう一度ここにふれよ」']]);return;}ui.rkAsk=false;if(state.owRk)delete state.owRk[state.ow.map];OWC.rk=null;sfx('sel');save();talk([['','ゴゴゴ……。洞窟じゅうの氷塊が、はじめの場所にもどった。']]);return;}
     if(kk==='tourou'){owWarm();sfx('heal');talk([['','石の灯籠に、あたたかい火がともっている。'],['','提灯に火をもらった。まわりが明るくなった！'],['','(灯がもどった。道を見失ったときは、ここへもどってくる)']]);return;}
     if(kk==='coin'&&!owFlag(flag)){owSetFlag(flag);sfx('win');save();const n=(m.fareAll||[]).filter(owFlag).length;talk([['','草のかげで、古い銭が光っている。'],['',`六文銭のかけらを拾った！(${n}/${(m.fareAll||[]).length})`]]);return;}
@@ -2867,7 +2989,7 @@ function renderOverworld(){
   const m=owMap(),tm=TIMES[state.time];
   return `<section class="ow" aria-label="${m.name}のマップ">
     <div class="ow-screen"><div class="ow-cv"><canvas id="owc" width="${OWC.vw*TS*OWSCALE}" height="${OWC.vh*TS*OWSCALE}" aria-label="${m.name}を見下ろしたマップ。主人公が立っている"></canvas>
-      <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}</span></div>${ui.band?`<div class="ow-band" style="--tc:${ui.band.c}" role="status"><b>${esc(ui.band.text)}</b></div>`:''}${ui.heal?`<button class="ow-heal" data-act="owHeal">${esc(ui.heal)}</button>`:''}${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
+      <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}</span><div class="ow-sub">${owSubHtml(m)}</div></div>${ui.stampCur?stampHtml(ui.stampCur):''}${ui.band?`<div class="ow-band" style="--tc:${ui.band.c}" role="status"><b>${esc(ui.band.text)}</b></div>`:''}${ui.heal?`<button class="ow-heal" data-act="owHeal">${esc(ui.heal)}</button>`:''}${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
     <div class="ow-pad">
       <div class="dpad">${['up','left','right','down'].map(d=>`<button class="dp dp-${d}" data-owdir="${d}" aria-label="${{up:'上',down:'下',left:'左',right:'右'}[d]}">${{up:'▲',down:'▼',left:'◀',right:'▶'}[d]}</button>`).join('')}<span class="dp-c"></span></div>
       ${state.ow.map!==m.town?`<button class="ow-back${ui.owBack?' on':''}" data-act="owBack" aria-label="町の駅へもどる">${ui.owBack?'もう一度で<br>もどる':'駅へ<br>もどる'}</button>`:''}
@@ -2882,7 +3004,7 @@ function wildCard(t){
 }
 function renderStationIn(){
   const h=renderMap(),cut=h.indexOf('<section class="town-grid">');const t=TOWN[state.town];
-  return `${h.slice(0,cut)}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
+  return `${h.slice(0,cut)}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
 }
 /* 建物の中 */
 function renderInside(){
@@ -2891,6 +3013,7 @@ function renderInside(){
   if(k==='sauna')return head(t.sento,'なかま全員のHPとMPが全回復する。')+`<div class="panel stack"><div class="row between"><b>${t.id==='kasumi'?'ととのう':'ひとっ風呂'}</b><span class="lv num">${t.sentoP}円</span></div><div><button class="btn primary" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.id==='kasumi'?'サウナに入る':'お湯につかる'}</button></div></div><div class="panel stack"><h4>パーティ</h4><div class="list">${state.party.map(m=>mrow(m,false,'gosel')).join('')}</div></div>`;
   if(k==='dome')return head('霞ヶ丘ドーム','配合杯の会場。3試合を勝ち抜けば優勝。')+cupsPanel(alive);
   if(k==='board')return head('掲示板','町の人からの依頼がはり出されている。')+reqBoard(t);
+  if(k==='mchi')return head('みちくさ帳','寄り道して集めた足あととスタンプ。みちくさ点を品物と交換できる。')+renderMchi();
   return head('建物','');
 }
 /* 入力 */
