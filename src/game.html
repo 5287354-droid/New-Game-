@@ -6944,8 +6944,8 @@ function win(){
   const head=!def.length?(B.enemies.some(c=>c.fled)?'逃げられた……':'スカウト成功！'):'勝利！';
   const rw={head,exp:def.length?exp:0,yen,bonus:0,drops:rwDrops,news,mem,stars:(state.stars||0)-B.stars0};
   B.result={win:true,lines,rw};save();
-  const up=mem.some(x=>x.lv1>x.lv0);sfx('win');// TODO(sound): 勝利ジングル(結果画面の開始)
-  if(up)rwSfx(rwPlan(rw).up,'lvup');// TODO(sound): レベルアップ専用音
+  const up=mem.some(x=>x.lv1>x.lv0);jingle('win');
+  if(up)rwSfx(rwPlan(rw).up,'lvup');
   render();
 }
 /* 結果画面の演出の時間割(ms, はやさに合わせて縮む)。rwPlan は画面と音の両方が使う */
@@ -7011,9 +7011,9 @@ function rwPanel(){
   for(const n of rw.news)card('news',n.again?'なかま':'図鑑 NEW',`No.${String(n.no).padStart(2,'0')} ${esc(SP[n.id].name)}${n.again?' をなかまにした':' 新登録！'}`);
   for(const d of rw.drops)card('drop','ドロップ',esc(d));
   if(rw.stars>0)card('star','流星石',`★${rw.stars}`);
-  if(!B.rwSfx){B.rwSfx=1;rwSfx(P.yen,'sel');// TODO(sound): 円のカウントアップ音
-    rw.news.forEach((n,j)=>rwSfx(P.c0+P.gap*j,'scout'));// TODO(sound): 新登録ジングル
-    rw.drops.forEach((d,j)=>rwSfx(P.c0+P.gap*(rw.news.length+j),'shiny'));}// TODO(sound): ドロップ取得音
+  if(!B.rwSfx){B.rwSfx=1;rwSfx(P.yen,'countup');
+    rw.news.forEach((n,j)=>rwSfx(P.c0+P.gap*j,'newdex'));
+    rw.drops.forEach((d,j)=>rwSfx(P.c0+P.gap*(rw.news.length+j),'kirari'));}
   const btn=B.next?(B.next.tower?`${B.next.tower}階へ進む`:`第${B.next.round}試合へ進む`):'もどる';
   return `<div class="rw" data-act="rwskip"><h3 class="rwh hl" ${S(0)}>${esc(rw.head)}</h3>${mem}${nums}<div class="rwcards">${cards.join('')}</div>${r.lines.filter(l=>/優勝|試合|踏破|荒ぶる|認めて|研究所|アオイ|賞|医務室/.test(l)).map(l=>`<p class="small rwl">${esc(l)}</p>`).join('')}</div>
     <div class="row rwbtn"><button class="btn primary big" data-act="bend" autofocus>${btn}</button>${B.next&&B.next.tower?'<button class="btn" data-act="bendStop">塔を出る</button>':''}</div>`;
