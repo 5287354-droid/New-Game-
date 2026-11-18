@@ -116,6 +116,23 @@ h1{font-size:clamp(28px,6vw,44px)} h2{font-size:24px} h3{font-size:18px} h4{font
 .station.locked .dot{border-color:var(--faint);color:var(--faint)}
 .station .sn{font-family:var(--f-disp);font-size:15px;margin-top:6px}
 .station .sk{font-size:11px;color:var(--muted)}
+.station.mabo .dot{border:5px dashed #8c93a3;color:#c6ccd8;font-size:12px;animation:maboflick 1.8s steps(1,end) infinite}
+.station.mabo .sn{color:#c6ccd8}
+@keyframes maboflick{0%,100%{opacity:1}30%{opacity:.35}36%{opacity:1}62%{opacity:.5}68%{opacity:1}}
+.mabo-note{border-left:6px solid #8c93a3}
+.mabo-fx{position:fixed;inset:0;z-index:95;background:#04050a;display:grid;place-items:center;pointer-events:none;animation:mabofx 3.6s linear both}
+.mabo-fx:not(.first){animation-duration:2.2s}
+.mabo-fx .mp{position:relative;min-width:240px;padding:22px 34px 16px;border:4px solid #e8ebf2;background:#000;color:#fff;text-align:center;font-family:var(--f-disp)}
+.mabo-fx .mp i{position:absolute;left:-4px;right:-4px;top:-4px;height:10px;background:#8c93a3}
+.mabo-fx .mp small{display:block;margin-top:6px;font-size:12px;letter-spacing:.3em;color:#a3aab6}
+.mabo-fx .mp b{display:block;font-size:34px;font-weight:900;letter-spacing:.06em}
+.mabo-fx .mp .q{animation:mabo-q 3.6s steps(1,end) both}
+.mabo-fx .mp .n{position:absolute;left:0;right:0;top:46px;animation:mabo-n 3.6s steps(1,end) both}
+.mabo-fx:not(.first) .mp .q,.mabo-fx:not(.first) .mp .n{animation-duration:2.2s}
+.mabo-fx .mp span{display:block;margin-top:34px;font-family:var(--f-num);font-weight:600;font-size:18px;letter-spacing:.18em;color:#a3aab6}
+@keyframes mabofx{0%{opacity:0}10%{opacity:1}86%{opacity:1}100%{opacity:0}}
+@keyframes mabo-q{0%{opacity:1}30%{opacity:.2}34%{opacity:1}44%{opacity:.3}48%{opacity:1}52%,100%{opacity:0}}
+@keyframes mabo-n{0%,50%{opacity:0}54%{opacity:.4}58%,100%{opacity:1}}
 
 .town-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px;align-items:start}
 .timebar{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
@@ -1331,6 +1348,7 @@ const SFX={
   lose:[[392,.2,0,'triangle',.06],[330,.2,.2,'triangle',.06],[262,.4,.4,'triangle',.06]],
 };
 SFX.levelup=SFX.lvup;
+SFX.fumikiri=[[1318,.13,0,'triangle',.05],[988,.13,.28,'triangle',.05]];   /* T8: 踏切のベル(カン・カン) */
 /* 1つの音(または一連の音)を、ctx の dst につなぐ。包絡線は0から始まり0で終わる(クリック防止) */
 function playSpec(ctx,dst,t,spec,rate){
   for(const s of spec){
@@ -1683,6 +1701,7 @@ function bgmWanted(){
   if(ui.tab==='gacha'||ui.gacha)return 'gacha';
   if(ui.tab==='tower')return 'tower';
   const field=ui.tab==='map'&&typeof owActive==='function'&&owActive()&&state.ow.map!==state.town,tb=TOWN_BGM[state.town]||'komorebi';
+  if(field&&MAPS[state.ow.map]&&MAPS[state.ow.map].mabo)return 'mabo';
   if(field)return SONGS[tb+'_t']||state.town==='mayoiga'?tb:'michi';   /* 町の外: 新しい町は元の曲、ほかは道の曲 */
   return SONGS[tb+'_t']?tb+'_t':tb;
 }
@@ -1760,8 +1779,10 @@ function wxPanel(){
   const msg=pk?`${i?TIMES[rows[i].tm].n+'は':'いまは'}${WX[rows[i].wx].n}。${state.seen[pk]?SP[pk].name:'まだ見たことのない魔生物'}が出やすい日だ。`:'この町では、いまの空もようで特別に出る魔生物はいない。';
   return `<div class="panel stack wxnews"><div class="row between"><h3>みちくさ便り</h3><span class="small muted">空もよう予報</span></div>
     <div class="wxrow">${rows.map((r,j)=>`<div class="wxc ${r.k?'':'now'}" style="--tc:${WX[r.wx].c}"><small>${r.k?TIMES[r.tm].n:'いま・'+TIMES[r.tm].n}</small><b>${WX[r.wx].n}</b><span class="wxh">${hs[j].map(s=>seal(s,'xs',state.seen[s]?true:'sil')).join('')}</span></div>`).join('')}</div>
-    <p class="small muted">${msg}</p></div>`;
+    <p class="small muted">${msg}</p>${state.boss.kasumi?`<p class="small muted">${maboOpen()?'いまなら、路線図に知らない駅が見える。':rows.some(r=>r.wx==='kiri'&&r.tm===3)?'霧の夜には、路線図にない駅が現れるという。':''}</p>`:''}</div>`;
 }
+/* T8: 霧 × 夜 × 霞ヶ丘のぬし撃破 のときだけ、路線図に「？？」駅が出る */
+const maboOpen=()=>!!(state&&state.started&&!B&&state.boss&&state.boss.kasumi&&MAPS[state.town]&&state.time===3&&wxNow(state.town)==='kiri');
 function wxNow(town){town=town||state.town;const k=town+'|'+(state.wxN||0)+'|'+state.time+'|'+dayKey();if(wxNow.k!==k){wxNow.k=k;wxNow.v=wxOf(town);}
   if(state.wxLog&&!state.wxLog[wxNow.v])state.wxLog[wxNow.v]=true;return wxNow.v;}
 const HAB={};
@@ -2849,6 +2870,14 @@ S('yukiwata','ユキワタボウシ','beast','B','綿','オコジョ','綿の帽
 S('haikagura','ハイカグラ','dragon','B','灰','ヤモリ','火山灰の降る日に舞う小さな竜。灰の中でしなやかに体をくねらせるさまは、神楽のようだと島の人は言う。',[38,16,19,12,15,14],[[1,'kamitsuki'],[10,'kazanbai'],[20,'honoonoiki'],[30,'tsumuji']],'shibutoi');
 S('kumozumi','クモリスミ','bug','D','墨','ヤママユガ','くもりの夜にだけ現れる、墨色の羽の蛾。羽ばたくと、夜空のくもりがいっそう濃くなる。',[20,11,10,8,12,12],[[1,'rinpun'],[6,'kasakasa'],[13,'hotarubi'],[24,'yumemi']],'bakegaku');
 S('hoshikuzume','ホシクズメ','bird','A','星','ツバメ','流れ星のかけらを集める小鳥。星降りの夜にだけ現れ、くちばしにくわえた星くずを、巣の目印にしている。',[40,24,15,12,20,21],[[1,'tsuttsuki'],[1,'hoshikusanoshizuku'],[20,'amanogawa'],[34,'seifuu']],'kaishin');
+S('mabonokoshou','マボロシャショウ','myst','S','灯','提灯と車掌','廃駅のホームに、霧の夜だけともる影の灯。古い車掌帽をかぶり、もう来ない終電を、いつまでも見送っている。出会えた者の行き先は、時刻表にない場所になるという。',[84,34,28,32,30,40],[[1,'maboroshi'],[1,'tamashiibi'],[30,'getsugashu'],[60,'tokoyonohi']],'bakegaku');
+/* ART(T8): まぼろし駅の新種の描画定義(仮の絵。本番の絵はモンスター工房が描き直す) */
+DRAW.mabonokoshou=g=>{g.e(24,46,16,1.4,'#12142c');g.path([[13,41],[8,34],[11,26]],'#2a2c58',5);g.path([[35,41],[40,35],[38,29]],'#2a2c58',4);
+  g.e(24,33,12,12,'#3a3c72');g.p([[24,16],[15,30],[33,30]],'#3a3c72');g.e(24,36,8,8,'#7fe4ee');g.e(24,38,4.6,5,'#eafdff');
+  g.p([[15,22],[17,11],[31,11],[33,22]],'#1c2646');g.p([[11,24],[37,24],[34,20],[14,20]],'#24305c');g.r(16,17,16,2.6,'#e8c04a');g.e(24,14,2.2,2.2,'#e8c04a');
+  g.eye(19,28);g.eye(28,28);g.l(22,35,27,35,'#1c2646',1);
+  g.l(34,33,40,38,'#2a2c58',2.6);g.l(41,31,41,35,'#7a6a3a',1);g.e(41,38,3.4,4,'#ffd070');g.e(41,38,1.8,2.4,'#fff4c0');
+  [[7,18,1.4],[42,20,1.2],[6,36,1.1]].forEach(([a,b,r])=>g.e(a,b,r,r*1.4,'#9fe8f0'));};
 /* ART(T1): 天候限定7体の描画定義はここ1か所にまとめてある。本番の絵はモンスター工房が描き直す(いまは flatPainter の仮絵) */
 Object.assign(DRAW,{
   amayadori:g=>{g.e(24,46,17,1.6,'#1e2c4a');g.e(14,42,5,3.2,'#3f9b5a');g.e(34,42,5,3.2,'#3f9b5a');g.e(24,36,13,9,'#4fb36b');g.e(24,39,8,5.5,'#d8f2b8');g.e(24,28,10,7,'#5cc27a');
@@ -2949,6 +2978,12 @@ TOWN.hinoshima.fields[2].table.push(['kumanomi',.6]);
 TOWNS.forEach(t=>t.fields[0].table.push(['hoshikuzume',1.5,'*']));   /* 星降りの夜は、どの町でも */
 TOWNS.forEach(t=>t.fields.forEach(f=>f.table.forEach(([s,,tm])=>{const x=t.name+'・'+f.name+(tm?`(${TM[tm]})`:'');(HAB[s]=HAB[s]||[]).includes(x)||HAB[s].push(x);})));
 HAB.nijitama=['天狗岳から先の探索先(ごくまれ)'];
+/* ===== T8 まぼろし駅: TOWNS には入れず、辞書 TOWN だけに足す(TOWNS.indexOf を使う所が多いため)。Lv は撃破したぬしの最大Lv+3(owEncounter が入れる) ===== */
+TOWN.mabo={id:'mabo',code:'??',name:'まぼろし駅',roma:'Maboroshi',kind:'隠し駅',scene:'subway',sento:'こもれび湯',sentoP:0,
+  desc:'霧の夜にだけ停まる、時刻表にない駅。',
+  fields:[{id:'mabo',name:'夢の野原',scene:'subway',lv:[20,20],max:3,dyn:true,
+    table:[['amayadori',1],['kirigarasu',1],['nijimimizu',1],['yukiwata',1],['haikagura',1],['kumozumi',1],['hoshikuzume',1],['mabonokoshou',1.5]]}]};
+TOWN.mabo.fields[0].table.forEach(([s])=>{(HAB[s]=HAB[s]||[]).push('まぼろし駅・夢の野原(霧の夜だけ)');});
 
 RIVALS.sango={team:[['oniitomaki',118,22],['kijimuna',119,22],['yukemuri',120,22]],reward:{yen:100000,items:{tenpu:2,kakusei:1}},
   pre:[['アオイ','見て見て、この島の海！ ……って、遊びに来たんじゃなかった。'],['アオイ','所長の昔のノート、わたしも少し読んだんだ。この島で、所長はいちど配合師をやめようとしたんだって。'],['アオイ','……だからこそ、ここで負けたくない！']],
@@ -2996,7 +3031,7 @@ function regList(tid){
 function regStat(tid){const L=regList(tid);return {all:L.length,seen:L.filter(x=>state.seen[x.s]).length,own:L.filter(x=>state.owned[x.s]).length};}
 const regDone=tid=>{const s=regStat(tid);return s.all>0&&s.own===s.all;};
 /* 地域コンプ報酬(町ごとに1回): 流星石★10 + その町の金スタンプ + 道具 */
-const REG_RW={komorebi:{onigiri:5},kasumi:{kirakira:3},shiomi:{kai:2},tengu:{makimono:2},mayoiga:{saino:1},ryuhyo:{kettou:1},hinoshima:{saino:2},sango:{kakusei:1},yomi:{tenpu:1}};
+const REG_RW={komorebi:{onigiri:5},kasumi:{kirakira:3},shiomi:{kai:2},tengu:{makimono:2},mayoiga:{saino:1},ryuhyo:{kettou:1},hinoshima:{saino:2},sango:{kakusei:1},yomi:{tenpu:1},mabo:{tenpu:1,saino:1}};
 function regClaim(tid){
   if(!TOWN[tid]||(state.dexReg&&state.dexReg[tid])||!regDone(tid))return false;
   state.dexReg=state.dexReg||{};state.dexReg[tid]=true;state.stamps=state.stamps||{};state.stamps['reg:'+tid]=2;
@@ -3018,6 +3053,12 @@ const wxLabel=id=>{try{return id&&typeof WX!=='undefined'&&WX[id]?(WX[id].n||WX[
 function seenAtText(sp){const a=state.seenAt&&state.seenAt[sp];if(!a)return state.seen[sp]?'はじめて会った場所: 記録なし':'';const t=TOWN[a[0]];return `はじめて会った場所: ${t?t.name:'?'}・${TIMES[a[1]]?TIMES[a[1]].n:''}${wxLabel(a[2])?'・'+wxLabel(a[2]):''}`;}
 function renderDexReg(DL){
   const cell=({s,tm})=>{const sn=!!state.seen[s],sp=SP[s],i=SPL.indexOf(sp);return `<button class="dexc ${ui.dexSel===s?'on':''} ${state.owned[s]?'own':''}" data-act="dex" data-id="${s}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s]?' <b class="shn">✦</b>':''}</span>${seal(s,'sm',sn?true:false)}<span class="nm">${sn?sp.name:'？？？'}</span>${tm?`<span class="rtag">${(typeof TM!=='undefined'&&TM[tm])||(tm==='n'?'夕方・夜':'朝・昼')}</span>`:''}</button>`;};
+  const mabo=TOWN.mabo,mst=regStat('mabo'),mgot=state.dexReg&&state.dexReg.mabo,mdone=regDone('mabo'),mrw=REG_RW.mabo||{};
+  const maboHtml=!state.flags.mabo?'':`<div class="dexgroup reg" style="--fam:${TLC.mabo}"><h4>?? ${mabo.name}</h4>
+      <div class="regsum"><span>見つけた <b class="num">${mst.seen}</b></span><span>なかま <b class="num">${mst.own}</b></span><span>全 <b class="num">${mst.all}</b></span>
+      ${mgot?'<span class="badge good">コンプ済み</span>':`<button class="btn sm ${mdone?'primary':''}" data-act="regClaim" data-id="mabo" ${mdone?'':'disabled'}>コンプ報酬を受け取る</button>`}</div>
+      <p class="small muted">報酬: 流星石★10・${rewardText({items:mrw})}・金スタンプ</p>
+      <div class="dex">${regList('mabo').map(cell).join('')}</div></div>`;
   return TOWNS.map(t=>{
     if(!townOpen(t))return `<div class="dexgroup reg locked" style="--fam:${TLC[t.id]}"><h4>${t.code} ？？？ <small class="muted">未開通</small></h4></div>`;
     const st=regStat(t.id),L=regList(t.id),done=regDone(t.id),got=state.dexReg&&state.dexReg[t.id];
@@ -3027,7 +3068,7 @@ function renderDexReg(DL){
       ${got?'<span class="badge good">コンプ済み</span>':`<button class="btn sm ${done?'primary':''}" data-act="regClaim" data-id="${t.id}" ${done?'':'disabled'}>コンプ報酬を受け取る</button>`}</div>
       <p class="small muted">報酬: 流星石★10・${rewardText({items:rw})}・金スタンプ</p>
       <div class="dex">${L.map(cell).join('')}</div></div>`;
-  }).join('');
+  }).join('')+maboHtml;
 }
 
 Object.assign(SONGS,{
@@ -3057,6 +3098,12 @@ Object.assign(SONGS,{
     {w:'nz',v:.025,m:'k2 h2'}]},
 });
 Object.assign(TOWN_BGM,{sango:'sango',yomi:'yomi'});
+/* T8: まぼろし駅の曲(仮。オルゴール風。サウンド班が差し替える) */
+Object.assign(SONGS,{mabo:{bpm:62,ch:[
+  {w:'sine',v:.05,o:6,m:'e4 g4 b4 >e4 d2 <b4 g4 a4 b4 >c4 <b2 r2 g4 b4 >e4 g4 f+2 e4 d4 <b4 a4 g4 e2 r2'},
+  {w:'tri',v:.07,o:3,m:'e2 e2 c2 c2 a2 a2 b2 b2'},
+  {w:'sine',v:.022,o:7,m:'r1 r1 e8 r8 b8 r8 e2 r1 r1'}]}});
+Object.assign(SONG_NAME,{mabo:'まぼろし駅'});
 Object.assign(BOSS_BGM,{sango:'oniitomaki',sango_ura:'nirai',yomi:'orochi',yomi_ura:'tokoyo'});
 Object.assign(SONG_NAME,{sango:'珊瑚島',oniitomaki:'珊瑚礁のぬし',nirai:'海のかなたの楽園',yomi:'黄泉ヶ原',orochi:'ひらさかの番蛇',tokoyo:'トコヨ'});
 
@@ -4991,6 +5038,70 @@ MAPS.kagami_ura={...MAPS.kagami,name:'湖の鏡',mirror:true,rate:.13,
   rows:MAPS.kagami.rows.map((r,j)=>{let a=[...r].reverse();if(j===10)a[15]='t';if(j===5)for(let i=9;i<13;i++)a[i]='o';return a.join('');}),
   objs:[['mirror',8,9]],doors:{'8,9':'mirror'},warps:{},items:{'7,6':'saino'},
   npcs:[{id:'kappa3',x:12,y:9,dir:'left',look:'kid',lines:[['河童の子……？','るなかわ はらちこ……？'],['','鏡の中の河童の子が、口だけ動かして何か言っている。']]}],spawn:{x:8,y:10,dir:'up'}};
+/* ===== T8 まぼろし駅(霧の夜だけの隠しマップ 60x50)。town:'*' は「どの町にも属さない」印。戻りの駅は state.town ===== */
+MAPS.maboroshi={town:'*',fieldTown:'mabo',name:'まぼろし駅',field:'mabo',ground:'mabo',enc:'T',rate:.09,mabo:true,
+  /* 幽霊列車: 踏切(H)の行 y を、時刻表どおりに走る。per=周期(ms) off=ずれ。warn=ベルが鳴る時間 run=走る時間(この間だけはねられる) */
+  ghost:{len:9,warn:2200,run:3000,lines:[{y:22,dir:1,per:14000,off:0},{y:24,dir:-1,per:11000,off:4000},{y:22,dir:-1,per:17000,off:9000}],cross:[14,48]},
+  /* 霧の足場(f): 霧が晴れている5.5秒のあいだだけ立てる(周期15秒)。のこり1.5秒はまたたいて知らせる */
+  fogStone:{per:15000,dawn:7000,on:8500,dusk:12500,off:14000},
+  goal:{x:52,y:5,flag:'mabo_goal'},
+  rows:[
+    "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt",
+    "tGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGt",
+    "tGGtGGGGGGGGGGtGGGGGtGGGGGGGGGGGGGGGtGGGtttttttttttttttttttt",
+    "tGGGGGGGGGGGGGGGtGtGGGGtGGGGGGtGGtGGGGtttPPPPPPPPPPPPPPGPttt",
+    "tGTTTTTtTtTTTGtGGTtTGGGGtGGGGGGGGGtGGGtttPPPPPPPPPPPPPPPPttt",
+    "tGTTTTGTTTTTGGTGTTGGGGGGGGGGGGGGGGGGGGGGGPPPPPPPPPPPPPPPPttt",
+    "tGTGGGGGTTTGGTGTtTTTGGGGGGGGGGGGGGGGGGtttPPPPPPPPPPPPPPPPttt",
+    "tGGTTTGtTttTTGTGGtGTGGGGGGGGGGGGGGGGGGtttPPPPPPPPPPPPPPPPttt",
+    "tGTGTGGttGTGTGTtGTTTGGGGGGGGGGGGGGGGGGGGt=================tt",
+    "tGTTTTTTTGtTGtTGGTTTGGGGGGGGGGGGGGGGGGGtt=================tt",
+    "tGGTGTGTTGGGtTGtGGTTtGGGGGGGGGGGGGGGGGGGGGTGTGGGTTGGTGGTGTGt",
+    "tGtTTTGGGTtTGTGGtGTTPPPPPPPPPPPPPPPPPPPGGGTTGGGGGGGTGGTGtGGt",
+    "tGTGGTTtTTTTGGTTGGGTPPPPPPPPPPPPPPPPPPPGGGTTGTGGTTGGGGGGTtGt",
+    "tGGTGTTTGTttTTGTGTTTPPPPPPPPPPPPPPPPPPPGGTTTGGTTTGGttGTGGGGt",
+    "tGTTTTGtTTtGttTTGTTGPPPPPPPPPPPPPPPPPPPGGTGTTTTGTGGTTGTTTGGt",
+    "tGGGTGGGTGtTTTTTTGTTPPPPPPPPPPPPPPPPPPPGGGTTGGGTTTTGTGTTGGGt",
+    "tGTtGTTGGGTGtGGTGTGTPPPPPPPPPGPPPPPPPPPGGTGTGTGTGGTGTGGTTTGt",
+    "tGGTGTTTtGtGTTttTTGTPPPPPPPPPPPPPPPPPPPGGTTGTGGTTTGTTTGGGGGt",
+    "tGGTtTtTTTTTTTTGTGTGPPPPPPPPPPPPPPPPPPPGGTGTTTGGTGGTGTTtTGGt",
+    "tGtGTGTTGTTGGtGTGTtTGGGGGGGGGtGGGGGGGGGGGGtGGTGGGGTTTGtGTTtt",
+    "tGtTGGGGTGTGGTGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGTGGGTTTtGGt",
+    "tGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGt",
+    "t=============H=================================H==========t",
+    "t===========PPHPP=============================PPHPP========t",
+    "t=============H=================================H==========t",
+    "tGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWWWWWWWWWGGGGGGGGGGGGGGt",
+    "tGTGGTTtttGGTTGGGTGGttTTTTTTTWWWWWWWWWWWWWWWWGTGGGGTGTTtTTGt",
+    "tGTtGTGTGTTGGtGTTTTGTGTGGTTGTWWWWWWGGGGGWWWWWGTtGTTGGtTTGTGt",
+    "tGGTTGGTTTGtTTGtGTGTTGTGTTTTGWWWWWWGGGGGWWWWWGTTGGtGTTGTTTGt",
+    "tGGTGtTGGTtTTtGTTTGTGTTGtGGtTWWWWWWGGGGGWWWWWGTTGGGGGTGTTTGt",
+    "tGGGTTGtTGGGTTGGTGTGtTtGTTGGtWWWWWWWWfWWWWWWWGGTTGGGTTTTTGGt",
+    "tGTGtTTTTTTGTTGGGGGTTTtGGTtTGWWWWWWWWfWWWWWWWTGGtGTGTTTGtGGt",
+    "tGTGTTGGGGGGTGtGTGGGGTGGTGGGGWWWWWWWWfffWWWWWGGTTtGGGGGGGTGt",
+    "tGTGttGTGtGttGTGGTGTGTTttTGTGWWWWWWWWWWGWWWWWGGtTGTGGGtGTGGt",
+    "tGTTGGGTGTTTGGGGGGGtTtGTTGGTtWWWWWWWWWWfWWWWWGTTTtGTGGTtGTGt",
+    "tGTGtGGTGTTTTtGTTGTGGGGGTTTTTWWWWWWWWfffWWWWWGGGGGGGGGTtTGGt",
+    "tGGTTTGTGGTGGTGGTtGGTGGGtTGttWWWWWWWWfWWWWWWWTGGGGttTGGGTGGt",
+    "tGGGtTGGGTGGGGGTTGGTTGTGTTGTTWWWWWWWWfWWWWWWWGTGGTTTTtGTtTGt",
+    "tGTGGGGTGTGTTGGTGGTTGGTGGtGtTWWWWWWWGGGGWWWWWGTGGGGGGTTGGGGt",
+    "tGTGtGTTttGGTTTGGGGGTGGTTTGGTWWWWWWWGGGGWWWWWGTGGGGTGGGGTGGt",
+    "tGGTTTGGGGGtTTTGGGGGTtTGGTGGGfffffffGGGGfffffGGGGGGGTGtTTGGt",
+    "tGTGGGGTGTGGTtGGGtGGtTGTTGGGGWWWWWWWGGGGWWWWWtGGGTGTTTGGGGGt",
+    "tGGGGGGGGGGGGGGGGGGGGGGGGGGGGWWWWWWWWWWWWWWWWTGtGGGGGtGGTTGt",
+    "tPPPPPPPPPPPPPPPPPPPPPPttttttWWWWWWWWWWWWWWWWtTTtGTtGTTGTTGt",
+    "tPPPPPPPPPPPPPPPPPPPPPPttttttWWWWWWWWWWWWWWWWGGTTTGGGGTTTGGt",
+    "tPPPPPPPPPPPPPPPPPPPPPPttttttWWWWWWWWWWWWWWWWGTttGTTGTGGGTGt",
+    "tPPPPPPPPPPPPPPPPPPPPPPttttttWWWWWWWWWWWWWWWWGGTTTTtTTtGGTGt",
+    "t======================ttttttWWWWWWWWWWWWWWWWttttttttttttttt",
+    "t======================ttttttWWWWWWWWWWWWWWWWttttttttttttttt",
+    "tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt"],
+  objs:[["station",15,39,5,3],["train",8,47,7,1],["train",44,8,8,1],["tokei",27,4,4,6],["bench",12,43],["bench",19,43],["bench",33,13],["bench",43,6],["lamp",8,43],["lamp",16,43],["lamp",21,43],["lamp",22,12],["lamp",36,12],["lamp",22,17],["lamp",36,17],["lamp",44,3],["lamp",54,3],["sign",4,43],["sign",13,25],["sign",49,25],["sign",27,39],["sign",46,41],["sign",43,4],["sign",31,19],["lever",38,39,1,1,"mabo_k"],["shutter",40,5,1,1,"mabo_k"]],
+  signs:{"4,43":[["","まぼろし駅 ／ 霧の夜にだけ停まる、時刻表にない駅"],["","ホームの西のはし(←)から、もとの駅へもどれる"]],"13,25":[["","時刻表(上り・下り・もう1本) ／ 北の線路は、列車がばらばらに走る"],["","踏切が鳴ったら、まん中の島で待つこと。島の上なら、はねられない"]],"49,25":[["","踏切 ／ 列車は、鳴りはじめてから2秒ほどで来る"],["","線路は2本。1本ずつ、わたること"]],"27,39":[["","霧の足場 ／ 霧が晴れたときだけ、沼に石が見える"],["","晴れ間は5秒ほど。石の上で、立ちどまってはいけない"]],"46,41":[["","霧の足場 ／ 石がまたたきはじめたら、もうすぐ消える"],["","落ちても、岸にもどれる(なかまのHPは少し減る)"]],"43,4":[["","終点 まぼろし駅 ／ ここから先に、線路はない"],["","ホームの東のはし(→)から、もとの駅へもどれる"]],"31,19":[["","止まった時計塔 ／ 針は、いつも終電の時刻を指している"]]},
+  items:{"22,34":"kai","39,38":"saino","37,27":"tenpu","29,16":"kirakira","55,3":"makimono"},
+  warps:{'1,44':{to:'@home',msg:'発車ベルが鳴って、霧がうすれていく……'},'56,5':{to:'@home',msg:'終点の鐘が鳴って、霧がうすれていく……'}},
+  npcs:[{"id":"mabo_eki","x":9,"y":44,"dir":"right","look":"salary","lines":[["駅員の影","……ああ、お客さん。霧の夜に、ミチクサ線が迷子になったんだね。"],["駅員の影","ここは「まぼろし駅」。時刻表にはのっていない、終電のあとの駅さ。"],["駅員の影","北の線路には、幽霊列車が走っている。踏切が鳴ったら、まん中の島で待つんだよ。"],["駅員の影","沼の足場は、霧が晴れたあいだだけ見える。立ちどまると、沼に落ちるからね。"]]},{"id":"mabo_kid","x":16,"y":25,"dir":"down","look":"kid","lines":[["ふしぎな子","列車、さっき行ったばかりだよ。……でも、すぐつぎのが来る。"],["ふしぎな子","上りと下りと、もう1本。ダイヤはばらばらなんだ。音をよく聞いて！"]]},{"id":"mabo_pass","x":30,"y":19,"dir":"down","look":"obaa","lines":[["さいごの乗客","わたしはね、ずっとこの時計塔の下で、終電を待っているの。"],["さいごの乗客","東の終点のホームは、改札がしまっているよ。沼の島に、古いレバーがあったっけねえ。"]]}],
+  spawn:{x:12,y:44,dir:'right'}};
 /* 話しかけたとき */
 function owNpcTalk(n,m){
   if(n.gift){if(!owFlag(n.gift)){owSetFlag(n.gift);sfx('win');save();return n.giftLines;}return n.lines;}
@@ -5098,6 +5209,17 @@ function owPaint(m,ti){
     if(ch==='r'){vG(x,y);E(x+8,y+10,7,5,'basalt');E(x+7,y+8,6,5,'basalt2');E(x+6,y+6,3,2,'basalt3');return true;}
     return false;};
   /* 黄泉ヶ原のタイル */
+  /* まぼろし駅(T8)のタイル: 青黒い地面、薄いホームの石、ススキ、枯れ木、黒い沼(f=霧の足場は、地は沼。石は owMaboDraw が重ねる) */
+  const mb=m.ground==='mabo';
+  const mbG=(x,y)=>{R(x,y,TS,TS,'#26304a');for(let k=0;k<4;k++)px(x+rr(16),y+rr(16),'#303c5a');if(rnd()<.2)R(x+rr(11),y+3+rr(10),3,1,'#1c2438');if(rnd()<.06)px(x+rr(16),y+rr(16),'#7a86a8');};
+  const mbTile=(ch,i,j,x,y)=>{
+    if(ch==='G'||ch==='.'){mbG(x,y);return true;}
+    if(ch==='P'){R(x,y,TS,TS,'#59607a');for(let k=0;k<3;k++)px(x+rr(16),y+rr(16),'#6c7490');R(x,y+15,TS,1,'#464c64');R(x+7,y,1,TS,'#4e546c');if(at(i,j-1)!=='P'&&at(i,j-1)!=='H')R(x,y,TS,1,'#7a82a0');return true;}
+    if(ch==='T'){mbG(x,y);[[3,5],[8,3],[12,7],[5,11],[11,12]].forEach(([a,b])=>{R(x+a,y+b,1,6,'#52608c');px(x+a-1,y+b+3,'#46537a');E(x+a,y+b-1,2,3,'#c9d4f2');px(x+a,y+b-3,'#eef2ff');});return true;}
+    if(ch==='t'){mbG(x,y);R(x+3,y+14,10,2,'#161a2a');R(x+7,y+3,2,12,'#12151f');R(x+4,y+6,3,1,'#12151f');R(x+3,y+4,1,3,'#12151f');R(x+9,y+5,4,1,'#12151f');R(x+12,y+2,1,4,'#12151f');R(x+5,y+9,2,1,'#12151f');R(x+9,y+9,3,1,'#12151f');px(x+7,y+3,'#7a86a8');return true;}
+    if(ch==='W'||ch==='f'){R(x,y,TS,TS,'#0e1430');if((i+j)%3===0)R(x+2+((i*5)%8),y+5,5,1,'#1e2a58');if((i*3+j)%5===1)px(x+((i*7)%13)+1,y+((j*5)%13)+1,'#5a6cb0');if((i*7+j*3)%11===2)R(x+4,y+11,4,1,'#18224a');
+      if(at(i,j-1)!=='W'&&at(i,j-1)!=='f')R(x,y,TS,2,'#1c2650');return true;}
+    return false;};
   const yo=m.ground==='yomi';
   const yoG=(x,y)=>{R(x,y,TS,TS,'#2a2034');for(let k=0;k<4;k++)px(x+rr(16),y+rr(16),'#382c44');if(rnd()<.25)R(x+rr(11),y+3+rr(10),3,1,'#201828');};
   const yoW=(i,j,x,y)=>{R(x,y,TS,TS,'#141c3c');if((i+j)%3===0)R(x+2+((i*5)%8),y+5,5,1,'#243060');if((i*3+j)%5===1)px(x+((i*7)%13)+1,y+((j*5)%13)+1,'#8ab0ff');};
@@ -5144,6 +5266,7 @@ function owPaint(m,ti){
     if(vo&&volcTile(ch,i,j,x,y))continue;
     if(co&&coralTile(ch,i,j,x,y))continue;
     if(yo&&yomiTile(ch,i,j,x,y))continue;
+    if(mb&&mbTile(ch,i,j,x,y))continue;
     if(!sn&&!vo&&'avi?^+c%y'.includes(ch)&&gimTile(ch,i,j,x,y))continue;
     if('Gg.t*'.includes(ch)){if(ch==='.')under(x,y);else ground(x,y);}
     if(ch==='*')[[3,4,'flower1'],[10,3,'flower2'],[6,10,'flower2'],[12,11,'flower1']].forEach(([a,b,c])=>{R(x+a,y+b,2,2,c);px(x+a,y+b+2,gk[1]);});
@@ -5186,7 +5309,7 @@ function owPaint(m,ti){
     if(ch==='L'){R(x,y,TS,TS,'step');R(x,y+7,TS,1,'step2');R(x,y+15,TS,1,'step2');R(x+(j%2?4:10),y,1,7,'step2');R(x+(j%2?10:4),y+8,1,7,'step2');}
   }
   for(let j=0;j<Hh;j++)for(let i=0;i<W;i++)if(at(i,j)==='t'){const x=i*TS,y=j*TS;
-    if(vo||co||yo)continue;
+    if(vo||co||yo||mb)continue;
     if(m.palm){R(x+7,y+4,2,12,'#8a6a40');R(x+7,y+7,2,1,'#6a4e2c');R(x+7,y+11,2,1,'#6a4e2c');[[-6,2],[-4,-1],[0,-3],[4,-1],[6,2]].forEach(([a,b])=>{R(x+8+Math.min(a,0),y+3+b,Math.abs(a)+1,2,'#3e9a54');R(x+8+a-(a>0?0:0),y+4+b,2,2,'#2c7a40');});R(x+6,y+4,2,2,'#7a5a2a');R(x+9,y+5,2,2,'#7a5a2a');continue;}
     if(sn){R(x+7,y+12,2,4,'trunk');for(let r=0;r<13;r++){const w=1+Math.floor((r%5)*.9+r*.35);R(x+8-w,y+r,w*2,1,'pine');R(x+8,y+r,w,1,'pine2');if(r%5===0)R(x+8-w,y+r,Math.max(1,w*2-1),1,'snow');}continue;}
     R(x+6,y+10,4,6,'trunk');E(x+8,y+7,8,8,'tree2');E(x+8,y+6,7,6,'tree');E(x+6,y+4,3,2,'tree3');}
@@ -5234,6 +5357,10 @@ function owPaint(m,ti){
     if(k==='tokonoma'){const WW=w*TS;R(X,Y,WW,TS,'pier');R(X+2,Y+12,WW-4,3,'pier2');E(X+WW/2,Y+8,3,4,'stone2');R(X+WW/2-1,Y+1,2,5,'hedge');E(X+WW/2+2,Y+2,2,2,'flower1');}
     if(k==='fusuma'){R(X,Y,TS,TS,'shoji');R(X+1,Y+1,6,14,'tatami');R(X+9,Y+1,6,14,'tatami');R(X+5,Y+7,1,2,'shoji2');R(X+10,Y+7,1,2,'shoji2');}
     if(k==='ring'){[[3,4],[8,2],[13,4],[14,9],[12,13],[7,14],[2,12],[1,8]].forEach(([a,b])=>{E(X+a,Y+b,2,1,'wall');R(X+a-1,Y+b,1,2,'trunk');});}
+    if(k==='tokei'){const WW=w*TS,HH=h*TS,cxm=X+WW/2;shadow(X,Y+HH,WW);R(X+4,Y+14,WW-8,HH-14,'#5a627e');R(X+4,Y+14,3,HH-14,'#6c7494');R(X+WW-7,Y+14,3,HH-14,'#464c66');R(X+2,Y+HH-4,WW-4,4,'#3e4460');
+      for(let r=0;r<14;r++){const hw=Math.round(WW/2-4-r*(WW/2-6)/14);R(cxm-hw,Y+r,hw*2,1,r%4<2?'#3a4262':'#2e3552');}R(cxm-1,Y-8,2,8,'#262c46');
+      E(cxm,Y+28,13,13,'#2c3250');E(cxm,Y+28,11,11,'#e6e9f2');E(cxm,Y+28,10,10,'#f4f6fc');for(let a=0;a<12;a++){const an=a*Math.PI/6;px(cxm+Math.round(Math.sin(an)*8),Y+28-Math.round(Math.cos(an)*8),'#2c3250');}
+      R(cxm,Y+21,1,8,'#14182a');R(cxm-1,Y+28,1,1,'#14182a');R(cxm-6,Y+27,6,1,'#14182a');R(X+WW/2-5,Y+HH-14,10,14,'#262c46');R(X+WW/2-4,Y+HH-13,8,13,'#14182a');[Y+46,Y+58].forEach(wy=>{R(X+9,wy,4,6,'#8ab0ff');R(X+WW-13,wy,4,6,'#8ab0ff');});}
     if(k==='mirror'){R(X+2,Y-8,12,22,'pier2');R(X+3,Y-7,10,19,'mirror');R(X+4,Y-6,3,8,'wall');R(X+5,Y+12,6,3,'pier2');}
     if(k==='sign'){R(X+7,Y+8,2,8,'trunk');R(X+2,Y+2,12,8,'sign');R(X+3,Y+3,10,6,'path');R(X+5,Y+5,6,1,'sign');R(X+5,Y+7,4,1,'sign');}
     if(k==='lamp'){R(X+7,Y+2,2,13,'lampp');R(X+5,Y,6,3,'lampp');R(X+6,Y+3,4,2,'lampl');}
@@ -5325,7 +5452,7 @@ function owDraw(){
   else if(OWC.tiLast!==state.time){OWC.fade={from:OWC.tiLast,t0:performance.now()};OWC.tiLast=state.time;}
   let fadeK=1,bgOld=null;if(OWC.fade){const k=(performance.now()-OWC.fade.t0)/800;if(k>=1)OWC.fade=null;else{bgOld=owBg(m,OWC.fade.from);fadeK=k;}}
   if(bgOld){c.drawImage(bgOld,-cx,-cy);c.globalAlpha=fadeK;c.drawImage(bg,-cx,-cy);c.globalAlpha=1;}else c.drawImage(bg,-cx,-cy);
-  owIceDraw(c,m,cx,cy,P);owVolcDraw(c,m,cx,cy,P,px,py);
+  owIceDraw(c,m,cx,cy,P);owVolcDraw(c,m,cx,cy,P,px,py);if(m.mabo)owMaboDraw(c,m,cx,cy);
   if(OWC.goal&&OWC.path&&OWC.path.length){const gx=OWC.goal[0]*TS-cx,gy=OWC.goal[1]*TS-cy,a=.5+Math.sin(Date.now()/150)*.3;c.strokeStyle=`rgba(242,177,60,${a})`;c.lineWidth=1;c.strokeRect(gx+1.5,gy+1.5,TS-3,TS-3);}
   const F=(x,y,w,h,col)=>{c.fillStyle=P[col]||col;c.fillRect(x-cx,y-cy,w,h);};
   /* 状態で変わる物 */
@@ -5536,6 +5663,47 @@ function owFloatAt(m,x,y){if(!m.floats)return false;for(const f of m.floats){con
 function owHole(x,y){const h=OWC.holes&&OWC.holes[x+','+y];return h&&performance.now()<h;}
 function owAval(L){const len=L.y1-L.y0+1,sweep=len*85+500,t=(Date.now()+(L.off||0))%L.period,ws=L.period-sweep-1600;
   if(t<ws)return {st:'idle'};if(t<ws+1600)return {st:'warn'};return {st:'sweep',front:L.y0+Math.floor((t-ws-1600)/85)};}
+/* ===== T8 まぼろし駅のしかけ =====
+ * 幽霊列車: 踏切(H)がある行を、時刻表(周期のちがう3本)どおりに列車が走る。ベルが鳴ってから走り出す。走っている列車に重なると、手前の岸(lastSafe)へもどされる。
+ * 霧の足場(f): 沼のあいだの石。霧が晴れている 5.5秒だけ立てる。のこり1.5秒はまたたく。足場の上で霧がもどると、岸へもどされる(詰まない) */
+function owMiPhase(m){m=m||owMap();const F=m&&m.fogStone;if(!F)return 'clear';const t=Date.now()%F.per;return t<F.dawn?'fog':t<F.on?'dawn':t<F.dusk?'clear':t<F.off?'dusk':'fog';}
+const owMiWalk=()=>{const p=owMiPhase();return p==='clear'||p==='dusk';};
+function owGhostState(G,L,now,W){const t=(((now-L.off)%L.per)+L.per)%L.per;if(t<G.warn)return {st:'warn'};
+  if(t<G.warn+G.run){const p=(t-G.warn)/G.run;return {st:'run',x0:L.dir>0?-G.len+p*(W+G.len):W-p*(W+G.len)};}return {st:'idle'};}
+const owGhostOver=(G,s,x)=>s.st==='run'&&x+1>s.x0&&x<s.x0+G.len;
+function owGhostHit(m){const o=state.ow,s=OWC.lastSafe&&OWC.lastSafe.map===o.map?OWC.lastSafe:m.spawn;
+  OWC.mv=null;OWC.held=null;OWC.slide=null;owCancelPath();owHurt(.08);o.x=s.x;o.y=s.y;OWC.ghostT=Date.now()+1500;sfx('hit');save();render();
+  talk([['','ガタン、ゴトン……ッ！ 幽霊列車が、すぐ目の前を走りぬけた！'],['','風にあおられて、手前の道まで引きもどされた。(なかまのHPが少し減った)']]);}
+function owMaboStep(m){
+  const o=state.ow,now=Date.now(),G=m.ghost,MW=m.rows[0].length;
+  if(OWC.fly||OWC.ride)return false;
+  let run=false,any=false;
+  for(const L of G.lines){const s=owGhostState(G,L,now,MW);if(s.st!=='idle')any=true;if(s.st==='run')run=true;}
+  if(any&&now>(OWC.bellT||0)){OWC.bellT=now+560;if(G.cross.some(cx=>Math.abs(o.x-cx)<=18)&&Math.abs(o.y-23)<=14)sfx('fumikiri');}
+  const t=OWC.mv&&OWC.mv.t<.5?{x:OWC.mv.fx,y:OWC.mv.fy}:{x:o.x,y:o.y};
+  if(run&&now>(OWC.ghostT||0))for(const L of G.lines){if(t.y===L.y&&owGhostOver(G,owGhostState(G,L,now,MW),t.x)){owGhostHit(m);return true;}}
+  if(!OWC.mv&&run&&o.y===23&&G.cross.some(cx=>Math.abs(o.x-cx)<=2))owStamp('g:ghost');
+  if(!OWC.mv&&(m.rows[o.y]||'')[o.x]==='f'&&!owMiWalk()){owSeaFall(m,'霧がもどってきた！ 足もとの石が、すうっと消えた……');return true;}
+  return false;
+}
+function owMaboDraw(c,m,cx,cy){
+  const now=Date.now(),W=OWC.vw*TS,Hh=OWC.vh*TS,G=m.ghost,ph=owMiPhase(m),MW=m.rows[0].length;
+  const tx0=Math.max(0,Math.floor(cx/TS)),tx1=Math.min(MW-1,tx0+OWC.vw+1),ty0=Math.max(0,Math.floor(cy/TS)),ty1=Math.min(m.rows.length-1,ty0+OWC.vh+1);
+  for(let y=ty0;y<=ty1;y++){const row=m.rows[y];for(let x=tx0;x<=tx1;x++){if(row[x]!=='f')continue;const X=x*TS-cx,Y=y*TS-cy;
+    const solid=ph==='clear'||(ph==='dusk'&&Math.floor(now/140)%2===0);
+    if(solid){c.fillStyle='#7d87a8';c.fillRect(X+1,Y+5,14,10);c.fillStyle='#cfd8ee';c.fillRect(X+1,Y+3,14,10);c.fillStyle='#eaf0fb';c.fillRect(X+2,Y+3,12,2);c.fillStyle='#9ba6c6';c.fillRect(X+4,Y+7,5,1);c.fillRect(X+9,Y+10,3,1);}
+    else if(ph==='dawn'||ph==='dusk'){c.fillStyle=`rgba(190,205,240,${ph==='dusk'?.3:.28+.22*Math.sin(now/120+x+y)})`;c.fillRect(X+3,Y+4,10,9);}
+    else{c.fillStyle='rgba(120,140,210,.2)';c.fillRect(X+7,Y+7,2,1);c.fillRect(X+5,Y+9,6,1);}}}
+  for(const L of G.lines){const s=owGhostState(G,L,now,MW);if(s.st==='idle')continue;const Y=L.y*TS-cy;
+    if(Math.floor(now/220)%2){c.fillStyle='#ff4a4a';G.cross.forEach(q=>[q-1,q+1].forEach(xx=>c.fillRect(xx*TS-cx+6,Y+6,4,4)));}
+    if(s.st==='run'){const X=Math.round(s.x0*TS-cx),Wd=G.len*TS;c.save();c.globalAlpha=.9;
+      c.fillStyle='#1c2440';c.fillRect(X,Y-4,Wd,TS+1);c.fillStyle='#2e3a62';c.fillRect(X,Y-4,Wd,3);c.fillStyle='#5a6690';c.fillRect(X,Y+9,Wd,2);
+      for(let a=X+3;a<X+Wd-6;a+=12){c.fillStyle='#ffe9a0';c.fillRect(a,Y,8,5);c.fillStyle='#fff7d0';c.fillRect(a,Y,8,1);}
+      for(let a=X+11;a<X+Wd-2;a+=12){c.fillStyle='#0c1020';c.fillRect(a,Y-4,1,TS+1);}
+      c.fillStyle='rgba(255,240,170,.5)';const hx=L.dir>0?X+Wd:X;c.fillRect(L.dir>0?hx:hx-3,Y+2,3,5);c.restore();}}
+  c.fillStyle='rgba(18,22,52,.12)';c.fillRect(0,0,W,Hh);
+  c.fillStyle='rgba(200,212,245,.7)';for(let i=0;i<8;i++){const t=now/1800+i*1.7,fx=((i*67+Math.sin(t)*14+now/90)%W+W)%W,fy=((i*43-now/130)%Hh+Hh)%Hh;c.fillRect(Math.round(fx),Math.round(fy),1,1);}
+}
 function owSeaFall(m,msg){const o=state.ow,s=OWC.lastSafe&&OWC.lastSafe.map===o.map?OWC.lastSafe:{x:m.spawn.x,y:m.spawn.y};
   OWC.mv=null;OWC.held=null;OWC.slide=null;owCancelPath();OWC.crack=null;owHurt(.12);if(m.cold)state.owCold=Math.min(m.cold-1,(state.owCold||0)+15);o.x=s.x;o.y=s.y;sfx('sel');save();render();
   talk([['',msg],['',m.ground==='snow'?'つめたい海から、なんとかはい上がった……(なかまのHPが減って、体が冷えた)':'ずぶぬれになって、岸にはい上がった……(なかまのHPが減った)']]);}
@@ -5646,7 +5814,7 @@ function owBackToTown(){const m=owMap();if(!m||B||ui.dlg)return;
   if(OWC.chase&&OWC.chase.map===state.ow.map){ui.owBack=false;ui.toast='いまは、にげるのに必死でもどれない！';render();return;}
   if(OWC.ride||OWC.fly||OWC.slide)return;
   if(!ui.owBack){ui.owBack=true;ui.toast='もう一度押すと、町の駅の前へもどります';render();return;}
-  const t=MAPS[m.town],sp=t.station||t.spawn;ui.owBack=false;OWC.mv=null;OWC.held=null;OWC.rk=null;OWC.crack=null;owCancelPath();owVolcReset();owTorchOut();state.owCold=0;state.ow={map:m.town,x:sp.x,y:sp.y,dir:sp.dir||'down'};owFoot();sfx('sel');ui.toast=t.name+'の駅へもどった';save();render();}
+  const hid=m.town==='*'?state.town:m.town,t=MAPS[hid],sp=t.station||t.spawn;ui.owBack=false;OWC.mv=null;OWC.held=null;OWC.rk=null;OWC.crack=null;owCancelPath();owVolcReset();owTorchOut();state.owCold=0;state.ow={map:hid,x:sp.x,y:sp.y,dir:sp.dir||'down'};owFoot();sfx('sel');ui.toast=t.name+'の駅へもどった';save();render();}
 const owRockAt=(m,x,y)=>m.rocks?owRocks(m).rocks.findIndex(r=>r[0]===x&&r[1]===y):-1;
 /* ---- 移動 ---- */
 const OWD={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
@@ -5655,6 +5823,7 @@ function owSolid(m,x,y){
   if(owHole(x,y))return true;
   if(ch==='O'&&m.rocks&&owRocks(m).filled[x+','+y]){}else if('~W'.includes(ch)&&m.floats&&owFloatAt(m,x,y)){}else if(OW_SOLID.includes(ch))return true;
   if(ch==='U'&&owTideHigh())return true;
+  if(ch==='f'&&!owMiWalk())return true;   /* T8: 霧の足場は、霧が晴れているあいだだけ立てる */
   if((ch==='a'||ch==='v')&&!owFloeOn(ch))return true;
   if(ch==='?'&&owBroken(x,y))return true;
   if(owRockAt(m,x,y)>=0)return true;
@@ -5692,10 +5861,11 @@ function owTryMove(dir){
 function owArrive(){
   const m=owMap(),o=state.ow,w=m.warps&&m.warps[o.x+','+o.y],here=m.rows[o.y][o.x];
   state.owSteps=(state.owSteps||0)+1;dailyInc('walk');if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
-  if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};owFoot();OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];OWC.slide=null;OWC.crack=null;if(OWC.chase&&OWC.chase.map===o.map&&m.chase)owSetFlag(m.chase.done);owVolcReset();owTorchOut();if(w.setFlag)owSetFlag(w.setFlag);if(!MAPS[w.to].cold)state.owCold=0;owCancelPath();ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
+  if(w&&(!w.need||owFlag(w.need))){const hm=w.to==='@home'?MAPS[state.town]:null,hs=hm&&(hm.station||hm.spawn),dst=hm?{map:state.town,x:hs.x,y:hs.y,dir:hs.dir||'down'}:{map:w.to,x:w.x,y:w.y,dir:w.dir};state.ow=dst;owFoot();OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];OWC.slide=null;OWC.crack=null;if(OWC.chase&&OWC.chase.map===o.map&&m.chase)owSetFlag(m.chase.done);owVolcReset();owTorchOut();if(w.setFlag)owSetFlag(w.setFlag);if(!MAPS[dst.map].cold)state.owCold=0;owCancelPath();ui.toast=w.msg||MAPS[dst.map].name;save();render();return;}
+  if(m.goal&&o.x===m.goal.x&&o.y===m.goal.y&&!owFlag(m.goal.flag)){owSetFlag(m.goal.flag);addStars(20);sfx('win');OWC.held=null;OWC.mv=null;owCancelPath();save();render();talk([['','終点のホームだ。古い駅名標が、霧のなかでかすかに光っている。'],['','「まぼろし」……。そこに書かれた字は、読むそばから、ほどけて消えていく。'],['','流星石★20を手に入れた！']]);return;}
   owFoot();owStampTiles(m,o,here);
   owKirariTick(m,o);
-  if(!'&$?!^~uWav'.includes(here)&&!owHole(o.x,o.y)){OWC.lastSafe={map:o.map,x:o.x,y:o.y};if(m.rest&&m.rest.includes(here))OWC.lastRest={map:o.map,x:o.x,y:o.y};}
+  if(!'&$?!^~uWav'.includes(here)&&!owHole(o.x,o.y)&&!(m.mabo&&(here==='H'||here==='f'))){OWC.lastSafe={map:o.map,x:o.x,y:o.y};if(m.rest&&m.rest.includes(here))OWC.lastRest={map:o.map,x:o.x,y:o.y};}
   if(here==='?'){OWC.crumb=OWC.crumb||{};const ck=o.x+','+o.y,b=OWC.crumb[ck];if(!b||performance.now()-b>=9000)OWC.crumb[ck]=performance.now();}
   if(state.owTorch>0){state.owTorch--;if(!state.owTorch){ui.toast='火種が燃えつきてしまった……';render();}}
   if(m.cold&&here!=='i'&&!(OWC.chase&&OWC.chase.map===o.map)){if(owColdAdd(m,here==='y'?2:1))return;}
@@ -5753,7 +5923,7 @@ function owWeatherNote(){
 function owWeatherChip(){const w=WX[wxNow()];return w?`<span class="tchip wx" style="--tc:${w.c}" title="空もよう: ${w.n}"><i></i>${w.s}</span>`:'';}
 /* 天気の画面効果は屋外のマップだけ(洞窟・屋内・まっ暗な所は出さない) */
 const owWxOutdoor=m=>!!m&&!m.dim&&!m.dark&&!m.cave&&!m.light&&!m.air&&m.ground!=='floor'&&m.ground!=='cave';
-const owWxId=()=>wxNow(owMap()?owMap().town:state.town);
+const owWxId=()=>{const m=owMap();return m&&m.mabo?'kiri':wxNow(m?m.town:state.town);};   /* まぼろし駅は、いつも霧 */
 /* 天気の音: 雨=雨音+BGMこもり、霧=BGMこもり、雪=風の音 */
 function owWxAudio(on){
   const m=owMap(),wx=on&&owWxOutdoor(m)?owWxId():'';if(OWC.wxAk===wx)return;OWC.wxAk=wx;
@@ -5776,7 +5946,7 @@ function owWxFx(c,m){
     for(let i=0;i<7;i++){const ph=((now/700+i*.37)%1);if(ph<.5)c.fillRect(Math.round((i*97+31)%W),Math.round(Hh*.35+((i*53)%(Hh*.6))),Math.round(2+ph*6),1);}
     return;}
   if(wx==='kiri'){
-    const col=nt?'26,32,48':'214,222,230',r1=state.time===0?72:84;c.save();const g=c.createRadialGradient(fx,fy,28,fx,fy,r1);g.addColorStop(0,`rgba(${col},0)`);g.addColorStop(1,`rgba(${col},.93)`);c.fillStyle=g;c.fillRect(0,0,W,Hh);
+    const clr=m.mabo&&owMiWalk(),col=nt?'26,32,48':'214,222,230',r1=clr?150:state.time===0?72:84;c.save();const g=c.createRadialGradient(fx,fy,28,fx,fy,r1);g.addColorStop(0,`rgba(${col},0)`);g.addColorStop(1,`rgba(${col},${clr?.4:.93})`);c.fillStyle=g;c.fillRect(0,0,W,Hh);
     c.fillStyle=`rgba(${col},.16)`;for(let i=0;i<5;i++){const tt=now/4200+i;c.fillRect(((Math.sin(tt)*.5+.5)*W+i*37)%W-20,(i*31)%Hh,56,9);}c.restore();return;}
   if(wx==='yuki'){
     c.fillStyle='rgba(190,214,245,.1)';c.fillRect(0,0,W,Hh);
@@ -5794,7 +5964,7 @@ function owWxFx(c,m){
 }
 function owBand(text){ui.band={text,c:TIMES[state.time].c,t:Date.now()};}
 /* ===== T2 みちくさ踏破(足あと・スタンプ・みちくさ点・寄り道ボーナス) ===== */
-/* しかけスタンプ16種。id は 'g:' + 名前。取ると +5点 */
+/* しかけスタンプ18種。id は 'g:' + 名前。取ると +5点 */
 const OW_STAMPS=[
   ['g:signal','信号','信号が青のあいだに、車道をわたる'],
   ['g:power','配電盤','止まっている機械の動力レバーを上げる'],
@@ -5811,7 +5981,9 @@ const OW_STAMPS=[
   ['g:mirror','湖の鏡','鏡の湖で、鏡の中へ入る'],
   ['g:warashi','座敷わらし','座敷わらしと遊ぶ'],
   ['g:feast','お膳','お膳のごちそうをいただく'],
-  ['g:aurora','オーロラ','光の橋を渡る']];
+  ['g:aurora','オーロラ','光の橋を渡る'],
+  ['g:ghost','幽霊列車','まぼろし駅で、列車が走るあいだ、踏切の島で待つ'],
+  ['g:fog','霧の足場','まぼろし駅で、霧の晴れ間に沼の足場をわたる']];
 /* 通れない区画の手動リスト {mapId:[区画番号...]}(自動の到達判定でも足りないとき用) */
 const FOOT_SKIP={};
 const FOOT_IN={};let FOOT_IN_OK=false;
@@ -5882,6 +6054,7 @@ function owStampTiles(m,o,here){
   if('~W'.includes(here)&&m.floats&&owFloatAt(m,o.x,o.y))owStamp('g:float');
   if(m.wind&&here==='H'&&owGust()!=='calm')owStamp('g:gust');
   if(m.aurora&&(here==='a'||here==='v')&&owFloeOn(here))owStamp('g:aurora');
+  if(m.mabo&&here==='f')owStamp('g:fog');
 }
 /* 寄り道ボーナスの倍率(野生戦だけ)。ぬし・配合杯・ライバル・塔では 1 */
 const detourMul=()=>B&&!B.boss&&!B.cup&&!B.tower&&!B.rival&&!B.trainer?1+.1*Math.min(5,state.detour||0):1;
@@ -5959,9 +6132,12 @@ function owKirariFoe(f,wx,up,r){
   const wr=rows.filter(([,,tm])=>tm&&[...tm].some(ch=>WXT[ch]===wx));
   return wr.length?[wpick(wr.map(x=>({w:x[1],s:x[0]}))).s,lv(),'wx']:low();
 }
+/* T8: まぼろし駅の敵Lv = 撃破したぬしの最大Lv + 3 */
+function maboLv(){const L=TOWNS.filter(t=>state.boss[t.id]).flatMap(t=>t.boss.foes.map(x=>x[1]));return (L.length?Math.max(...L):12)+3;}
 function owEncounter(fid,kir){
-  const t=TOWN[state.town],f=t.fields.find(x=>x.id===fid);if(!f)return;
-  const wx=wxNow(state.town),n=Math.min(f.max,wpick([{w:6,v:1},{w:3,v:2},{w:1,v:3}]).v);
+  const mm=owMap(),t=TOWN[(mm&&mm.fieldTown)||state.town],f=t.fields.find(x=>x.id===fid);if(!f)return;
+  if(f.dyn){const L=maboLv();f.lv=[L,L];}
+  const wx=mm&&mm.mabo?'kiri':wxNow(state.town),n=Math.min(f.max,wpick([{w:6,v:1},{w:3,v:2},{w:1,v:3}]).v);
   const tb=wxTable(f.table,state.time,wx);
   const up=(owMap()&&owMap().lvUp)||0,foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(f.lv[0],f.lv[1])+up]);
   const mrate=.035*((state.lure||0)>0?4:1);if(state.lure>0)state.lure--;
@@ -6079,7 +6255,7 @@ function owA(){
 }
 /* ---- タップで歩く ---- */
 function owCancelPath(){OWC.path=null;OWC.goal=null;OWC.pathAct=null;}
-function owTapLimit(m){if(m.fog)return 3;if(m.blizzard&&owBliz()==='storm')return 3;if(m.dim)return 4;if(m.dark&&!owFlag(m.dark))return 2;if(owWxOutdoor(m)&&owWxId()==='kiri')return 5;return 99;}
+function owTapLimit(m){if(m.mabo)return owMiWalk()?99:5;if(m.fog)return 3;if(m.blizzard&&owBliz()==='storm')return 3;if(m.dim)return 4;if(m.dark&&!owFlag(m.dark))return 2;if(owWxOutdoor(m)&&owWxId()==='kiri')return 5;return 99;}
 function owFindPath(m,sx,sy,goals){
   const W=m.rows[0].length,Hh=m.rows.length,key=(x,y)=>y*W+x,prev=new Map([[key(sx,sy),null]]),q=[[sx,sy]];
   const isGoal=(x,y)=>goals.some(g=>g[0]===x&&g[1]===y);
@@ -6138,6 +6314,7 @@ function owLoop(ts){
   if(m.wind&&owGust()==='gust'&&!OWC.mv&&m.rows[state.ow.y][state.ow.x]==='H'&&performance.now()>(OWC.pushT||0)){OWC.pushT=performance.now()+420;const o=state.ow,by=o.y+1;if(!owSolid(m,o.x,by)){OWC.mv={fx:o.x,fy:o.y,t:0};o.y=by;OWC.held=null;}}if(OWC.fish&&OWC.held){OWC.fish=null;ui.toast='釣りをやめた。';OWC.held=null;render();return;}
   if(m.cars&&owCarHit(m)){owCancelPath();const o=state.ow;const back=o.y<=7?6:9;OWC.mv=null;OWC.held=null;o.y=back;o.dir=back===6?'down':'up';OWC.stuck=performance.now()+500;sfx('sel');ui.toast='プップー！ 危ない！ 信号を守ろう。';render();return;}
   if(!OWC.mv&&!OWC.ride&&!OWC.fly&&owStuck(m,state.ow)){const sp=m.spawn;OWC.held=null;OWC.slide=null;owCancelPath();state.ow={map:state.ow.map,x:sp.x,y:sp.y,dir:sp.dir||'down'};if(!owFireOK(state.owFire))state.owFire=null;ui.toast='(動けない場所にいたので、入口へもどりました)';save();render();return;}
+  if(m.mabo&&owMaboStep(m)){owDraw();return;}
   if(owVolcStep(m)){owDraw();return;}
   if(OWC.ride){if(!OWC.mv)owRideNext(m);else{OWC.mv.t+=.24;if(OWC.mv.t>=1){OWC.mv=null;owRideNext(m);}}owDraw();return;}
   const hereT=(m.rows[state.ow.y]||'')[state.ow.x];
@@ -6149,8 +6326,8 @@ function owLoop(ts){
   owDraw();
 }
 function owEnsureLoop(){if(!OWC.raf)OWC.raf=requestAnimationFrame(owLoop);}
-function owActive(){return state&&state.started&&!B&&ui.tab==='map'&&!ui.station&&!ui.inside&&MAPS[state.town]&&state.ow&&MAPS[state.ow.map]&&MAPS[state.ow.map].town===state.town;}
-function owEnsureState(){if(MAPS[state.town]&&(!state.ow||!MAPS[state.ow.map]||MAPS[state.ow.map].town!==state.town)){const s=MAPS[state.town].spawn;state.ow={map:state.town,x:s.x,y:s.y,dir:s.dir};}
+function owActive(){return state&&state.started&&!B&&ui.tab==='map'&&!ui.station&&!ui.inside&&MAPS[state.town]&&state.ow&&MAPS[state.ow.map]&&(MAPS[state.ow.map].town===state.town||MAPS[state.ow.map].town==='*');}
+function owEnsureState(){if(MAPS[state.town]&&(!state.ow||!MAPS[state.ow.map]||(MAPS[state.ow.map].town!==state.town&&MAPS[state.ow.map].town!=='*'))){const s=MAPS[state.town].spawn;state.ow={map:state.town,x:s.x,y:s.y,dir:s.dir};}
   else if(state.ow&&MAPS[state.ow.map]&&!OWC.okPos){OWC.okPos=true;const m=MAPS[state.ow.map],c=(m.rows[state.ow.y]||'')[state.ow.x];const lay=state.owLay!==2&&['ryuhyo','hinoshima','sango','yomi','shiomi','tengu','mayoiga'].includes(state.ow.map);state.owLay=2;if(lay||c===undefined||OW_SOLID.includes(c)&&c!=='~'||'av'.includes(c)){const s=m.spawn;state.ow={map:state.ow.map,x:s.x,y:s.y,dir:s.dir};}}}
 function renderOverworld(){
   const m=owMap(),tm=TIMES[state.time];
@@ -6171,7 +6348,7 @@ function wildCard(t){
 }
 function renderStationIn(){
   const h=renderMap(),cut=h.indexOf('<section class="town-grid">');const t=TOWN[state.town];
-  return `${h.slice(0,cut)}${wxPanel()}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
+  return `${h.slice(0,cut)}${wxPanel()}${maboOpen()?`<div class="panel stack mabo-note"><h3>？？駅</h3><p class="small">霧の向こうに、知らないホームが見える……</p><div><button class="btn primary" data-act="mabo">まぼろし駅へ行く</button></div></div>`:''}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
 }
 /* 建物の中 */
 function renderInside(){
@@ -6374,7 +6551,7 @@ const townOpen=t=>!t.req||state.boss[t.req];
 
 /*ART-START*/const ART={};/*ART-END*/
 /* 路線の色(町ごと) */
-const TLC={komorebi:'#62c46e',kasumi:'#9aa8c4',shiomi:'#35a8e6',tengu:'#c8964a',mayoiga:'#b79cf4',ryuhyo:'#8fd6f6',hinoshima:'#ff6a3a',sango:'#ff8db0',yomi:'#e9344a'};
+const TLC={komorebi:'#62c46e',kasumi:'#9aa8c4',shiomi:'#35a8e6',tengu:'#c8964a',mayoiga:'#b79cf4',ryuhyo:'#8fd6f6',hinoshima:'#ff6a3a',sango:'#ff8db0',yomi:'#e9344a',mabo:'#8c93a3'};
 /* ========== 描画パーツ ========== */
 function seal(spId,size='',known=true,shiny=false){
   const sp=SP[spId];
@@ -6509,7 +6686,8 @@ function cupsPanel(alive){return `<div class="panel stack cups"><div class="row 
     <div class="list">${CUPS.map(c=>{const open=cupOpen(c),won=state.cups[c.id];return `<div class="cuprow ${won?'won':''}"><span class="rankbadge">${c.id}</span><div class="stack tight"><b>${c.name}</b><span class="small muted">Lv${c.lv[0]}〜${c.lv[1]} ・ ${won?'優勝済み(再挑戦で賞金)':'賞品 '+rewardText(c.reward)}</span></div><button class="btn sm ${open&&!won?'primary':''}" data-act="cup" data-id="${c.id}" ${open&&alive?'':'disabled'}>${open?'出場':'未解放'}</button></div>`;}).join('')}</div></div>`;}
 function renderMap(){
   const t=TOWN[state.town],ti=TOWNS.indexOf(t),prev=TOWNS[ti-1],next=TOWNS[ti+1];
-  const rail=`<div class="railwrap"><div class="rail" role="list" style="--n:${TOWNS.length}">${TOWNS.map(x=>{const open=townOpen(x);return `<button class="station ${x.id===state.town?'cur':''} ${open?'':'locked'}" role="listitem" data-act="town" data-id="${x.id}" ${open?'':'disabled'}><span class="dot">${x.code.slice(2)}</span><span class="sn">${open?x.name:'？？？'}</span><span class="sk">${open?x.kind:'未開通'}</span></button>`;}).join('')}</div></div>`;
+  const mabo=maboOpen(),maboBtn=`<button class="station mabo" role="listitem" data-act="mabo" aria-label="まぼろし駅へ(霧の夜だけ)"><span class="dot">？？</span><span class="sn">？？？？</span><span class="sk">霧の夜だけ</span></button>`;
+  const rail=`<div class="railwrap"><div class="rail" role="list" style="--n:${TOWNS.length+(mabo?1:0)}">${TOWNS.map(x=>{const open=townOpen(x);return `<button class="station ${x.id===state.town?'cur':''} ${open?'':'locked'}" role="listitem" data-act="town" data-id="${x.id}" ${open?'':'disabled'}><span class="dot">${x.code.slice(2)}</span><span class="sn">${open?x.name:'？？？'}</span><span class="sk">${open?x.kind:'未開通'}</span></button>${mabo&&x.id===state.town?maboBtn:''}`;}).join('')}</div></div>`;
   const hero=`<section class="hero town-hero"><img class="scene" src="${scene(t.scene,state.time)}" alt="${t.name}の風景">
     <div class="plate"><div class="plate-main"><span class="code">${t.code}</span><div class="plate-name"><b>${t.name}</b><span class="roma">${t.roma}</span></div></div>
     <div class="plate-bar"><span>${prev?'← '+prev.name:''}</span><span>${next&&townOpen(next)?next.name+' →':next?'？？？ →':''}</span></div></div></section>`;
@@ -7412,6 +7590,12 @@ function lose(){
   else{const early=!state.boss.komorebi,lost=early?0:Math.min(Math.floor(state.yen*.25),2000*(TOWNS.findIndex(x=>x.id===state.town)+1));state.yen-=lost;if(state.detour)state.detour=0;lines=['目の前がまっくらになった……',early?'こもれび湯のおかみさんが、そっと拾っておいてくれた。':`${lost}円を落としてしまった。`,MAPS[state.town]?(state.ow={map:state.town,...MAPS[state.town].spawn},ui.station=false,ui.inside=null,state.town==='komorebi'?'家で目をさました。なかまは回復している。':`${TOWN[state.town].sento}で目をさました。なかまは回復している。`):`${TOWN[state.town].sento}で目をさました。なかまは回復している。`];}
   healAll();B.result={win:false,lines};save();sfx('lose');render();
 }
+/* T8: 初めて着いた演出。黒い画面に駅名標が出て、「？？」が「まぼろし駅」に変わる(CSSだけ・にじみなし) */
+function maboIntro(first){
+  const el=document.createElement('div');el.className='mabo-fx'+(first?' first':'');el.setAttribute('role','status');
+  el.innerHTML=`<div class="mp"><i></i><small>${first?'はじめての駅':'まもなく'}</small><b class="q">？？</b><b class="n">まぼろし駅</b><span>Maboroshi</span></div>`;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),first?3600:2200);
+}
 function stChips(c){
   const out=Object.keys(c.sts).map(k=>`<span class="chip bad">${STN[k]}</span>`);
   for(const k of ['atk','def'])if(c.stg[k])out.push(`<span class="chip ${c.stg[k]>0?'up':'bad'}">${STL[k]}${c.stg[k]>0?'↑':'↓'}${Math.abs(c.stg[k])>1?'↑'.repeat(0)+'×2':''}</span>`);
@@ -7514,6 +7698,10 @@ function explore(fid){
 const H={
   starter:d=>{const m=newMon(d.id,3,{talent:randTalent(8,12)});m.gen=0;state.party=[m];state.owned[d.id]=true;state.seen[d.id]=true;state.started=true;state.flags.intro=true;state.flags.v2=true;state.flags.gacha=true;state.stars=50;state.login={last:dayKey(),streak:1};ui.sel=m.uid;ui.toast=`${SP[d.id].name}が相棒になった！ まずは田んぼのあぜ道でなかまをスカウトしよう。`;save();render();talk(STORY.intro);},
   tab:d=>{ui.tab=d.v;ui.toast='';ui.confirmRel=false;ui.renaming=false;ui.detailOpen=false;sfx('sel');render();scrollTop0();},
+  mabo:()=>{if(!maboOpen())return;const first=!state.flags.mabo;state.flags.mabo=true;const m=MAPS.maboroshi,sp=m.spawn;
+    state.ow={map:'maboroshi',x:sp.x,y:sp.y,dir:sp.dir};ui.station=false;ui.inside=null;ui.tab='map';OWC.cars=null;OWC.mv=null;OWC.held=null;owCancelPath();owVolcReset();owFoot();
+    jingle('station');maboIntro(first);save();render();
+    if(first)setTimeout(()=>{if(state.ow.map==='maboroshi'&&!ui.dlg&&!B)talk([['','気がつくと、知らないホームに降りていた。'],['','霧のなかに、古い駅舎がぼうっと浮かんでいる。'],['','(ここは「まぼろし駅」。戻りたくなったら、ホームの西のはしか、「駅へもどる」ボタンから)']]);},jingleLen('station')*1000+900);},
   town:d=>{const t=TOWN[d.id];if(!townOpen(t))return;state.town=d.id;if(MAPS[d.id]){const s=MAPS[d.id].station;state.ow={map:d.id,x:s.x,y:s.y,dir:s.dir};owFoot();ui.station=false;ui.inside=null;OWC.cars=null;}ui.toast=`ミチクサ線で${t.name}へ移動した。`;save();render();const fk='visit_'+d.id;if(STORY[fk]&&!state.flags[fk]){state.flags[fk]=true;save();talk(STORY[fk]);}},
   explore:d=>explore(d.f),
   ura:()=>{const t=TOWN[state.town];if(!t.ura||!state.boss[t.id])return;startBattle(t.ura.foes,{boss:true,ura:true,town:t.id,field:t.ura.title,scene:t.ura.scene});},
