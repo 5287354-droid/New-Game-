@@ -852,6 +852,7 @@ const SK={
   shoukaeki:{n:'しょうかえき',mp:6,k:'mag',t:'one',b:16,e:'',debuff:{def:-1},dch:.8,d:'消化液を浴びせ守備を下げる'},
   shinkeidoku:{n:'しんけいどく',mp:6,k:'mag',t:'one',b:12,e:'',st:[['poison',.8],['para',.4]],d:'猛毒。毒とマヒを与える'},
   kiseihoushi:{n:'きせいほうし',mp:8,k:'mag',t:'one',b:14,e:'',st:[['confuse',.85],['poison',.85]],d:'寄生胞子を植えつける'},
+  houshidan:{n:'ほうしだん',mp:2,k:'mag',t:'one',b:11,e:'',st:[['poison',.25]],d:'胞子のかたまりをぶつける。毒にすることがある'},
   maboroshi:{n:'まぼろしほうし',mp:5,k:'stat',t:'all',st:[['confuse',.4]],d:'幻覚の胞子で敵全体を混乱させる'},
   yumemi:{n:'ゆめみほうし',mp:4,k:'stat',t:'one',st:[['sleep',.65]],d:'夢見の胞子で眠らせる'},
   dokunokiri:{n:'どくのきり',mp:4,k:'stat',t:'all',st:[['poison',.55]],d:'毒の霧で敵全体を毒にする'},
@@ -963,7 +964,7 @@ function S(id,name,fam,rank,glyph,motif,desc,base,skills,trait,special){
   SP[id]=o;SPL.push(o);
 }
 S('dokudamin','ドクダミン','plant','F','薬','ドクダミ','「十薬」とも呼ばれる薬草が歩き出した姿。強烈なにおいで外敵を追い払い、葉を煎じた茶で仲間を癒やす。',[16,8,6,7,5,9],[[1,'yakusou'],[6,'kusai'],[14,'dokudamicha']],'shizen');
-S('ibote','イボテ','plant','E','茸','ベニテングタケ','赤い笠に白いイボを散らした歩くキノコ。笠をゆらして撒く胞子を吸うと、ありもしない景色が見えてくる。',[18,12,7,7,6,11],[[1,'maboroshi'],[6,'yumemi'],[12,'dokunokiri'],[22,'akumu']],'houshi');
+S('ibote','イボテ','plant','E','茸','ベニテングタケ','赤い笠に白いイボを散らした歩くキノコ。笠をゆらして撒く胞子を吸うと、ありもしない景色が見えてくる。',[18,12,7,7,6,11],[[1,'houshidan'],[1,'maboroshi'],[6,'yumemi'],[12,'dokunokiri'],[22,'akumu']],'houshi');
 S('tsubokurau','ツボクラウ','plant','C','壺','ウツボカズラ','都心のビルの屋上庭園から逃げ出した食虫植物。人の背丈ほどの捕虫袋で、ネズミもカラスも丸ごと飲みこむ。',[28,14,12,10,6,12],[[1,'marunomi'],[8,'amaimitsu'],[16,'shoukaeki'],[26,'taiyou']],'shizen');
 S('yadoridake','ヤドリダケ','plant','A','宿','冬虫夏草','甲虫に寄生し、その体を乗っ取って歩くキノコ。宿主の怪力と胞子の毒を、両方あやつる。',[44,24,16,14,10,22],[[1,'kiseihoushi'],[1,'maboroshi'],[20,'akumu'],[34,'taiyou']],'mpkaifuku',true);
 S('dobuchu','ドブチュウ','beast','F','鼠','ドブネズミ','霞ヶ丘の地下の下水道に暮らす大ネズミ。何でもかじる前歯は、鉄のフェンスにも穴をあける。',[13,4,8,5,11,4],[[1,'kamitsuki'],[6,'bikin'],[14,'tobikakari']],'subashikoi');
@@ -6178,11 +6179,13 @@ function owFishPull(){
   const n=Math.random()<.25?2:1,foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(OW_LV(fs.lv[0],1.25),OW_LV(fs.lv[1],1.25))]);
   ui.toast='';owStamp('g:fish');save();startBattle(foes,{field:`${t.name}・釣り`,scene:'port'});
 }
-/* はじめの3勝まで: 野生は1体だけ、Lvは先頭のなかま-1まで(こもれび町のぬしを倒したあとは補正なし) */
+/* はじめの3勝まで: 野生は1体だけ、Lvは先頭のなかま-1まで(はじめの1戦は-2)。
+   3勝したあとも、なかまが先頭1体だけのあいだは野生は1体だけ、Lvは先頭-1まで。こもれび町のぬしを倒したあとは補正なし */
 function owEarly(foes){
-  if((state.wins||0)>=3||state.boss.komorebi||!foes.length)return foes;
+  if(state.boss.komorebi||!foes.length)return foes;
   const lead=state.party.find(m=>m.hp>0)||state.party[0];if(!lead)return foes;
-  foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-1));return foes;
+  if((state.wins||0)>=3){if(state.party.length<2){foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-1));}return foes;}
+  foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-((state.wins||0)<1?2:1)));return foes;
 }
 /* 色違いの率: 通常 1/150、きらり 1/30。星降りは通常 1/75、きらり 1/15 */
 const owShinyP=(wx,kir)=>kir?(wx==='hoshi'?1/15:1/30):(wx==='hoshi'?1/75:1/150);

@@ -1,0 +1,1045 @@
+{
+ "item": "points",
+ "seed": 1,
+ "n": null,
+ "params": {
+  "STEP_S": 0.185,
+  "BATTLE_OVERHEAD_S": 2.4,
+  "AUTO_TURN_S": 0.35,
+  "REST_S": 40,
+  "REST_HP": 0.45,
+  "RAMP_S": 120,
+  "GRASS": 1,
+  "GAME": "src/game.html"
+ },
+ "result": {
+  "rows": [
+   {
+    "id": "komorebi",
+    "name": "こもれび町",
+    "town": "komorebi",
+    "blocks": 18,
+    "missed": 0,
+    "steps": 57,
+    "encSteps": 9,
+    "rate": 0.11,
+    "hub": true,
+    "stampMax": 0,
+    "sec": 32.325,
+    "pts": 48,
+    "stars": 3
+   },
+   {
+    "id": "urayama",
+    "name": "鎮守の森・裏山",
+    "town": "komorebi",
+    "blocks": 21,
+    "missed": 0,
+    "steps": 71,
+    "encSteps": 21,
+    "rate": 0.11,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 63.955,
+    "pts": 51,
+    "stars": 3
+   },
+   {
+    "id": "okumori",
+    "name": "大楠の迷い森",
+    "town": "komorebi",
+    "blocks": 80,
+    "missed": 5,
+    "steps": 291,
+    "encSteps": 57,
+    "rate": 0.09,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 166.695,
+    "pts": 110,
+    "stars": 3
+   },
+   {
+    "id": "kasumi",
+    "name": "霞ヶ丘",
+    "town": "kasumi",
+    "blocks": 25,
+    "missed": 0,
+    "steps": 84,
+    "encSteps": 0,
+    "rate": 0.11,
+    "hub": true,
+    "stampMax": 0,
+    "sec": 15.54,
+    "pts": 55,
+    "stars": 3
+   },
+   {
+    "id": "roji",
+    "name": "雑居ビルの路地裏",
+    "town": "kasumi",
+    "blocks": 20,
+    "missed": 0,
+    "steps": 85,
+    "encSteps": 72,
+    "rate": 0.1,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 174.125,
+    "pts": 50,
+    "stars": 3
+   },
+   {
+    "id": "chika",
+    "name": "旧地下鉄のトンネル",
+    "town": "kasumi",
+    "blocks": 17,
+    "missed": 0,
+    "steps": 53,
+    "encSteps": 46,
+    "rate": 0.09,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 100.88499999999999,
+    "pts": 47,
+    "stars": 3
+   },
+   {
+    "id": "haibiru",
+    "name": "廃ビル 最上階",
+    "town": "kasumi",
+    "blocks": 13,
+    "missed": 0,
+    "steps": 33,
+    "encSteps": 12,
+    "rate": 0.25,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 72.105,
+    "pts": 43,
+    "stars": 3
+   },
+   {
+    "id": "kanjou",
+    "name": "旧環状線",
+    "town": "kasumi",
+    "blocks": 54,
+    "missed": 0,
+    "steps": 307,
+    "encSteps": 19,
+    "rate": 0.1,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 98.595,
+    "pts": 84,
+    "stars": 3
+   },
+   {
+    "id": "shiomi",
+    "name": "潮見浜",
+    "town": "shiomi",
+    "blocks": 28,
+    "missed": 0,
+    "steps": 87,
+    "encSteps": 0,
+    "rate": 0.11,
+    "hub": true,
+    "stampMax": 0,
+    "sec": 16.095,
+    "pts": 58,
+    "stars": 3
+   },
+   {
+    "id": "hama",
+    "name": "砂浜と磯",
+    "town": "shiomi",
+    "blocks": 16,
+    "missed": 0,
+    "steps": 57,
+    "encSteps": 37,
+    "rate": 0.1,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 91.94500000000001,
+    "pts": 46,
+    "stars": 3
+   },
+   {
+    "id": "gyokou",
+    "name": "夜の漁港",
+    "town": "shiomi",
+    "blocks": 15,
+    "missed": 0,
+    "steps": 58,
+    "encSteps": 35,
+    "rate": 0.06,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 56.93000000000001,
+    "pts": 45,
+    "stars": 3
+   },
+   {
+    "id": "doukutsu",
+    "name": "灯台下の海蝕洞",
+    "town": "shiomi",
+    "blocks": 12,
+    "missed": 0,
+    "steps": 34,
+    "encSteps": 30,
+    "rate": 0.08,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 59.089999999999996,
+    "pts": 42,
+    "stars": 3
+   },
+   {
+    "id": "nanpasen",
+    "name": "沖の岩礁と難破船",
+    "town": "shiomi",
+    "blocks": 154,
+    "missed": 0,
+    "steps": 548,
+    "encSteps": 54,
+    "rate": 0.07,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 184.54000000000002,
+    "pts": 184,
+    "stars": 3
+   },
+   {
+    "id": "tengu",
+    "name": "天狗岳 門前町",
+    "town": "tengu",
+    "blocks": 27,
+    "missed": 0,
+    "steps": 90,
+    "encSteps": 0,
+    "rate": 0.11,
+    "hub": true,
+    "stampMax": 0,
+    "sec": 16.65,
+    "pts": 57,
+    "stars": 3
+   },
+   {
+    "id": "sando",
+    "name": "杉林の参道",
+    "town": "tengu",
+    "blocks": 21,
+    "missed": 0,
+    "steps": 81,
+    "encSteps": 24,
+    "rate": 0.09,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 62.505,
+    "pts": 51,
+    "stars": 3
+   },
+   {
+    "id": "keiryu",
+    "name": "渓流の吊り橋",
+    "town": "tengu",
+    "blocks": 20,
+    "missed": 0,
+    "steps": 64,
+    "encSteps": 8,
+    "rate": 0.1,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 29.44,
+    "pts": 50,
+    "stars": 3
+   },
+   {
+    "id": "okumiya",
+    "name": "奥宮への石段",
+    "town": "tengu",
+    "blocks": 14,
+    "missed": 0,
+    "steps": 42,
+    "encSteps": 13,
+    "rate": 0.1,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 36.370000000000005,
+    "pts": 44,
+    "stars": 3
+   },
+   {
+    "id": "shugendo",
+    "name": "天狗の修験道",
+    "town": "tengu",
+    "blocks": 79,
+    "missed": 4,
+    "steps": 329,
+    "encSteps": 10,
+    "rate": 0.08,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 78.465,
+    "pts": 109,
+    "stars": 3
+   },
+   {
+    "id": "mayoiga",
+    "name": "迷い家の里",
+    "town": "mayoiga",
+    "blocks": 37,
+    "missed": 0,
+    "steps": 133,
+    "encSteps": 0,
+    "rate": 0.11,
+    "hub": true,
+    "stampMax": 0,
+    "sec": 24.605,
+    "pts": 67,
+    "stars": 3
+   },
+   {
+    "id": "yashiki",
+    "name": "迷い家の屋敷",
+    "town": "mayoiga",
+    "blocks": 6,
+    "missed": 0,
+    "steps": 11,
+    "encSteps": 0,
+    "rate": 0.11,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 2.035,
+    "pts": 36,
+    "stars": 3
+   },
+   {
+    "id": "okunoma",
+    "name": "奥の間",
+    "town": "mayoiga",
+    "blocks": 7,
+    "missed": 0,
+    "steps": 14,
+    "encSteps": 0,
+    "rate": 0.11,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 2.59,
+    "pts": 37,
+    "stars": 3
+   },
+   {
+    "id": "chikurin",
+    "name": "霧の竹林",
+    "town": "mayoiga",
+    "blocks": 15,
+    "missed": 11,
+    "steps": 3,
+    "encSteps": 2,
+    "rate": 0.1,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 4.955,
+    "pts": 45,
+    "stars": 3
+   },
+   {
+    "id": "kagami",
+    "name": "鏡の湖",
+    "town": "mayoiga",
+    "blocks": 14,
+    "missed": 0,
+    "steps": 41,
+    "encSteps": 23,
+    "rate": 0.1,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 58.18500000000001,
+    "pts": 44,
+    "stars": 3
+   },
+   {
+    "id": "senbon",
+    "name": "千本鳥居",
+    "town": "mayoiga",
+    "blocks": 12,
+    "missed": 0,
+    "steps": 35,
+    "encSteps": 3,
+    "rate": 0.1,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 13.075000000000001,
+    "pts": 42,
+    "stars": 3
+   },
+   {
+    "id": "kairou",
+    "name": "裏座敷・鬼火の回廊",
+    "town": "mayoiga",
+    "blocks": 95,
+    "missed": 0,
+    "steps": 497,
+    "encSteps": 385,
+    "rate": 0.035,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 388.39500000000004,
+    "pts": 125,
+    "stars": 3
+   },
+   {
+    "id": "kagami_ura",
+    "name": "湖の鏡",
+    "town": "mayoiga",
+    "blocks": 16,
+    "missed": 0,
+    "steps": 70,
+    "encSteps": 29,
+    "rate": 0.13,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 95.89,
+    "pts": 46,
+    "stars": 3
+   },
+   {
+    "id": "ryuhyo",
+    "name": "流氷岬",
+    "town": "ryuhyo",
+    "blocks": 70,
+    "missed": 0,
+    "steps": 227,
+    "encSteps": 8,
+    "rate": 0.11,
+    "hub": true,
+    "stampMax": 0,
+    "sec": 61.355,
+    "pts": 100,
+    "stars": 3
+   },
+   {
+    "id": "genseirin",
+    "name": "雪の原生林",
+    "town": "ryuhyo",
+    "blocks": 179,
+    "missed": 0,
+    "steps": 723,
+    "encSteps": 307,
+    "rate": 0.09,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 741.615,
+    "pts": 209,
+    "stars": 3
+   },
+   {
+    "id": "hyoukai",
+    "name": "流氷の海",
+    "town": "ryuhyo",
+    "blocks": 272,
+    "missed": 192,
+    "steps": 265,
+    "encSteps": 28,
+    "rate": 0.07,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 92.14500000000001,
+    "pts": 302,
+    "stars": 3
+   },
+   {
+    "id": "hyouketsu",
+    "name": "氷山の洞窟",
+    "town": "ryuhyo",
+    "blocks": 71,
+    "missed": 0,
+    "steps": 328,
+    "encSteps": 179,
+    "rate": 0.03,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 178.82,
+    "pts": 101,
+    "stars": 3
+   },
+   {
+    "id": "okanoue",
+    "name": "オーロラの丘",
+    "town": "ryuhyo",
+    "blocks": 80,
+    "missed": 0,
+    "steps": 345,
+    "encSteps": 174,
+    "rate": 0.09,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 408.34499999999997,
+    "pts": 110,
+    "stars": 3
+   },
+   {
+    "id": "hinoshima",
+    "name": "火ノ島",
+    "town": "hinoshima",
+    "blocks": 66,
+    "missed": 0,
+    "steps": 258,
+    "encSteps": 11,
+    "rate": 0.11,
+    "hub": true,
+    "stampMax": 0,
+    "sec": 74.35,
+    "pts": 96,
+    "stars": 3
+   },
+   {
+    "id": "kokusa",
+    "name": "溶岩の黒い浜",
+    "town": "hinoshima",
+    "blocks": 86,
+    "missed": 54,
+    "steps": 115,
+    "encSteps": 18,
+    "rate": 0.08,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 52.955,
+    "pts": 116,
+    "stars": 3
+   },
+   {
+    "id": "jigokudani",
+    "name": "地獄谷",
+    "town": "hinoshima",
+    "blocks": 153,
+    "missed": 0,
+    "steps": 667,
+    "encSteps": 90,
+    "rate": 0.08,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 281.795,
+    "pts": 183,
+    "stars": 3
+   },
+   {
+    "id": "yougandou",
+    "name": "溶岩洞",
+    "town": "hinoshima",
+    "blocks": 93,
+    "missed": 55,
+    "steps": 169,
+    "encSteps": 81,
+    "rate": 0.035,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 93.63500000000002,
+    "pts": 123,
+    "stars": 3
+   },
+   {
+    "id": "kakou",
+    "name": "火口のふち",
+    "town": "hinoshima",
+    "blocks": 67,
+    "missed": 5,
+    "steps": 242,
+    "encSteps": 20,
+    "rate": 0.08,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 79.97,
+    "pts": 97,
+    "stars": 3
+   },
+   {
+    "id": "sango",
+    "name": "珊瑚島",
+    "town": "sango",
+    "blocks": 42,
+    "missed": 0,
+    "steps": 163,
+    "encSteps": 0,
+    "rate": 0.11,
+    "hub": true,
+    "stampMax": 0,
+    "sec": 30.155,
+    "pts": 72,
+    "stars": 3
+   },
+   {
+    "id": "shirahama",
+    "name": "白い砂浜",
+    "town": "sango",
+    "blocks": 192,
+    "missed": 0,
+    "steps": 709,
+    "encSteps": 60,
+    "rate": 0.09,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 249.96499999999997,
+    "pts": 222,
+    "stars": 3
+   },
+   {
+    "id": "hirugimori",
+    "name": "マングローブの森",
+    "town": "sango",
+    "blocks": 58,
+    "missed": 0,
+    "steps": 284,
+    "encSteps": 30,
+    "rate": 0.09,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 111.94,
+    "pts": 88,
+    "stars": 3
+   },
+   {
+    "id": "sangosho",
+    "name": "珊瑚礁の海",
+    "town": "sango",
+    "blocks": 203,
+    "missed": 0,
+    "steps": 803,
+    "encSteps": 60,
+    "rate": 0.08,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 254.155,
+    "pts": 233,
+    "stars": 3
+   },
+   {
+    "id": "yomi",
+    "name": "黄泉ヶ原",
+    "town": "yomi",
+    "blocks": 51,
+    "missed": 0,
+    "steps": 198,
+    "encSteps": 0,
+    "rate": 0.11,
+    "hub": true,
+    "stampMax": 0,
+    "sec": 36.63,
+    "pts": 81,
+    "stars": 3
+   },
+   {
+    "id": "higanno",
+    "name": "彼岸花の原",
+    "town": "yomi",
+    "blocks": 104,
+    "missed": 0,
+    "steps": 488,
+    "encSteps": 97,
+    "rate": 0.08,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 261,
+    "pts": 134,
+    "stars": 3
+   },
+   {
+    "id": "wasure",
+    "name": "忘れ川のほとり",
+    "town": "yomi",
+    "blocks": 224,
+    "missed": 0,
+    "steps": 782,
+    "encSteps": 104,
+    "rate": 0.08,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 327.71000000000004,
+    "pts": 254,
+    "stars": 3
+   },
+   {
+    "id": "kanata",
+    "name": "川の向こう",
+    "town": "yomi",
+    "blocks": 62,
+    "missed": 0,
+    "steps": 276,
+    "encSteps": 46,
+    "rate": 0.07,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 121.9,
+    "pts": 92,
+    "stars": 3
+   },
+   {
+    "id": "sakanoue",
+    "name": "ひらさかの上",
+    "town": "yomi",
+    "blocks": 89,
+    "missed": 0,
+    "steps": 284,
+    "encSteps": 13,
+    "rate": 0.08,
+    "hub": false,
+    "stampMax": 0,
+    "sec": 75.42,
+    "pts": 119,
+    "stars": 3
+   }
+  ],
+  "cum": [
+   {
+    "id": "komorebi",
+    "town": "komorebi",
+    "t": 0.008979166666666668,
+    "p": 48
+   },
+   {
+    "id": "urayama",
+    "town": "komorebi",
+    "t": 0.026744444444444446,
+    "p": 99
+   },
+   {
+    "id": "okumori",
+    "town": "komorebi",
+    "t": 0.07304861111111112,
+    "p": 209
+   },
+   {
+    "id": "kasumi",
+    "town": "kasumi",
+    "t": 0.0773652777777778,
+    "p": 264
+   },
+   {
+    "id": "roji",
+    "town": "kasumi",
+    "t": 0.12573333333333334,
+    "p": 314
+   },
+   {
+    "id": "chika",
+    "town": "kasumi",
+    "t": 0.15375694444444446,
+    "p": 361
+   },
+   {
+    "id": "haibiru",
+    "town": "kasumi",
+    "t": 0.17378611111111114,
+    "p": 404
+   },
+   {
+    "id": "kanjou",
+    "town": "kasumi",
+    "t": 0.20117361111111115,
+    "p": 488
+   },
+   {
+    "id": "shiomi",
+    "town": "shiomi",
+    "t": 0.2056444444444445,
+    "p": 546
+   },
+   {
+    "id": "hama",
+    "town": "shiomi",
+    "t": 0.23118472222222228,
+    "p": 592
+   },
+   {
+    "id": "gyokou",
+    "town": "shiomi",
+    "t": 0.24699861111111115,
+    "p": 637
+   },
+   {
+    "id": "doukutsu",
+    "town": "shiomi",
+    "t": 0.26341250000000005,
+    "p": 679
+   },
+   {
+    "id": "nanpasen",
+    "town": "shiomi",
+    "t": 0.3146736111111112,
+    "p": 863
+   },
+   {
+    "id": "tengu",
+    "town": "tengu",
+    "t": 0.3192986111111112,
+    "p": 920
+   },
+   {
+    "id": "sando",
+    "town": "tengu",
+    "t": 0.33666111111111124,
+    "p": 971
+   },
+   {
+    "id": "keiryu",
+    "town": "tengu",
+    "t": 0.34483888888888903,
+    "p": 1021
+   },
+   {
+    "id": "okumiya",
+    "town": "tengu",
+    "t": 0.35494166666666677,
+    "p": 1065
+   },
+   {
+    "id": "shugendo",
+    "town": "tengu",
+    "t": 0.3767375000000001,
+    "p": 1174
+   },
+   {
+    "id": "mayoiga",
+    "town": "mayoiga",
+    "t": 0.3835722222222223,
+    "p": 1241
+   },
+   {
+    "id": "yashiki",
+    "town": "mayoiga",
+    "t": 0.38413750000000013,
+    "p": 1277
+   },
+   {
+    "id": "okunoma",
+    "town": "mayoiga",
+    "t": 0.3848569444444445,
+    "p": 1314
+   },
+   {
+    "id": "chikurin",
+    "town": "mayoiga",
+    "t": 0.38623333333333343,
+    "p": 1359
+   },
+   {
+    "id": "kagami",
+    "town": "mayoiga",
+    "t": 0.4023958333333334,
+    "p": 1403
+   },
+   {
+    "id": "senbon",
+    "town": "mayoiga",
+    "t": 0.4060277777777779,
+    "p": 1445
+   },
+   {
+    "id": "kairou",
+    "town": "mayoiga",
+    "t": 0.5139152777777779,
+    "p": 1570
+   },
+   {
+    "id": "kagami_ura",
+    "town": "mayoiga",
+    "t": 0.540551388888889,
+    "p": 1616
+   },
+   {
+    "id": "ryuhyo",
+    "town": "ryuhyo",
+    "t": 0.5575944444444445,
+    "p": 1716
+   },
+   {
+    "id": "genseirin",
+    "town": "ryuhyo",
+    "t": 0.7635986111111113,
+    "p": 1925
+   },
+   {
+    "id": "hyoukai",
+    "town": "ryuhyo",
+    "t": 0.7891944444444445,
+    "p": 2227
+   },
+   {
+    "id": "hyouketsu",
+    "town": "ryuhyo",
+    "t": 0.8388666666666668,
+    "p": 2328
+   },
+   {
+    "id": "okanoue",
+    "town": "ryuhyo",
+    "t": 0.9522958333333335,
+    "p": 2438
+   },
+   {
+    "id": "hinoshima",
+    "town": "hinoshima",
+    "t": 0.9729486111111112,
+    "p": 2534
+   },
+   {
+    "id": "kokusa",
+    "town": "hinoshima",
+    "t": 0.9876583333333334,
+    "p": 2650
+   },
+   {
+    "id": "jigokudani",
+    "town": "hinoshima",
+    "t": 1.0659347222222222,
+    "p": 2833
+   },
+   {
+    "id": "yougandou",
+    "town": "hinoshima",
+    "t": 1.0919444444444446,
+    "p": 2956
+   },
+   {
+    "id": "kakou",
+    "town": "hinoshima",
+    "t": 1.1141583333333334,
+    "p": 3053
+   },
+   {
+    "id": "sango",
+    "town": "sango",
+    "t": 1.1225347222222224,
+    "p": 3125
+   },
+   {
+    "id": "shirahama",
+    "town": "sango",
+    "t": 1.1919694444444444,
+    "p": 3347
+   },
+   {
+    "id": "hirugimori",
+    "town": "sango",
+    "t": 1.2230638888888887,
+    "p": 3435
+   },
+   {
+    "id": "sangosho",
+    "town": "sango",
+    "t": 1.2936625,
+    "p": 3668
+   },
+   {
+    "id": "yomi",
+    "town": "yomi",
+    "t": 1.3038375,
+    "p": 3749
+   },
+   {
+    "id": "higanno",
+    "town": "yomi",
+    "t": 1.3763375,
+    "p": 3883
+   },
+   {
+    "id": "wasure",
+    "town": "yomi",
+    "t": 1.4673680555555555,
+    "p": 4137
+   },
+   {
+    "id": "kanata",
+    "town": "yomi",
+    "t": 1.5012291666666664,
+    "p": 4229
+   },
+   {
+    "id": "sakanoue",
+    "town": "yomi",
+    "t": 1.5221791666666664,
+    "p": 4348
+   }
+  ],
+  "byTown": {
+   "komorebi": {
+    "maps": 3,
+    "blocks": 119,
+    "pts": 209,
+    "sec": 262.975
+   },
+   "kasumi": {
+    "maps": 5,
+    "blocks": 129,
+    "pts": 279,
+    "sec": 461.25
+   },
+   "shiomi": {
+    "maps": 5,
+    "blocks": 225,
+    "pts": 375,
+    "sec": 408.6
+   },
+   "tengu": {
+    "maps": 5,
+    "blocks": 161,
+    "pts": 311,
+    "sec": 223.43
+   },
+   "mayoiga": {
+    "maps": 8,
+    "blocks": 202,
+    "pts": 442,
+    "sec": 589.73
+   },
+   "ryuhyo": {
+    "maps": 5,
+    "blocks": 672,
+    "pts": 822,
+    "sec": 1482.28
+   },
+   "hinoshima": {
+    "maps": 5,
+    "blocks": 465,
+    "pts": 615,
+    "sec": 582.705
+   },
+   "sango": {
+    "maps": 4,
+    "blocks": 495,
+    "pts": 615,
+    "sec": 646.215
+   },
+   "yomi": {
+    "maps": 5,
+    "blocks": 530,
+    "pts": 680,
+    "sec": 822.66
+   }
+  },
+  "total": 4428,
+  "totalHours": 1.6555124999999997,
+  "ptsPerHour": 2674.7004326454803,
+  "hoursTo": {
+   "15": 0.008979166666666668,
+   "40": 0.008979166666666668,
+   "80": 0.026744444444444446,
+   "400": 0.17378611111111114,
+   "1000": 0.34483888888888903,
+   "1500": 0.5139152777777779,
+   "2000": 0.7891944444444445
+  },
+  "order": [
+   "komorebi",
+   "kasumi",
+   "shiomi",
+   "tengu",
+   "mayoiga",
+   "ryuhyo",
+   "hinoshima",
+   "sango",
+   "yomi"
+  ]
+ }
+}

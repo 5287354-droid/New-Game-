@@ -13,22 +13,22 @@
  },
  "result": {
   "ibote": {
-   "n": 1000,
-   "win": 0.197,
+   "n": 992,
+   "win": 0.6381048387096774,
    "ci": [
-    0.17352775230416598,
-    0.22279134823918673
+    0.6077204860725594,
+    0.667423673400192
    ],
-   "turns": 6.095,
-   "sec": 20.055130000000023,
+   "turns": 7.886088709677419,
+   "sec": 23.05313508064515,
    "byN": {
     "1": [
-     197,
-     607
+     633,
+     992
     ],
     "2": [
      0,
-     393
+     0
     ],
     "3": [
      0,
@@ -36,39 +36,38 @@
     ]
    },
    "lostBy": {
-    "numekuji": 126,
-    "kanahebin": 95,
-    "dokudamin": 154,
-    "watapopo": 138,
-    "chunta": 128,
-    "hasunoha": 32,
-    "gorodango": 141,
-    "amezari": 97,
-    "denden": 100,
-    "happadanuki": 60,
-    "uribou": 45,
-    "medakan": 67,
-    "koganetsubu": 10,
-    "haganetsubu": 3
+    "hasunoha": 24,
+    "dokudamin": 86,
+    "uribou": 23,
+    "happadanuki": 33,
+    "amezari": 41,
+    "denden": 14,
+    "watapopo": 23,
+    "kanahebin": 30,
+    "gorodango": 33,
+    "amayadori": 23,
+    "haganetsubu": 7,
+    "koganetsubu": 19,
+    "chunta": 3
    }
   },
   "happadanuki": {
-   "n": 1000,
-   "win": 0.447,
+   "n": 995,
+   "win": 0.935678391959799,
    "ci": [
-    0.4164454520911983,
-    0.4779601991589592
+    0.9186965384951868,
+    0.9493089590731963
    ],
-   "turns": 5.399,
-   "sec": 17.056729999999963,
+   "turns": 4.278391959798995,
+   "sec": 12.57617085427135,
    "byN": {
     "1": [
-     406,
-     570
+     931,
+     995
     ],
     "2": [
-     41,
-     430
+     0,
+     0
     ],
     "3": [
      0,
@@ -76,39 +75,32 @@
     ]
    },
    "lostBy": {
-    "kanahebin": 91,
-    "dokudamin": 143,
-    "chunta": 65,
-    "watapopo": 77,
-    "medakan": 78,
-    "gorodango": 112,
-    "uribou": 52,
-    "amezari": 81,
-    "happadanuki": 51,
-    "numekuji": 68,
-    "denden": 79,
-    "hasunoha": 37,
-    "koganetsubu": 5,
-    "haganetsubu": 3
+    "hasunoha": 14,
+    "amayadori": 10,
+    "haganetsubu": 8,
+    "koganetsubu": 13,
+    "uribou": 6,
+    "amezari": 12,
+    "happadanuki": 1
    }
   },
   "yamoryu": {
-   "n": 1000,
-   "win": 0.482,
+   "n": 995,
+   "win": 0.914572864321608,
    "ci": [
-    0.4511578913647933,
-    0.5129798769843169
+    0.895570577089036,
+    0.9303862112545812
    ],
-   "turns": 5.246,
-   "sec": 18.36541999999994,
+   "turns": 4.366834170854271,
+   "sec": 14.118783919597952,
    "byN": {
     "1": [
-     433,
-     592
+     910,
+     995
     ],
     "2": [
-     49,
-     408
+     0,
+     0
     ],
     "3": [
      0,
@@ -116,45 +108,38 @@
     ]
    },
    "lostBy": {
-    "dokudamin": 115,
-    "gorodango": 99,
-    "amezari": 81,
-    "denden": 70,
-    "hasunoha": 26,
-    "happadanuki": 53,
-    "watapopo": 85,
-    "numekuji": 62,
-    "koganetsubu": 9,
-    "kanahebin": 83,
-    "chunta": 80,
-    "medakan": 69,
-    "uribou": 41,
-    "haganetsubu": 4
+    "hasunoha": 18,
+    "amezari": 21,
+    "haganetsubu": 9,
+    "koganetsubu": 16,
+    "happadanuki": 2,
+    "amayadori": 13,
+    "uribou": 6
    }
   },
   "talent812": {
    "ibote": {
-    "n": 1000,
-    "win": 0.178,
+    "n": 991,
+    "win": 0.6064581231079718,
     "ci": [
-     0.15553722047993956,
-     0.20292730220969596
+     0.5756861217872036,
+     0.6364079442430067
     ]
    },
    "happadanuki": {
-    "n": 1000,
-    "win": 0.501,
+    "n": 990,
+    "win": 0.9333333333333333,
     "ci": [
-     0.4700652689060268,
-     0.5319270772968003
+     0.9160596155480445,
+     0.9472570337047137
     ]
    },
    "yamoryu": {
-    "n": 1000,
-    "win": 0.517,
+    "n": 990,
+    "win": 0.9161616161616162,
     "ci": [
-     0.48602179171422133,
-     0.5478480937338415
+     0.8972472748133259,
+     0.9318586913688102
     ]
    }
   }
