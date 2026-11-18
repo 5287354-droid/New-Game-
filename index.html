@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="69f306143f";</script>
+<script>window.JG_APP=true;window.JG_VER="b8e3f6f314";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -547,6 +547,11 @@ img,canvas{-webkit-user-drag:none;user-drag:none}
 .top2 .yen{font-size:17px;white-space:nowrap}.top2 .stars{font-size:15px;white-space:nowrap}
 .ib{flex:none;width:34px;height:30px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--faint);font-family:var(--f-disp);font-size:12px;cursor:pointer}
 .ib[aria-pressed="true"]{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 60%,var(--line2))}
+.volctl{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin:8px 0}
+.vol{display:flex;align-items:center;gap:8px}.vol-l{font-size:12px;font-weight:700;color:var(--faint);min-width:76px}
+.vol-s{display:flex;gap:2px}.vol-b{min-width:34px;height:26px;padding:0 4px;border:1px solid var(--line2);border-radius:3px;background:#0b0d16;color:var(--faint);font-family:var(--f-disp);font-weight:700;font-size:13px;cursor:pointer}
+.vol-b.lo{border-color:color-mix(in srgb,var(--accent) 45%,var(--line2));color:var(--ink)}
+.vol-b[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .shell .tabs .tab{padding:7px 10px;font-size:14px}
 .shell .partybar .pb{padding:4px 8px}
 .shell .partybar .seal.xs{--s:28px;--i:20px}
@@ -1221,34 +1226,159 @@ function scene(key,time){
   return SCN[id]=cv.toDataURL();
 }
 
-/* ========== 効果音(Web Audioで鳴らす短い電子音) ========== */
+/* ========== 音の土台(Web Audio) ==========
+   バス: BGM→(籠らせるローパス)→ダッキング→ ┐
+         SE / 環境音 / ジングル ────────────┴→ マスター→コンプレッサー→出力
+   音量は state.bgmVol / state.seVol(0・.25・.5・.75・1 の5段階) */
 let AC=null;
+const AUD={g:null,nb:null};
+const VOL_STEPS=[0,.25,.5,.75,1];
+const volGain=v=>Math.pow(Math.max(0,Math.min(1,v)),1.6);
+const bgmVolume=()=>state&&state.bgmVol!=null?state.bgmVol:.75;
+const seVolume=()=>state&&state.seVol!=null?state.seVol:.75;
+function audioGraph(ctx){
+  const g={},mk=()=>ctx.createGain();
+  g.master=mk();g.comp=ctx.createDynamicsCompressor();
+  g.comp.threshold.value=-14;g.comp.knee.value=10;g.comp.ratio.value=4;g.comp.attack.value=.003;g.comp.release.value=.2;
+  g.lim=ctx.createDynamicsCompressor();g.lim.threshold.value=-4;g.lim.knee.value=0;g.lim.ratio.value=20;g.lim.attack.value=.001;g.lim.release.value=.1;
+  g.master.connect(g.comp);g.comp.connect(g.lim);g.lim.connect(ctx.destination);
+  g.bgmIn=mk();g.tone=ctx.createBiquadFilter();g.tone.type='lowpass';g.tone.frequency.value=20000;g.tone.Q.value=.5;g.duck=mk();
+  g.bgmIn.connect(g.tone);g.tone.connect(g.duck);g.duck.connect(g.master);
+  g.se=mk();g.amb=mk();g.jin=mk();[g.se,g.amb,g.jin].forEach(n=>n.connect(g.master));
+  return g;
+}
+function audio(){
+  if(!AUD.g){AC=AC||new (window.AudioContext||window.webkitAudioContext)();AUD.g=audioGraph(AC);audioVolumes(true);}
+  return AC;
+}
+function bgmCtx(){return audio();}
+/* 音量を反映する(設定を変えたら呼ぶ) */
+function audioVolumes(now){
+  const g=AUD.g;if(!g||!AC)return;const t=AC.currentTime,tc=now?0.001:.05;
+  g.bgmIn.gain.setTargetAtTime(state&&state.bgm?volGain(bgmVolume()):0,t,tc);
+  g.se.gain.setTargetAtTime(volGain(seVolume()),t,tc);
+  g.jin.gain.setTargetAtTime(volGain(seVolume()),t,tc);
+  g.amb.gain.setTargetAtTime(volGain(seVolume())*.55,t,tc);
+}
+function noiseBuf(ctx){
+  if(AUD.nb&&AUD.nbCtx===ctx)return AUD.nb;
+  const n=ctx.sampleRate*2,b=ctx.createBuffer(1,n,ctx.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+  AUD.nb=b;AUD.nbCtx=ctx;return b;
+}
+
+/* ========== 効果音(Web Audioで鳴らす短い電子音) ==========
+   音の書き方: 音=[周波数,長さ,遅れ,波形,音量,行き先の周波数] / ノイズ=['n',長さ,遅れ,音量,フィルタ,周波数,行き先の周波数,立ち上がり] */
 const SFX={
-  sel:[[660,.05,0,'square',.03]],
-  hit:[[180,.09,0,'sawtooth',.06],[110,.1,.04,'sawtooth',.05]],
-  crit:[[900,.05,0,'square',.05],[200,.16,.05,'sawtooth',.08]],
-  heal:[[523,.08,0,'triangle',.07],[784,.12,.08,'triangle',.07]],
-  lvup:[[523,.09,0],[659,.09,.1],[784,.09,.2],[1046,.25,.3]],
-  scout:[[392,.1,0],[523,.1,.12],[659,.1,.24],[784,.3,.36,'triangle',.08]],
-  breed:[[262,.15,0,'triangle',.08],[330,.15,.15,'triangle',.08],[392,.15,.3,'triangle',.08],[523,.45,.45,'triangle',.08],[659,.45,.45,'triangle',.06]],
-  win:[[523,.1,0],[523,.1,.12],[523,.1,.24],[659,.35,.36]],
-  lose:[[392,.2,0,'triangle',.07],[330,.2,.2,'triangle',.07],[262,.4,.4,'triangle',.07]],
-  shiny:[[1318,.08,0,'triangle',.06],[1760,.08,.08,'triangle',.06],[2093,.22,.16,'triangle',.06]],
+  ui_ok:[[784,.05,0,'triangle',.045],[1175,.09,.05,'triangle',.045]],
+  ui_back:[[880,.05,0,'triangle',.04],[587,.09,.05,'triangle',.04]],
+  sel:[[660,.04,0,'triangle',.04]],
+  hit:[['n',.09,0,.11,'lowpass',2200,300],[150,.11,0,'triangle',.09,60]],
+  crit:[['n',.08,0,.13,'bandpass',3200,900],[1000,.05,0,'square',.025],[190,.2,.04,'sawtooth',.045,70],[120,.2,.04,'triangle',.08,50]],
+  ko:[[330,.14,0,'triangle',.07,170],[196,.34,.13,'triangle',.07,70],['n',.3,.1,.05,'lowpass',900,150]],
+  heal:[[523,.08,0,'triangle',.06],[784,.14,.08,'triangle',.06]],
+  lvup:[[523,.09,0,'square',.035],[659,.09,.1,'square',.035],[784,.09,.2,'square',.035],[1046,.28,.3,'square',.04],[523,.28,.3,'triangle',.05]],
+  countup:[[1568,.03,0,'square',.022]],
+  newdex:[[659,.08,0,'square',.035],[784,.08,.09,'square',.035],[988,.08,.18,'square',.035],[1318,.32,.27,'triangle',.06],[1976,.32,.27,'sine',.03]],
+  rare:[[196,1,0,'sine',.06,520],[392,1,0,'triangle',.03,1040],['n',1,0,.05,'bandpass',500,4200,.6],[1568,.25,1,'sine',.04]],
+  shiny:[[1318,.08,0,'triangle',.05],[1760,.08,.08,'triangle',.05],[2093,.2,.16,'triangle',.05],[2637,.32,.26,'sine',.03],[3136,.32,.34,'sine',.022]],
+  kirari:[[2093,.12,0,'sine',.045],[2794,.15,.07,'sine',.035],[3520,.22,.14,'sine',.025]],
+  stamp:[['n',.06,0,.09,'lowpass',1200,200],[200,.09,0,'square',.05,80],[1046,.14,.07,'triangle',.045],[1568,.22,.1,'triangle',.035]],
+  rain:[['n',.05,0,.04,'highpass',5000,4000],['n',.05,.12,.035,'highpass',6000,5000],['n',.05,.19,.04,'highpass',4500,4000],['n',.05,.33,.03,'highpass',5500,4500],['n',.05,.41,.04,'highpass',5000,4200]],
+  wind:[['n',1.3,0,.07,'bandpass',300,900,.45]],
+  station:[[784,.4,0,'sine',.07],[988,.4,0,'sine',.03],[659,.7,.34,'sine',.07],[1318,.5,.34,'sine',.03]],
+  scout:[[392,.1,0,'square',.035],[523,.1,.12,'square',.035],[659,.1,.24,'square',.035],[784,.3,.36,'triangle',.06]],
+  breed:[[262,.15,0,'triangle',.06],[330,.15,.15,'triangle',.06],[392,.15,.3,'triangle',.06],[523,.45,.45,'triangle',.06],[659,.45,.45,'triangle',.04]],
+  win:[[523,.1,0,'square',.035],[523,.1,.12,'square',.035],[523,.1,.24,'square',.035],[659,.35,.36,'square',.04],[523,.35,.36,'triangle',.05]],
+  lose:[[392,.2,0,'triangle',.06],[330,.2,.2,'triangle',.06],[262,.4,.4,'triangle',.06]],
 };
-function sfx(type){
-  if(!state||!state.sound||!SFX[type])return;
-  try{
-    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
-    const t=AC.currentTime;
-    for(const [f,d,st,wave='square',vol=.045] of SFX[type]){
-      const o=AC.createOscillator(),g=AC.createGain();
-      o.type=wave;o.frequency.setValueAtTime(f,t+st);
-      g.gain.setValueAtTime(vol,t+st);g.gain.exponentialRampToValueAtTime(.0001,t+st+d);
-      o.connect(g);g.connect(AC.destination);o.start(t+st);o.stop(t+st+d+.03);
+SFX.levelup=SFX.lvup;
+/* 1つの音(または一連の音)を、ctx の dst につなぐ。包絡線は0から始まり0で終わる(クリック防止) */
+function playSpec(ctx,dst,t,spec,rate){
+  for(const s of spec){
+    if(s[0]==='n'){
+      const [,d,st,vol,ft,f1,f2,att=.004]=s,src=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain(),t0=t+st;
+      src.buffer=noiseBuf(ctx);src.loop=true;f.type=ft;f.Q.value=ft==='bandpass'?1.2:.7;
+      f.frequency.setValueAtTime(f1*rate,t0);if(f2)f.frequency.exponentialRampToValueAtTime(f2*rate,t0+d);
+      g.gain.setValueAtTime(.0001,t0);g.gain.linearRampToValueAtTime(vol,t0+Math.min(att,d*.5));g.gain.exponentialRampToValueAtTime(.0001,t0+d);
+      src.connect(f);f.connect(g);g.connect(dst);src.start(t0);src.stop(t0+d+.03);
+    }else{
+      const [fr,d,st,wave='square',vol=.045,f2]=s,o=ctx.createOscillator(),g=ctx.createGain(),t0=t+st;
+      o.type=wave;o.frequency.setValueAtTime(fr*rate,t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2*rate,t0+d);
+      g.gain.setValueAtTime(.0001,t0);g.gain.linearRampToValueAtTime(vol,t0+.004);g.gain.exponentialRampToValueAtTime(.0001,t0+d);
+      o.connect(g);g.connect(dst);o.start(t0);o.stop(t0+d+.03);
     }
+  }
+}
+/* sfx(名前, 音程の倍率=1)。カウントアップなどは倍率を上げながら呼ぶ */
+function sfx(type,rate){
+  if(!state||!state.sound||!SFX[type]||seVolume()<=0)return;
+  try{
+    const ctx=audio();if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+    playSpec(ctx,AUD.g.se,ctx.currentTime,SFX[type],rate||1);
   }catch(e){}
 }
 
+/* ---- 環境音(ループ): ambStart('rain'|'wind') / ambStop() ---- */
+const AMB={want:null,cur:null,nodes:null};
+function ambStart(name){
+  AMB.want=name;ambSync();
+  if(name==='rain')bgmSetMood({rain:true});
+}
+function ambStop(){
+  const was=AMB.want;AMB.want=null;ambSync();
+  if(was==='rain')bgmSetMood({rain:false});
+}
+function ambKill(){
+  const a=AMB.nodes;AMB.nodes=null;AMB.cur=null;if(!a||!AC)return;
+  try{a.out.gain.cancelScheduledValues(AC.currentTime);a.out.gain.setTargetAtTime(0,AC.currentTime,.35);
+    setTimeout(()=>{a.srcs.forEach(s=>{try{s.stop();}catch(e){}});try{a.out.disconnect();}catch(e){}},1800);}catch(e){}
+}
+/* 効果音がオンで、音量が0でないときだけ鳴らす。設定を変えたら呼ぶ */
+function ambSync(){
+  const want=state&&state.sound&&seVolume()>0?AMB.want:null;
+  if(want===AMB.cur)return;
+  ambKill();if(!want)return;
+  try{
+    const ctx=audio();if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+    const out=ctx.createGain(),srcs=[],t=ctx.currentTime;
+    out.gain.setValueAtTime(.0001,t);out.gain.linearRampToValueAtTime(1,t+1.6);out.connect(AUD.g.amb);
+    const layer=(ft,f,q,lvl,lfoHz,lfoDepth,fdepth)=>{
+      const s=ctx.createBufferSource(),fl=ctx.createBiquadFilter(),g=ctx.createGain();
+      s.buffer=noiseBuf(ctx);s.loop=true;fl.type=ft;fl.frequency.value=f;fl.Q.value=q;g.gain.value=lvl;
+      s.connect(fl);fl.connect(g);g.connect(out);
+      if(lfoHz){const o=ctx.createOscillator(),og=ctx.createGain();o.frequency.value=lfoHz;og.gain.value=lvl*lfoDepth;o.connect(og);og.connect(g.gain);o.start();srcs.push(o);
+        if(fdepth){const fg=ctx.createGain();fg.gain.value=fdepth;o.connect(fg);fg.connect(fl.frequency);}}
+      s.start(t,Math.random()*1.5);srcs.push(s);
+    };
+    if(want==='rain'){layer('highpass',900,.4,.30,0,0,0);layer('bandpass',3200,.5,.22,.13,.35,0);layer('lowpass',500,.6,.10,.07,.4,0);}
+    else{layer('bandpass',380,2.2,.5,.11,.5,160);layer('highpass',2200,.5,.05,.17,.9,0);}
+    AMB.nodes={out,srcs};AMB.cur=want;
+  }catch(e){}
+}
+
+/* ---- ジングル: jingle('win'|'rare'|'shiny'|'awaken'|'station')。BGMを下げて、終わったら戻す ---- */
+const JINGLES={
+  win:{bpm:152,duck:.15,ch:[{w:'p25',v:.05,o:5,m:'g8 g16 g16 g8 >c8 e4 g2.'},{w:'p12',v:.025,o:5,m:'e8 e16 e16 e8 g8 >c4 e2.',pan:.4},{w:'tri',v:.09,o:3,m:'c4 e4 g4 >c2'}]},
+  rare:{bpm:88,duck:.12,ch:[{w:'tri',v:.07,o:3,m:'c+4 d4 c+4 d4 c+8 d8 e-2.'},{w:'p12',v:.02,o:5,m:'r2 g+8 a8 g+8 a8 b-2'},{w:'nz',v:.02,m:'h8 h8 h4 h4 h8 h8'}]},
+  shiny:{bpm:140,duck:.04,ch:[{w:'p12',v:.04,o:6,m:'e16 g16 >c16 e16 g16 >c16 e8 g8 >c2'},{w:'sine',v:.045,o:5,m:'r8 c8 e8 g8 >c4 e4 g2'},{w:'tri',v:.07,o:3,m:'c4 g4 >c4 <g4 >c2'}]},
+  awaken:{bpm:104,duck:.12,ch:[{w:'p25',v:.05,o:4,m:'c4 e4 g4 >c4 e4 g4 >c2. r4 <b-4 >d4 g1'},{w:'tri',v:.1,o:2,m:'c2 c2 c2 c2 g2 g2 g1'},{w:'p12',v:.02,o:5,m:'e16 g16 >c16 e16 g16 >c16 e16 g16 >c16 e16 g16 >c16 e16 g16 >c16 e16 g16 >c8 e8 g8 >c8 e1',pan:-.4}]},
+  station:{bpm:112,duck:.2,ch:[{w:'sine',v:.07,o:5,m:'e4 c4 d4 g2 e4 c4 d4 <g2.'},{w:'tri',v:.08,o:3,m:'c2 g2 c2 g2'},{w:'p12',v:.015,o:6,m:'r4 g8 e8 f8 d8 g2 r4 g8 e8 f8 d8 g2',pan:.4}]},
+};
+const AUDJ={rig:null,ctx:null,until:0};
+function jingleLen(name){const J=JINGLES[name];if(!J)return 0;return Math.max(...J.ch.map(c=>parseMML(c.m,c.o).len))*60/J.bpm;}
+function jingle(name){
+  const J=JINGLES[name];if(!J||!state||!state.sound||seVolume()<=0)return;
+  try{
+    const ctx=audio();if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+    if(!AUDJ.rig||AUDJ.ctx!==ctx){AUDJ.rig={gain:AUD.g.jin,send:null,noise:null,waves:{}};AUDJ.ctx=ctx;}
+    const spb=60/J.bpm,t0=ctx.currentTime+.04;let end=t0;
+    J.ch.forEach(c=>{const p=parseMML(c.m,c.o);p.ev.forEach(e=>bgmNote(ctx,Object.assign({env:'pad'},c),e,t0+e.t*spb,spb,AUDJ.rig));end=Math.max(end,t0+p.len*spb);});
+    const d=AUD.g.duck.gain;d.cancelScheduledValues(ctx.currentTime);d.setTargetAtTime(J.duck,ctx.currentTime,.03);
+    AUDJ.until=Math.max(AUDJ.until,end+.25);
+    d.setTargetAtTime(1,AUDJ.until,.45);
+  }catch(e){}
+}
 /* ========== BGM(Web Audioのチップチューン。楽譜はMML風の文字列) ========== */
 /* 音名 c d e f g a b(+で#、-で♭)・数字は音の長さ(4=4分)・.で付点・r休符・o3など音域・< >で音域を上下・l8で既定の長さ。打楽器は k(低)s(中)h(高) */
 const SONGS={
@@ -1382,22 +1512,24 @@ function thicken(chs){
     chs.push({def:{w:'p12',v:.016,pan:.5,env:'pluck',echo:.5},ev,len:b.len,i:0,base:l.base});}
   return chs;
 }
-const BGM={cur:null,song:null,chs:null,timer:null,gain:null,waves:{},noise:null};
-function bgmCtx(){AC=AC||new (window.AudioContext||window.webkitAudioContext)();return AC;}
+/* 曲ごとの音量そろえ(tools/audio_levels.js で測った値。1が基準) */
+const SONG_TRIM={"komorebi":1.07,"kasumi":1.35,"shiomi":1.34,"tengu":1.22,"mayoiga":1.14,"ryuhyo":1.37,"battle":1.06,"boss":1.05,"rival":1.05,"kyuubi":1.15,"nue":1.03,"sorakujira":1.07,"sakamata":1.03,"amanotsuru":1.07,"michi":1.07,"victory":1.07,"hinoshima_t":1.07,"sango_t":1.08,"yomi_t":1.06,"gacha":1.34,"tower":1.08,"hinoshima":1.28,"hisanshou":1.01,"kagutsuchi":1.03,"sango":1.32,"oniitomaki":1.03,"nirai":1.07,"yomi":1.33,"orochi":0.99,"tokoyo":1.18};
+const BGM={cur:null,song:null,chs:null,timer:null,gain:null,send:null,waves:{},noise:null,mood:{},auto:{},ov:{},busy:false,moodKey:''};
 function pulseWave(ctx,duty){const n=32,re=new Float32Array(n),im=new Float32Array(n);for(let i=1;i<n;i++)im[i]=2/(i*Math.PI)*Math.sin(i*Math.PI*duty);return ctx.createPeriodicWave(re,im);}
-function bgmNote(ctx,ch,e,at,spb){
-  const dur=e.d*spb;
+/* R は「リグ」: {gain:出力先, send:エコーの入口, noise:ノイズ, waves:波形のキャッシュ}。ふだんは BGM、オフライン計測では別の物 */
+function bgmNote(ctx,ch,e,at,spb,R){
+  R=R||BGM;const dur=e.d*spb;R.waves=R.waves||{};
   if(e.k){
-    if(!BGM.noise){const b=ctx.createBuffer(1,ctx.sampleRate*.3,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;BGM.noise=b;}
+    if(!R.noise){const b=ctx.createBuffer(1,ctx.sampleRate*.3,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;R.noise=b;}
     const g=ctx.createGain(),v=ch.v*(e.k==='k'?1.6:e.k==='s'?1:.5);
-    if(e.k==='k'){const o=ctx.createOscillator();o.type='sine';o.frequency.setValueAtTime(140,at);o.frequency.exponentialRampToValueAtTime(40,at+.12);g.gain.setValueAtTime(v*2.2,at);g.gain.exponentialRampToValueAtTime(.0001,at+.15);o.connect(g);g.connect(BGM.gain);o.start(at);o.stop(at+.17);return;}
-    const s=ctx.createBufferSource();s.buffer=BGM.noise;const f=ctx.createBiquadFilter();f.type=e.k==='h'?'highpass':'bandpass';f.frequency.value=e.k==='h'?7000:1800;
-    const len=e.k==='h'?.04:.11;g.gain.setValueAtTime(v,at);g.gain.exponentialRampToValueAtTime(.0001,at+len);s.connect(f);f.connect(g);g.connect(BGM.gain);s.start(at);s.stop(at+len+.02);return;
+    if(e.k==='k'){const o=ctx.createOscillator();o.type='sine';o.frequency.setValueAtTime(140,at);o.frequency.exponentialRampToValueAtTime(40,at+.12);g.gain.setValueAtTime(.0001,at);g.gain.linearRampToValueAtTime(v*2.2,at+.003);g.gain.exponentialRampToValueAtTime(.0001,at+.15);o.connect(g);g.connect(R.gain);o.start(at);o.stop(at+.17);return;}
+    const s=ctx.createBufferSource();s.buffer=R.noise;const f=ctx.createBiquadFilter();f.type=e.k==='h'?'highpass':'bandpass';f.frequency.value=e.k==='h'?7000:1800;
+    const len=e.k==='h'?.04:.11;g.gain.setValueAtTime(.0001,at);g.gain.linearRampToValueAtTime(v,at+.002);g.gain.exponentialRampToValueAtTime(.0001,at+len);s.connect(f);f.connect(g);g.connect(R.gain);s.start(at);s.stop(at+len+.02);return;
   }
   const g=ctx.createGain(),v=ch.v,end=at+dur*(ch.env==='pluck'?.98:.92);
   const mk=(det)=>{const o=ctx.createOscillator();
-    if(ch.w==='p25'||ch.w==='p12'||ch.w==='p50'){const k=ch.w;BGM.waves[k]=BGM.waves[k]||pulseWave(ctx,k==='p25'?.25:k==='p12'?.125:.5);o.setPeriodicWave(BGM.waves[k]);}
-    else o.type=ch.w==='tri'?'triangle':ch.w==='saw'?'sawtooth':'square';
+    if(ch.w==='p25'||ch.w==='p12'||ch.w==='p50'){const k=ch.w;R.waves[k]=R.waves[k]||pulseWave(ctx,k==='p25'?.25:k==='p12'?.125:.5);o.setPeriodicWave(R.waves[k]);}
+    else o.type=ch.w==='tri'?'triangle':ch.w==='saw'?'sawtooth':ch.w==='sine'?'sine':'square';
     o.frequency.setValueAtTime(e.f,at);if(det)o.detune.value=det;
     if(ch.vib&&dur>.34){const lf=ctx.createOscillator(),lg=ctx.createGain();lf.frequency.value=5.6;lg.gain.setValueAtTime(0,at);lg.gain.setValueAtTime(0,at+.16);lg.gain.linearRampToValueAtTime(e.f*.011,at+.3);lf.connect(lg);lg.connect(o.frequency);lf.start(at);lf.stop(end+.03);}
     o.connect(g);o.start(at);o.stop(end+.03);};
@@ -1407,15 +1539,67 @@ function bgmNote(ctx,ch,e,at,spb){
   else if(ch.env==='pad'){g.gain.setValueAtTime(.0001,at);g.gain.linearRampToValueAtTime(vv,at+Math.min(.06,dur*.3));g.gain.setValueAtTime(vv,Math.max(at+.07,end-.08));g.gain.linearRampToValueAtTime(.0001,end);}
   else{const rel=Math.min(.08,dur*.3);g.gain.setValueAtTime(.0001,at);g.gain.linearRampToValueAtTime(vv,at+.008);g.gain.linearRampToValueAtTime(vv*.78,at+Math.min(.09,dur*.5));g.gain.setValueAtTime(vv*.78,Math.max(at+.1,end-rel));g.gain.linearRampToValueAtTime(.0001,end);}
   let out=g;if(ch.pan&&ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=ch.pan;g.connect(p);out=p;}
-  out.connect(BGM.gain);
-  if(ch.echo&&BGM.send){const s=ctx.createGain();s.gain.value=ch.echo;out.connect(s);s.connect(BGM.send);}
+  out.connect(R.gain);
+  if(ch.echo&&R.send){const s=ctx.createGain();s.gain.value=ch.echo;out.connect(s);s.connect(R.send);}
+}
+
+/* ---- 適応型BGM ----
+   パートの役目(role): lead 主旋律 / har ハモリ / arp 分散和音 / bass ベース / drum ドラム / drumx 追加のドラム(ふだんは鳴らさない)
+   bgmSetLayer(role,on): パートを手で入り切りする。on に null で手動をやめる
+   bgmSetMood({night,danger,lowHp,rain,fog}): 状況を知らせる。夜=ハモリと分散和音を抜く / danger・lowHp=ドラムを足す / rain・fog=ローパスで籠らせる
+   夜・ぬし戦・HPが少ない は bgmUpdate が自動で判定する(bgmSetMood で上書きできる) */
+function bgmMoodNow(){return Object.assign({},BGM.auto,BGM.mood);}
+function bgmLayerOn(role){
+  if(role in BGM.ov)return BGM.ov[role];
+  const m=bgmMoodNow();
+  if(role==='har'||role==='arp')return !m.night;
+  if(role==='drumx')return !!(m.danger||m.lowHp)&&!BGM.busy;
+  return true;
+}
+function bgmSetLayer(name,on){if(on==null)delete BGM.ov[name];else BGM.ov[name]=!!on;}
+function bgmSetMood(o){Object.assign(BGM.mood,o||{});bgmApplyMood();}
+function bgmApplyMood(){
+  const g=AUD.g;if(!g||!AC)return;const m=bgmMoodNow();
+  const f=m.fog?1000:m.rain?1900:20000;
+  try{g.tone.frequency.setTargetAtTime(f,AC.currentTime,.5);}catch(e){}
+}
+/* 夜・ぬし戦・HPが少ないを、画面の状態から自動で決める */
+function bgmAutoMood(){
+  let a={night:false,danger:false,lowHp:false};
+  try{
+    a.night=!!state&&state.time>=3;
+    if(B){a.danger=!!(B.boss||B.rival||B.towerBoss);a.lowHp=B.allies.some(c=>c.hp>0&&c.st&&c.hp<=c.st.hp*.3);}
+  }catch(e){}
+  const k=JSON.stringify(a);if(k===BGM.moodKey)return;BGM.moodKey=k;BGM.auto=a;bgmApplyMood();
+}
+
+/* 曲から、鳴らすパート一式を作る。start=最初の拍の時刻 */
+function bgmChannels(S,start){
+  const mkd=(def,ev,len,role)=>({def,ev,len,role,i:0,base:start});
+  let chs;
+  if(S.chords){const R=['lead','har','arp','bass','drum'];chs=arrange(S).map((c,i)=>Object.assign(c,{role:R[i],i:0,base:start}));}
+  else{
+    chs=thicken(S.ch.map(def=>{const p=parseMML(def.m,def.o);return {def,ev:p.ev,len:p.len,i:0,base:start};}));
+    chs.forEach((c,i)=>{c.base=start;c.role=i>=S.ch.length?'arp':i===0?'lead':c.def.w==='nz'?'drum':c.def.w==='tri'?'bass':'har';});
+  }
+  const dx=parseMML('k4 r4 k4 r4',4);chs.push(mkd({w:'nz',v:.03},dx.ev,dx.len,'drumx'));
+  return chs;
+}
+/* 先読みして音符を予約する。on(role) が偽のパートは鳴らさない */
+function bgmSchedule(ctx,chs,S,ahead,R,on){
+  const spb=60/S.bpm;
+  for(const c of chs){
+    if(!c.ev.length)continue;
+    while(true){const e=c.ev[c.i],at=c.base+e.t*spb;if(at>ahead)break;if(at>=ctx.currentTime-.05&&on(c.role))bgmNote(ctx,c.def,e,at,spb,R);c.i++;if(c.i>=c.ev.length){c.i=0;c.base+=c.len*spb;}}
+  }
+}
+function bgmEcho(ctx,R,spb,dst){
+  const dl=ctx.createDelay(1.2),fb=ctx.createGain(),lp=ctx.createBiquadFilter(),wet=ctx.createGain();dl.delayTime.value=Math.min(1.1,spb*.75);fb.gain.value=.3;lp.type='lowpass';lp.frequency.value=2600;wet.gain.value=.3;
+  R.send=ctx.createGain();R.send.connect(dl);dl.connect(lp);lp.connect(fb);fb.connect(dl);lp.connect(wet);wet.connect(dst);
 }
 function bgmTick(){
-  const ctx=AC;if(!ctx||!BGM.chs)return;const spb=60/SONGS[BGM.cur].bpm,ahead=ctx.currentTime+.3;
-  for(const c of BGM.chs){
-    if(!c.ev.length)continue;
-    while(true){const e=c.ev[c.i],at=c.base+e.t*spb;if(at>ahead)break;if(at>=ctx.currentTime-.05)bgmNote(ctx,c.def,e,at,spb);c.i++;if(c.i>=c.ev.length){c.i=0;c.base+=c.len*spb;}}
-  }
+  const ctx=AC;if(!ctx||!BGM.chs)return;
+  bgmSchedule(ctx,BGM.chs,SONGS[BGM.cur],ctx.currentTime+.3,BGM,bgmLayerOn);
 }
 function bgmStop(){
   clearInterval(BGM.timer);BGM.timer=null;BGM.chs=null;
@@ -1428,16 +1612,26 @@ function bgmPlay(id){
   if(!id||!SONGS[id]||!state||!state.bgm)return;
   try{
     const ctx=bgmCtx();if(ctx.state==='suspended')ctx.resume().catch(()=>{});
-    const S=SONGS[id],spb=60/S.bpm;
-    BGM.gain=ctx.createGain();BGM.gain.gain.value=state.bgmVol==null?.8:state.bgmVol;
-    const cmp=ctx.createDynamicsCompressor();cmp.threshold.value=-16;cmp.ratio.value=3;cmp.attack.value=.004;cmp.release.value=.2;BGM.gain.connect(cmp);cmp.connect(ctx.destination);
-    /* エコー: 付点8分のディレイを、うすく返す */
-    const dl=ctx.createDelay(1.2),fb=ctx.createGain(),lp=ctx.createBiquadFilter(),wet=ctx.createGain();dl.delayTime.value=Math.min(1.1,spb*.75);fb.gain.value=.3;lp.type='lowpass';lp.frequency.value=2600;wet.gain.value=.3;
-    BGM.send=ctx.createGain();BGM.send.connect(dl);dl.connect(lp);lp.connect(fb);fb.connect(dl);lp.connect(wet);wet.connect(BGM.gain);
-    const start=ctx.currentTime+.12;
-    BGM.chs=S.chords?arrange(S).map(c=>Object.assign(c,{i:0,base:start})):thicken(S.ch.map(def=>{const p=parseMML(def.m,def.o);return {def,ev:p.ev,len:p.len,i:0,base:start};}));
+    const S=SONGS[id],spb=60/S.bpm,t=ctx.currentTime;
+    BGM.gain=ctx.createGain();BGM.gain.gain.setValueAtTime(.0001,t);BGM.gain.gain.linearRampToValueAtTime(SONG_TRIM[id]||1,t+.06);
+    BGM.gain.connect(AUD.g.bgmIn);
+    bgmEcho(ctx,BGM,spb,BGM.gain);
+    BGM.busy=S.style==='battle'||S.bpm>=130;
+    bgmAutoMood();bgmApplyMood();audioVolumes();
+    BGM.chs=bgmChannels(S,t+.12);
     BGM.timer=setInterval(bgmTick,60);bgmTick();
   }catch(e){}
+}
+/* オフラインで1曲を描く(tools/audio_levels.js 用)。本番と同じバス・コンプレッサーを通す */
+async function audioOfflineSong(id,secs,opt){
+  opt=opt||{};const sr=44100,ctx=new OfflineAudioContext(2,Math.ceil(sr*secs),sr),g=audioGraph(ctx),S=SONGS[id],spb=60/S.bpm;
+  g.bgmIn.gain.value=volGain(opt.vol==null?.75:opt.vol);
+  const R={gain:ctx.createGain(),send:null,noise:null,waves:{}};R.gain.gain.value=opt.trim==null?(SONG_TRIM[id]||1):opt.trim;R.gain.connect(g.bgmIn);
+  bgmEcho(ctx,R,spb,R.gain);
+  const chs=bgmChannels(S,.05),from=opt.from||0;
+  if(from)chs.forEach(c=>{c.base-=from;});
+  bgmSchedule(ctx,chs,S,secs,R,r=>r!=='drumx');
+  return ctx.startRendering();
 }
 function bgmWanted(){
   if(!state||!state.started)return 'komorebi';
@@ -1454,8 +1648,8 @@ function bgmWanted(){
   if(field)return SONGS[tb+'_t']||state.town==='mayoiga'?tb:'michi';   /* 町の外: 新しい町は元の曲、ほかは道の曲 */
   return SONGS[tb+'_t']?tb+'_t':tb;
 }
-function bgmUpdate(){const w=state&&state.bgm?bgmWanted():null;if(w!==BGM.cur||(w&&!BGM.timer))bgmPlay(w);}
-document.addEventListener('pointerdown',()=>{if(AC&&AC.state==='suspended'&&state&&state.bgm)AC.resume().catch(()=>{});if(state&&state.bgm&&!BGM.timer)bgmUpdate();},true);
+function bgmUpdate(){bgmAutoMood();const w=state&&state.bgm?bgmWanted():null;if(w!==BGM.cur||(w&&!BGM.timer))bgmPlay(w);}
+document.addEventListener('pointerdown',()=>{if(AC&&AC.state==='suspended'&&state&&(state.bgm||state.sound))AC.resume().catch(()=>{});if(state&&state.bgm&&!BGM.timer)bgmUpdate();if(state&&state.sound&&AMB.want&&!AMB.cur)ambSync();},true);
 document.addEventListener('visibilitychange',()=>{if(!AC)return;if(document.visibilityState==='hidden')AC.suspend().catch(()=>{});else if(state&&(state.bgm||state.sound))AC.resume().catch(()=>{});});
 
 /* ========== 町とフィールド ========== */
@@ -5640,7 +5834,7 @@ function randTalent(lo,hi){const t={};STATS.forEach(k=>t[k]=ri(lo,hi));return t;
 const KEY='michikusa-save-v1';
 let state=null, B=null, tempUid=-1;
 const ui={tab:'map',sel:null,bA:null,bB:null,bSlot:'A',inh:[],trs:[],toast:'',confirmRel:false,dexSel:null,result:null,confirmReset:false,dlg:null,renaming:false,cats:[]};
-function fresh(){return {v:1,started:false,yen:300,items:{bansoko:3,tea:1,drink:0,onigiri:2},party:[],box:[],uidN:1,seen:{},owned:{},boss:{},town:'komorebi',breeds:0,time:1,steps:0,reqDone:{},cups:{},rival:{},flags:{},shinySeen:{},dexClaim:{},sound:false,lure:0,daycare:[]};}
+function fresh(){return {v:1,started:false,yen:300,items:{bansoko:3,tea:1,drink:0,onigiri:2},party:[],box:[],uidN:1,seen:{},owned:{},boss:{},town:'komorebi',breeds:0,time:1,steps:0,reqDone:{},cups:{},rival:{},flags:{},shinySeen:{},dexClaim:{},sound:false,bgmVol:.75,seVol:.75,lure:0,daycare:[]};}
 function save(){if(state)state.savedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}cloudSchedule();}
 function load(){try{const s=localStorage.getItem(KEY);if(s){const o=JSON.parse(s);if(o&&o.v===1)return o;}}catch(e){}return null;}
 
@@ -5813,6 +6007,7 @@ function renderIntro(){
     <p>この地方では、身近な生き物がときどき不思議な力に目覚める。人々はそれを「魔生物(ませいぶつ)」と呼び、ともに暮らしてきた。</p>
     <p class="muted">あなたは、こもれび町の配合研究所にやって来た新人ブリーダー。魔生物をスカウトし、育て、配合して、まだ誰も見たことのない魔生物を生み出そう。まずは最初の相棒を選んでほしい。</p>
     <div class="row"><button class="btn sm" data-act="bgm" aria-pressed="${!!state.bgm}">♪ BGM ${state.bgm?'オン':'オフ'}</button><button class="btn sm" data-act="sound" aria-pressed="${!!state.sound}">効果音 ${state.sound?'オン':'オフ'}</button></div>
+    ${volCtl()}
     <div class="panel row between"><span class="small">別の端末やclaude.ai版で遊んだデータがある？ 引き継ぎコードかセーブファイルで続きから遊べる。</span><button class="btn primary" data-act="transfer">データを引き継ぐ</button></div>
     <div class="starters">${st.map(id=>{const s=SP[id];return `<div class="panel starter">${seal(id,'lg')}<h3>${s.name}</h3><span class="small muted">${FAM[s.fam].n} ・ モチーフ: ${s.motif}</span><p class="small">${s.desc}</p><button class="btn primary" data-act="starter" data-id="${id}">${s.name}にする</button></div>`;}).join('')}</div>
   </section>`;
@@ -5826,7 +6021,12 @@ function renderHeader(){
 }
 function renderTab(){if(ui.tab==='map'&&MAPS[state.town]){owEnsureState();return ui.station?renderStationIn():ui.inside?renderInside():renderOverworld();}return ({map:renderMap,party:renderParty,breed:renderBreed,gacha:renderGacha,tower:renderTower,dex:renderDex,shop:renderShop}[ui.tab]||renderMap)();}
 function renderFoot(){
-  return `<div class="foot"><span class="small muted"><span id="cloudStat" class="cloudstat">${cloudStatusText()}</span><br>配合 ${state.breeds||0}回 ・ 依頼 ${Object.keys(state.reqDone).length}/${REQUESTS.length} ・ 配合杯 ${Object.keys(state.cups).length}/${CUPS.length}</span><span class="row"><button class="btn sm primary" data-act="transfer">セーブ管理</button></span></div>`;
+  return `<div class="foot"><span class="small muted"><span id="cloudStat" class="cloudstat">${cloudStatusText()}</span><br>配合 ${state.breeds||0}回 ・ 依頼 ${Object.keys(state.reqDone).length}/${REQUESTS.length} ・ 配合杯 ${Object.keys(state.cups).length}/${CUPS.length}</span><span class="row"><button class="btn sm primary" data-act="transfer">セーブ管理</button></span></div>${volCtl()}`;
+}
+/* 音量: 駅の案内サイン調の5段階(0・25・50・75・100%)。BGMとSEを別々に */
+function volCtl(){
+  const row=(k,label,key)=>{const cur=state[key]==null?.75:state[key];return `<div class="vol"><span class="vol-l">${label}</span><span class="vol-s" role="group" aria-label="${label}の音量">${VOL_STEPS.map(v=>`<button class="vol-b${v<=cur&&v>0?' lo':''}" data-act="vol" data-k="${k}" data-v="${v}" aria-pressed="${Math.abs(cur-v)<.01}" aria-label="${label} ${v*100}%">${v*100}</button>`).join('')}</span></div>`;};
+  return `<div class="volctl">${row('bgm','♪ BGM','bgmVol')}${row('se','SE 効果音','seVol')}</div>`;
 }
 
 /* ----- データの引き継ぎ(別の端末へ) ----- */
@@ -6944,7 +7144,8 @@ const H={
   rest:()=>{advanceTime();ui.toast=`ベンチでひと休み。${TIMES[state.time].n}になった。`;save();render();},
   req:d=>{const r=REQUESTS.find(x=>x.id===d.id);if(!r||state.reqDone[r.id])return;const m=reqMatch(r.need);if(!m)return;state.reqDone[r.id]=true;addStars(2);const got=giveReward(r.reward)+'・流星石★2';sfx('win');save();talk([[r.from,m.dex?'すごい記録ですね！ お礼を受け取ってください。':`${mName(m)}……！ 見せてくれてありがとう。これはお礼です。`],['',`${got} を受け取った。`]]);},
   dexms:d=>{const n=+d.n,x=DEX_MS.find(q=>q.n===n),own=dexList().filter(s=>state.owned[s.id]).length;if(!x||state.dexClaim[n]||own<n)return;state.dexClaim[n]=true;addStars(5);ui.toast=`図鑑の記念品として ${giveReward(x.reward)} を受け取った！`;sfx('win');save();render();},
-  sound:()=>{state.sound=!state.sound;save();render();sfx('sel');},
+  sound:()=>{state.sound=!state.sound;ambSync();save();render();sfx('ui_ok');},
+  vol:d=>{const se=d.k==='se';state[se?'seVol':'bgmVol']=+d.v;audioVolumes();ambSync();if(!se&&state.bgm&&!BGM.timer)bgmUpdate();save();render();if(se)sfx('ui_ok');},
   bgm:()=>{state.bgm=!state.bgm;if(state.bgm){try{bgmCtx().resume();}catch(e){}}else bgmStop(),BGM.cur=null;save();render();},
   owA:()=>owA(),
   owBack:()=>owBackToTown(),
@@ -7023,6 +7224,9 @@ function migrate(){
   allMons().forEach(m=>{if(m.parents)m.parents=m.parents.map(fix);if(m.gen==null)m.gen=m.parents?1:0;});
   const d={time:1,steps:0,reqDone:{},cups:{},rival:{},flags:{},shinySeen:{},dexClaim:{},sound:false,lure:0,daycare:[]};
   if(state.bgm==null)state.bgm=true;
+  /* 音量(0〜1 を5段階に丸める。むかしの値 .8 も .75 になる) */
+  state.bgmVol=state.bgmVol==null?.75:Math.round(Math.max(0,Math.min(1,+state.bgmVol||0))*4)/4;
+  state.seVol=state.seVol==null?.75:Math.round(Math.max(0,Math.min(1,+state.seVol||0))*4)/4;
   if(state.stars==null)state.stars=0;
   for(const k in d)if(state[k]==null)state[k]=d[k];
   if(!state.flags.star20){state.flags.star20=true;if(state.started){const a=state.stars||0,b=Math.floor(a/20);state.stars=b;ui.starMig={a,b};}}

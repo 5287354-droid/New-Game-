@@ -1,0 +1,60 @@
+name,type,method,author,date,license
+sfx_ui_ok,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_ui_back,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_sel,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_hit,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_crit,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_ko,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_heal,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_lvup,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_countup,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_newdex,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_rare,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_shiny,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_kirari,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_stamp,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_rain,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_wind,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_station,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_scout,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_breed,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_win,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_lose,SE,Web Audio API(OscillatorNode・ノイズ・BiquadFilter)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_levelup,SE,sfx_lvup の別名(同じ合成),sound-lab(Claude),2026-11-18,自作・商用可
+jingle_win,ジングル,MML風の文字列を Web Audio で合成(矩形波・三角波・ノイズ)。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+jingle_rare,ジングル,MML風の文字列を Web Audio で合成(矩形波・三角波・ノイズ)。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+jingle_shiny,ジングル,MML風の文字列を Web Audio で合成(矩形波・三角波・ノイズ)。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+jingle_awaken,ジングル,MML風の文字列を Web Audio で合成(矩形波・三角波・ノイズ)。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+jingle_station,ジングル,MML風の文字列を Web Audio で合成(矩形波・三角波・ノイズ)。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+amb_rain,環境音,ノイズをフィルタとLFOで加工したループ。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+amb_wind,環境音,ノイズをフィルタとLFOで加工したループ。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+bgm_komorebi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_kasumi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_shiomi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_tengu,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_mayoiga,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_ryuhyo,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_battle,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_boss,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_rival,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_kyuubi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_nue,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_sorakujira,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_sakamata,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_amanotsuru,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_michi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_victory,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_hinoshima_t,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_sango_t,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_yomi_t,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_gacha,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_tower,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_hinoshima,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_hisanshou,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_kagutsuchi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_sango,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_oniitomaki,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_nirai,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_yomi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_orochi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_tokoyo,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
