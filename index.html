@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="2b79ff8a40";</script>
+<script>window.JG_APP=true;window.JG_VER="1f06f16973";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -1200,7 +1200,7 @@ function artFatten(ax,FAT){const N=ASZ,t=document.createElement('canvas');t.widt
   ax.globalCompositeOperation='destination-over';for(let q=0;q<16;q++)ax.drawImage(t,Math.cos(q/16*Math.PI*2)*FAT,Math.sin(q/16*Math.PI*2)*FAT);ax.globalCompositeOperation='source-over';}
 function mainHue(id){
   if(MAINC[id])return MAINC[id].h;
-  const c=document.createElement('canvas');c.width=c.height=ASZ;const x=c.getContext('2d');const rec=[];
+  const c=document.createElement('canvas');c.width=c.height=ASZ;const x=c.getContext('2d',{willReadFrequently:true});const rec=[];
   const is96=!!DRAW96[id],fam=SP[id].fam,f=flatPainter(x,{min:is96?1.8:1,u:is96?2:1,mid:is96?48:24,iris:'#fff',eyeType:EYET[fam],rec});
   x.scale(4,4);if(is96)x.scale(.5,.5);try{(is96?DRAW96[id]:DRAW[id])(f,0);}catch(e){}
   const m={};rec.forEach(([cc,ar])=>{if(hex6(cc)){const [h,s,l]=hsl(cc);if(l>.12&&l<.93&&s>.1)m[cc]=(m[cc]||0)+ar*(.4+s);}});
