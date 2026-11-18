@@ -177,10 +177,47 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await ev(() => { if (B) { B.lockUntil = 0; render(); } }); await shot('73_shiny_battle', 900);
     await ev(() => { B = null; ui.dlg = null; ui.toast = ''; render(); });
     // 天候限定7体の図鑑
-    await ev(() => { SPL.slice(-7).forEach(s => { state.seen[s.id] = true; state.owned[s.id] = true; }); ui.tab = 'dex'; ui.dexSel = 'hoshikuzume'; render(); }); await shot('74_dex_weather7', 400);
-    await ev(() => { const d = document.createElement('div'); d.id = 'sheet'; d.style.cssText = 'position:fixed;inset:0;z-index:999;background:#000;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px;overflow:auto'; d.innerHTML = SPL.slice(-7).map(s => `<div style="color:#fff;text-align:center;font:12px sans-serif"><img src="${sprite(s.id)}" style="width:170px;height:170px;image-rendering:auto"><br>${s.name}</div>`).join(''); document.body.appendChild(d); });
+    await ev(() => { SPL.slice(-8, -1).forEach(s => { state.seen[s.id] = true; state.owned[s.id] = true; }); ui.tab = 'dex'; ui.dexSel = 'hoshikuzume'; render(); }); await shot('74_dex_weather7', 400);
+    await ev(() => { const d = document.createElement('div'); d.id = 'sheet'; d.style.cssText = 'position:fixed;inset:0;z-index:999;background:#000;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px;overflow:auto'; d.innerHTML = SPL.slice(-8, -1).map(s => `<div style="color:#fff;text-align:center;font:12px sans-serif"><img src="${sprite(s.id)}" style="width:170px;height:170px;image-rendering:auto"><br>${s.name}</div>`).join(''); document.body.appendChild(d); });
     await shot('75_weather7_sheet', 400);
     await ev(() => { document.getElementById('sheet').remove(); if (window.__wxNow) window.wxNow = window.__wxNow; render(); });
+  });
+
+  /* T8: まぼろし駅(霧×夜だけの隠し駅・60x50 の隠しマップ・新種)。Date.now を止めて、列車・足場の時刻を決めて撮る */
+  await step('mabo', async () => {
+    await ev(() => { B = null; ui.dlg = null; ui.result = null; ui.inside = null; ui.band = null; ui.toast = ''; state.kirari = null; state.boss.komorebi = true; state.boss.kasumi = true; state.town = 'kasumi'; state.time = 3; state.flags.mabo = false;
+      if (!window.__wxNow) window.__wxNow = wxNow; window.wxNow = () => 'kiri'; window.__rd = Date.now.bind(Date); window.__fix = false; window.__T = 0; Date.now = () => window.__fix ? window.__T : window.__rd();
+      const s = MAPS.kasumi.station; state.ow = { map: 'kasumi', x: s.x, y: s.y, dir: 'down' }; ui.tab = 'map'; ui.station = true; render(); const m = document.getElementById('main'); if (m) m.scrollTop = 0; });
+    await shot('80_mabo_rail_station', 500);
+    await ev(() => { H.mabo(); }); await shot('81_mabo_arrive_fx1', 700); await shot('81b_mabo_arrive_fx2', 1500);
+    await wait(2200); await shot('82_mabo_arrive_dialog', 1400);
+    await ev(() => { ui.dlg = null; ui.toast = ''; ui.band = null; render(); });
+    const at = (x, y, T, dir = 'up') => ev(([x, y, T, dir]) => { ui.dlg = null; ui.toast = ''; ui.band = null; ui.station = false; state.ow = { map: 'maboroshi', x, y, dir }; window.__fix = true; window.__T = T; OWC.mv = null; OWC.lastSafe = null; render(); }, [x, y, T, dir]);
+    // マップ全体(静的な地面と建物。足場は晴れ間の姿を重ねる)
+    await ev(() => { const m = MAPS.maboroshi, bg = owBg(m, 3), d = document.createElement('div'); d.id = 'sheet'; d.style.cssText = 'position:fixed;inset:0;z-index:999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:6px';
+      const c = document.createElement('canvas'); c.width = bg.width; c.height = bg.height; c.style.cssText = 'width:100%;image-rendering:pixelated'; const x = c.getContext('2d'); x.drawImage(bg, 0, 0);
+      for (let y = 0; y < m.rows.length; y++) for (let xx = 0; xx < m.rows[y].length; xx++) if (m.rows[y][xx] === 'f') { x.fillStyle = '#cfd8ee'; x.fillRect(xx * 16 + 1, y * 16 + 3, 14, 10); }
+      d.appendChild(c); const p = document.createElement('p'); p.style.cssText = 'color:#a3aab6;font:600 12px sans-serif;margin:0'; p.textContent = 'まぼろし駅 60x50(白い四角は、霧の晴れ間に見える足場)'; d.appendChild(p); document.body.appendChild(d); });
+    await shot('83_mabo_map_whole', 600); await ev(() => document.getElementById('sheet').remove());
+    await at(14, 25, 14000 * 3 + 600); await shot('84_mabo_crossing_bell', 300);
+    await at(14, 25, 14000 * 3 + 3000); await shot('85_mabo_crossing_train', 300);
+    await at(14, 23, 14000 * 3 + 3000, 'up'); await shot('85b_mabo_island_wait', 300);
+    await at(28, 40, 15000 * 4 + 3000, 'right'); await shot('86_mabo_stones_fog', 300);
+    await at(28, 40, 15000 * 4 + 7800, 'right'); await shot('86b_mabo_stones_dawn', 300);
+    await at(28, 40, 15000 * 4 + 10000, 'right'); await shot('87_mabo_stones_clear', 300);
+    await at(36, 40, 15000 * 4 + 13000, 'right'); await shot('87b_mabo_stones_dusk', 300);
+    await at(38, 40, 15000 * 4 + 10000, 'up'); await shot('88_mabo_lever_island', 300);
+    await at(29, 12, 0, 'up'); await shot('89_mabo_clock_tower', 300);
+    await ev(() => { owSetFlag('mabo_k'); }); await at(46, 5, 0, 'right'); await shot('90_mabo_terminal', 300);
+    await at(20, 33, 0, 'down'); await ev(() => { window.__fix = false; }); await shot('91_mabo_dream_field', 300);
+    // 新種: 出会う → 図鑑
+    await ev(() => { const real = Math.random; Math.random = () => 0; owEncounter('mabo'); Math.random = real; if (B && !B.enemies.some(c => c.mon.sp === 'mabonokoshou')) { B = null; } startBattle([['mabonokoshou', maboLv()]], { field: 'まぼろし駅・夢の野原', scene: 'subway' }); });
+    await shot('92_mabo_battle', 1100); await ev(() => { B = null; ui.dlg = null; ui.result = null; render(); });
+    await ev(() => { state.seen.mabonokoshou = true; state.owned.mabonokoshou = true; state.seenAt = state.seenAt || {}; state.seenAt.mabonokoshou = ['kasumi', 3, 'kiri']; ui.tab = 'dex'; ui.dexMode = 'fam'; ui.dexSel = 'mabonokoshou'; render(); }); await shot('93_mabo_dex_detail', 500);
+    await ev(() => { ui.dexSel = null; ui.dexMode = 'reg'; render(); const m = document.getElementById('main'); if (m) m.scrollTop = 99999; }); await shot('94_mabo_dex_region', 500);
+    await ev(() => { const d = document.createElement('div'); d.id = 'sheet'; d.style.cssText = 'position:fixed;inset:0;z-index:999;background:#0d0f12;display:flex;align-items:center;justify-content:center;padding:20px'; d.innerHTML = `<img src="${sprite('mabonokoshou')}" style="width:340px;height:340px;image-rendering:auto">`; document.body.appendChild(d); });
+    await shot('95_mabo_new_species', 500);
+    await ev(() => { document.getElementById('sheet').remove(); window.__fix = false; if (window.__wxNow) window.wxNow = window.__wxNow; state.flags.mabo = true; ui.tab = 'map'; owBackToTown(); owBackToTown(); render(); });
   });
 
   await browser.close(); server.close();
