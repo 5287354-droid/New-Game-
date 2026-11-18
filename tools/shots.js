@@ -137,6 +137,26 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await ev(() => { state.town = 'komorebi'; state.ow = { map: 'komorebi', x: MAPS.komorebi.station.x, y: MAPS.komorebi.station.y, dir: 'down' }; state.time = 3; ui.toast = ''; render(); });
     await shot('51_map_komorebi_night');
   });
+  // T2 みちくさ踏破 / T4 地域図鑑
+  await step('t2t4', async () => {
+    await ev(() => { state.town = 'komorebi'; state.time = 1; ui.tab = 'map'; ui.station = false; ui.inside = null; ui.toast = ''; B = null; ui.dlg = null;
+      const id = 'urayama', m = MAPS[id]; state.ow = { map: id, x: m.spawn.x, y: m.spawn.y, dir: 'up' }; state.detour = 3; state.detourN = 34; owFoot(); render(); });
+    await shot('60_map_foot_detour');
+    await ev(() => { ui.stampQ = []; ui.stampCur = null; delete state.stamps['g:warm']; owStamp('g:warm'); });
+    await shot('61_stamp_get', 450);
+    await wait(2200);
+    await ev(() => { state.detour = 3; healAll(); startBattle([['dokudamin', 6]], { field: 'こもれび町・裏山', scene: 'mori' }); B.enemies.forEach(c => c.hp = 0); win(); B.lockUntil = 0; render(); });
+    await shot('62_result_detour_bonus', 2800);
+    await ev(() => { B = null; ui.dlg = null; state.mpt = 230; state.mptAll = 640; ['g:warm', 'g:trash', 'g:signal', 'g:fish', 'g:ring'].forEach(k => state.stamps[k] = 1); state.ow = { map: 'komorebi', x: MAPS.komorebi.station.x, y: MAPS.komorebi.station.y, dir: 'down' }; owFoot(); render(); });
+    await shot('63_map_hub_mchi_chip');
+    await ev(() => { H.mchi(); }); await shot('64_mchi');
+    await ev(() => { const m = document.getElementById('main'); if (m) m.scrollTop = 700; }); await shot('65_mchi_stamps');
+    await ev(() => { const m = document.getElementById('main'); if (m) m.scrollTop = 99999; }); await shot('66_mchi_foot');
+    await ev(() => { H.owLeave(); regList('komorebi').slice(0, 15).forEach(x => { state.seen[x.s] = true; }); regList('komorebi').slice(0, 9).forEach(x => { state.owned[x.s] = true; }); ui.tab = 'dex'; ui.dexMode = 'reg'; ui.dexSel = null; render(); });
+    await shot('67_dex_region');
+    await ev(() => { ui.dexSel = 'dokudamin'; render(); const m = document.getElementById('main'); if (m) m.scrollTop = 0; }); await shot('68_dex_detail_seenat');
+    await ev(() => { ui.dexSel = null; ui.dexMode = 'fam'; render(); document.querySelector('details.rules').open = true; }); await shot('69_dex_milestones');
+  });
 
   await browser.close(); server.close();
   const uniq = [...new Set(errors)];

@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="e8135988ef";</script>
+<script>window.JG_APP=true;window.JG_VER="f46513ae80";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -749,6 +749,45 @@ body.bshake2 .battle{animation:bshk2 .42s linear}
 .rwc.news{border-left-color:var(--accent)}.rwc.news em{background:var(--accent);color:var(--accent-ink)}
 .rwc.star span{font-family:var(--f-num);color:var(--accent)}
 @media (prefers-reduced-motion:reduce){.rwn1 b::after{content:counter(n)}}
+/* ---- T2 みちくさ踏破 / T4 地域図鑑 ---- */
+.ow-name{flex-wrap:wrap;row-gap:4px}
+.ow-sub{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-start}
+.ow-sub>*{background:color-mix(in srgb,var(--win) 78%,transparent);border:1px solid var(--line2);border-radius:3px;padding:2px 8px;font:700 13px var(--f-disp);color:var(--text);white-space:nowrap}
+.ow-sub .ow-detour{border-color:var(--tl);letter-spacing:.06em}
+.ow-sub .ow-foot.glow{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.ow-sub .ow-mchi{pointer-events:auto;cursor:pointer;position:relative;margin:0}
+.ow-sub .ow-mchi::after{content:"";position:absolute;left:-4px;right:-4px;top:-12px;bottom:-12px}
+.ow-cv .ow-toast{top:74px}
+.ow-stamp{position:absolute;left:50%;top:42%;z-index:6;pointer-events:none;transform:translate(-50%,-50%);animation:stampIn 2s ease-out both}
+.ow-stamp .stp{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:170px;max-width:calc(100vw - 48px);padding:12px 16px;background:#000;border:4px solid var(--tl);border-radius:4px;color:#fff;text-align:center;transform:rotate(-5deg)}
+.ow-stamp small{font:700 12px var(--f-disp);letter-spacing:.12em;color:var(--tl)}
+.ow-stamp b{font:700 28px/1.1 var(--f-disp)}
+.ow-stamp span{font:700 13px var(--f-disp);color:#ddd}
+.ow-stamp.k-s .stp{border-color:#c8d0dc}.ow-stamp.k-s small{color:#c8d0dc}
+.ow-stamp.k-o .stp{border-color:#ffd21f}.ow-stamp.k-o small{color:#ffd21f}.ow-stamp.k-o b{color:#ffd21f}
+@keyframes stampIn{0%{opacity:0;transform:translate(-50%,-50%) scale(2.4)}12%{opacity:1;transform:translate(-50%,-50%) scale(.94)}20%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
+.mpt .big{font:700 40px/1 var(--f-num)}.mpt .big small{font-size:16px;margin-left:4px;color:var(--muted)}
+.mex{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line2);border-left:4px solid var(--tl);border-radius:3px;background:var(--panel2)}
+.mex.done{opacity:.55}.mex .btn{min-height:44px;min-width:104px}
+.mstamps{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mst{display:flex;gap:8px;align-items:center;padding:8px;border:1px solid var(--line2);border-radius:3px;background:var(--panel2);min-height:56px}
+.mst .mk{flex:none;width:32px;height:32px;display:grid;place-items:center;border:2px solid var(--line2);border-radius:3px;font:700 14px var(--f-disp);color:var(--muted)}
+.mst.got{border-color:var(--tl)}.mst.got .mk{background:var(--tl);color:#111;border-color:var(--tl)}
+.mst b{font:700 14px var(--f-disp)}.mst .small{font-size:11px;line-height:1.3}
+.foot-t{padding:0}.foot-t summary{padding:12px 14px;min-height:44px;border-left:6px solid var(--tl);cursor:pointer}
+.flist{display:flex;flex-direction:column;gap:6px;padding:4px 14px 12px}
+.frow{display:grid;grid-template-columns:minmax(0,1fr) 72px 44px 26px;align-items:center;gap:8px;font-size:13px}
+.frow .fn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.frow .num{text-align:right}
+.fb{height:8px;background:var(--panel2);border-radius:2px;overflow:hidden}.fb i{display:block;height:100%;background:var(--tl)}
+.fs{font:700 12px var(--f-disp);text-align:center;color:var(--muted)}.fs.gold{color:#ffd21f}.fs.silv{color:#c8d0dc}
+.top2 .ttl{font:700 11px var(--f-disp);padding:1px 5px;border:1px solid var(--accent);color:var(--accent);border-radius:2px;white-space:nowrap}
+.dmode{display:flex;gap:0;border:1px solid var(--line2);border-radius:3px;overflow:hidden}
+.dmode button{flex:1;min-height:44px;font:700 15px var(--f-disp);background:var(--panel2);color:var(--muted);border:0}
+.dmode button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+.dexgroup.reg h4{border-left:6px solid var(--fam);padding-left:8px}
+.regsum{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13px}
+.regsum .btn{min-height:44px;margin-left:auto}
+.dexc .rtag{font:700 10px var(--f-disp);color:var(--accent)}
 </style>
 
 <div id="app"></div>
@@ -2877,6 +2916,53 @@ REQUESTS.push(
   {id:'r50',town:'yomi',from:'トコヨ',text:'(トコヨは、+50以上の魔生物を見たがっているようだ)',need:{minPlus:50},reward:{yen:1000000,items:{tenpu:5,kakusei:3}}},
 );
 DEX_MS.push({n:133,reward:{yen:500000,items:{tenpu:3,kakusei:2}}},{n:141,reward:{yen:1000000,items:{tenpu:5,kakusei:3,kettou:3}}});
+/* ===== T4 地域図鑑 =====
+ * 町ごとに「その町の出現表(fields の table と、町のマップの釣り場)に出る種族」をまとめる。tm は '' / 'd' / 'n'(いつでも/昼だけ/夜だけ) */
+const REGC={};
+function regList(tid){
+  if(REGC[tid])return REGC[tid];
+  const t=TOWN[tid],rec={},ord=[];
+  const add=(s,tm)=>{if(!SP[s]||SP[s].gacha)return;if(!rec[s]){rec[s]={s,any:false,n:false,d:false};ord.push(s);}if(!tm)rec[s].any=true;else rec[s][tm]=true;};
+  t.fields.forEach(f=>f.table.forEach(([s,,tm])=>add(s,tm)));
+  for(const id in MAPS){const m=MAPS[id];if(m.town===tid&&m.fish&&m.fish.table)m.fish.table.forEach(([s,,tm])=>add(s,tm));}
+  return REGC[tid]=ord.map(s=>{const r=rec[s];return {s,tm:r.any||(r.n&&r.d)?'':r.n?'n':'d'};});
+}
+function regStat(tid){const L=regList(tid);return {all:L.length,seen:L.filter(x=>state.seen[x.s]).length,own:L.filter(x=>state.owned[x.s]).length};}
+const regDone=tid=>{const s=regStat(tid);return s.all>0&&s.own===s.all;};
+/* 地域コンプ報酬(町ごとに1回): 流星石★10 + その町の金スタンプ + 道具 */
+const REG_RW={komorebi:{onigiri:5},kasumi:{kirakira:3},shiomi:{kai:2},tengu:{makimono:2},mayoiga:{saino:1},ryuhyo:{kettou:1},hinoshima:{saino:2},sango:{kakusei:1},yomi:{tenpu:1}};
+function regClaim(tid){
+  if(!TOWN[tid]||(state.dexReg&&state.dexReg[tid])||!regDone(tid))return false;
+  state.dexReg=state.dexReg||{};state.dexReg[tid]=true;state.stamps=state.stamps||{};state.stamps['reg:'+tid]=2;
+  addStars(10);const got=giveReward({items:REG_RW[tid]||{}});
+  ui.toast=`${TOWN[tid].name}の図鑑をコンプ！ 流星石★10・${got}・金スタンプ`;sfx('stamp');save();return true;
+}
+/* 図鑑の記念品の「全種」: 数は dexList().length (数字は直書きしない) */
+const dexKey=x=>x.all?'all':x.n;
+DEX_MS.push({n:70,stars:20,reward:{}},{n:80,reward:{items:{kai:3}}},{n:90,reward:{items:{tenpu:1}}},{n:100,stars:50,reward:{}},{n:110,reward:{items:{saino:3}}},{n:120,reward:{items:{kakusei:1}}},{n:130,stars:100,reward:{}},{n:140,reward:{items:{saino:5}}},
+  {all:true,get n(){return dexList().length;},reward:{items:{tenpu:2}}});
+const msText=x=>[rewardText(x.reward),x.stars!=null?`流星石★${x.stars}`:'',x.all?'称号「魔生物博士」':''].filter(Boolean).join('・');
+function dexMsClaim(k){
+  const x=DEX_MS.find(q=>String(dexKey(q))===String(k)),own=dexList().filter(s=>state.owned[s.id]).length;
+  if(!x||state.dexClaim[dexKey(x)]||own<x.n)return false;
+  state.dexClaim[dexKey(x)]=true;addStars(x.stars!=null?x.stars:5);if(x.all)state.flags.hakase=true;
+  ui.toast=`図鑑の記念品として ${msText(x)||giveReward(x.reward)} を受け取った！`;if(rewardText(x.reward))giveReward(x.reward);sfx('win');save();return true;
+}
+const wxLabel=id=>{try{return id&&typeof WX!=='undefined'&&WX[id]?(WX[id].n||WX[id].name||''):'';}catch(e){return '';}};
+function seenAtText(sp){const a=state.seenAt&&state.seenAt[sp];if(!a)return state.seen[sp]?'はじめて会った場所: 記録なし':'';const t=TOWN[a[0]];return `はじめて会った場所: ${t?t.name:'?'}・${TIMES[a[1]]?TIMES[a[1]].n:''}${wxLabel(a[2])?'・'+wxLabel(a[2]):''}`;}
+function renderDexReg(DL){
+  const cell=({s,tm})=>{const sn=!!state.seen[s],sp=SP[s],i=SPL.indexOf(sp);return `<button class="dexc ${ui.dexSel===s?'on':''} ${state.owned[s]?'own':''}" data-act="dex" data-id="${s}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s]?' <b class="shn">✦</b>':''}</span>${seal(s,'sm',sn?true:false)}<span class="nm">${sn?sp.name:'？？？'}</span>${tm?`<span class="rtag">${tm==='n'?'夕方・夜':'朝・昼'}</span>`:''}</button>`;};
+  return TOWNS.map(t=>{
+    if(!townOpen(t))return `<div class="dexgroup reg locked" style="--fam:${TLC[t.id]}"><h4>${t.code} ？？？ <small class="muted">未開通</small></h4></div>`;
+    const st=regStat(t.id),L=regList(t.id),done=regDone(t.id),got=state.dexReg&&state.dexReg[t.id];
+    const rw=REG_RW[t.id]||{};
+    return `<div class="dexgroup reg" style="--fam:${TLC[t.id]}"><h4>${t.code} ${t.name}</h4>
+      <div class="regsum"><span>見つけた <b class="num">${st.seen}</b></span><span>なかま <b class="num">${st.own}</b></span><span>全 <b class="num">${st.all}</b></span>
+      ${got?'<span class="badge good">コンプ済み</span>':`<button class="btn sm ${done?'primary':''}" data-act="regClaim" data-id="${t.id}" ${done?'':'disabled'}>コンプ報酬を受け取る</button>`}</div>
+      <p class="small muted">報酬: 流星石★10・${rewardText({items:rw})}・金スタンプ</p>
+      <div class="dex">${L.map(cell).join('')}</div></div>`;
+  }).join('');
+}
 
 Object.assign(SONGS,{
   sango:{bpm:104,ch:[
@@ -4864,7 +4950,7 @@ const OW_DOOR={
   fusuma:()=>{const r=wpick([{w:2,v:'zashiki'},{w:2,v:'feast'},{w:3,v:'ambush'},{w:2,v:'scroll'},{w:1,v:'empty'}]).v;OWC.room=r;state.ow={map:'okunoma',...MAPS.okunoma.spawn};OWC.mv=null;OWC.held=null;sfx('sel');ui.toast='';save();
     const msg={zashiki:'ふすまを開けると、赤い着物の子どもがちょこんと座っていた。',feast:'ふすまを開けると、湯気の立つお膳が用意されていた。だれもいないのに……',ambush:'ふすまを開けると、魔生物が待ちかまえていた！',scroll:'ふすまを開けると、床の間に古い掛け軸がかかった部屋に出た。',empty:'ふすまを開けると、がらんとした部屋だった。さっきとはちがう部屋のようだ……'}[r];
     render();if(r==='ambush'&&state.party.some(x=>x.hp>0))talk([['',msg]],()=>owEncounter('chikurin'));else talk([['',msg]]);},
-  mirror:()=>{const toU=state.ow.map==='kagami',to=toU?'kagami_ura':'kagami';state.ow={map:to,x:15-state.ow.x,y:10,dir:'down'};OWC.mv=null;OWC.held=null;sfx('shiny');save();render();talk(toU?[['','鏡に手をふれると、すうっと吸いこまれた……'],['','鏡の中の世界だ！ 右と左が逆になっている！']]:[['','もとの世界にもどってきた。']]);},
+  mirror:()=>{const toU=state.ow.map==='kagami',to=toU?'kagami_ura':'kagami';state.ow={map:to,x:15-state.ow.x,y:10,dir:'down'};owStamp('g:mirror');owFoot();OWC.mv=null;OWC.held=null;sfx('shiny');save();render();talk(toU?[['','鏡に手をふれると、すうっと吸いこまれた……'],['','鏡の中の世界だ！ 右と左が逆になっている！']]:[['','もとの世界にもどってきた。']]);},
   vend:()=>{if(state.yen<120){talk([['','自動販売機だ。スポーツドリンクが120円で売っている。'],['','……お金が足りない。']]);return;}state.yen-=120;state.items.drink=(state.items.drink||0)+1;sfx('sel');save();talk([['','ガコン！'],['','スポーツドリンクを買った。(120円)']]);},
 };
 const owFlag=k=>k.startsWith('boss:')?!!state.boss[k.slice(5)]:!!(state.owFlags&&state.owFlags[k]);
@@ -5279,7 +5365,7 @@ function owVolcStep(m){
   if(!OWC.mv){
     if((here==='&'||here==='$')&&owFlow(here)==='flow'){owBurn(m,'足もとに溶岩が流れこんできた！');return true;}
     if(here==='!'&&owVent(o.x,o.y)==='on'){owScald(m);return true;}
-    if(here==='^'&&owGeyser()==='on'&&m.jumps&&m.jumps[k]){const [tx,ty]=m.jumps[k];OWC.fly={fx:o.x,fy:o.y,tx,ty,t:0};OWC.held=null;owCancelPath();sfx('shiny');ui.toast=m.ground==='volcano'?'ドドドド……ブシャアアッ！ 間欠泉に吹き飛ばされた！':'ゴオオッ！ 天狗風に乗って、空を飛んだ！';render();return true;}
+    if(here==='^'&&owGeyser()==='on'&&m.jumps&&m.jumps[k]){const [tx,ty]=m.jumps[k];OWC.fly={fx:o.x,fy:o.y,tx,ty,t:0};OWC.held=null;owCancelPath();owStamp('g:geyser');sfx('shiny');ui.toast=m.ground==='volcano'?'ドドドド……ブシャアアッ！ 間欠泉に吹き飛ばされた！':'ゴオオッ！ 天狗風に乗って、空を飛んだ！';render();return true;}
     if(here==='?'&&owBroken(o.x,o.y)){if(m.ground==='volcano')owFallLava(m);else if(m.ground==='sand')owSeaFall(m,'バキバキッ！ くさった床板がぬけて、海に落ちた！');else owCliff(m,'ガラガラッ……！ 足場が崩れて、崖から落ちた！');OWC.crumb={};return true;}
   }
   /* 噴石 */
@@ -5309,7 +5395,7 @@ function owRideStart(m){
   if(m.fareAll&&!m.fareAll.every(owFlag)){talk([['渡し守','……川を渡りたいか。'],['渡し守',`渡し賃は、六文。……彼岸花の原と、この川べりに、六文銭のかけらが落ちているはずだ。(いま${m.fareAll.filter(owFlag).length}/${m.fareAll.length})`]]);return;}
   if(m.power&&!owFlag(m.power)){talk([['','トロッコだ。……動かない。'],['','どこかで動力を入れないといけないらしい。']]);return;}
   const o=state.ow;const ds=Object.entries(OWD).filter(([d,[dx,dy]])=>(m.rows[o.y+dy]||'')[o.x+dx]==='+');if(!ds.length)return;
-  const d=(ds.find(([d])=>d===o.dir)||ds[0])[0];OWC.ride={dir:d,n:0};OWC.held=null;owCancelPath();OWC.bombs=[];sfx('sel');ui.toast=m.canoe?'カヌーをこぎ出した。流れに乗って、すいすい進む！':'ガタン、ゴトン……トロッコが走り出した！';render();owRideNext(m);}
+  const d=(ds.find(([d])=>d===o.dir)||ds[0])[0];OWC.ride={dir:d,n:0};owStamp('g:ride');OWC.held=null;owCancelPath();OWC.bombs=[];sfx('sel');ui.toast=m.canoe?'カヌーをこぎ出した。流れに乗って、すいすい進む！':'ガタン、ゴトン……トロッコが走り出した！';render();owRideNext(m);}
 function owRideNext(m){
   const o=state.ow,r=OWC.ride,back={up:'down',down:'up',left:'right',right:'left'}[r.dir];
   if(r.n>0&&(m.rows[o.y]||'')[o.x]==='c'||r.n>400){OWC.ride=null;ui.toast=m.canoe?'船着き場に着いた。':'キキーッ！ 乗り場に着いた。';render();return;}
@@ -5457,8 +5543,8 @@ function owColdBar(c,m){
   const col=m.air?(v<.5?'#8ae0ff':v<.75?'#f2c43a':'#ff5a4a'):m.heat?(v<.5?'#f2c43a':v<.75?'#ff8a2a':'#ff3a2a'):v<.5?'#8ad0f0':v<.75?'#f2c43a':'#ff5a4a';c.fillStyle=col;c.fillRect(x+8,y,Math.round(w*v),5);
   if(v>=.75&&Math.floor(Date.now()/300)%2){c.fillStyle='rgba(255,90,74,.5)';c.fillRect(x+8,y,w,5);}
 }
-function owWarashi(){const d=dayKey();if(state.owWara===d)return [['座敷わらし','……(にこにこしている)']];state.owWara=d;healAll();sfx('heal');save();return [['座敷わらし','……あそんでくれるの？'],['','座敷わらしと手まりをついて遊んだ。'],['','なかまの疲れが、すっかりとれた！']];}
-function owFeast(){const d=dayKey();if(state.owFeast===d)return [['','お膳は空になっている。']];state.owFeast=d;const it=pick(['onigiri','onigiri','tea','drink','tane']);state.items[it]=(state.items[it]||0)+1;sfx('shiny');save();return [['','お膳の上に、だれかが用意してくれたものがある。'],['',`${ITEMS[it].n}をもらった。`]];}
+function owWarashi(){const d=dayKey();if(state.owWara===d)return [['座敷わらし','……(にこにこしている)']];state.owWara=d;owStamp('g:warashi');healAll();sfx('heal');save();return [['座敷わらし','……あそんでくれるの？'],['','座敷わらしと手まりをついて遊んだ。'],['','なかまの疲れが、すっかりとれた！']];}
+function owFeast(){const d=dayKey();if(state.owFeast===d)return [['','お膳は空になっている。']];state.owFeast=d;owStamp('g:feast');const it=pick(['onigiri','onigiri','tea','drink','tane']);state.items[it]=(state.items[it]||0)+1;sfx('shiny');save();return [['','お膳の上に、だれかが用意してくれたものがある。'],['',`${ITEMS[it].n}をもらった。`]];}
 /* 吊り橋の突風: 7秒ごとに、予兆(木の葉)のあと強い風が吹く */
 function owGust(){const t=Date.now()%7000;return t<4600?'calm':t<5400?'warn':'gust';}
 /* 狐火の灯籠: 東→西→南→北の順に灯す */
@@ -5469,7 +5555,7 @@ function owToro(id){
   OWC.lseq.push(id);const ok=OWC.lseq.every((v,i)=>v===OW_LSEQ[i]);
   if(!ok){OWC.lseq=[];sfx('sel');talk([['','灯籠に火をともした……'],['','ふっ、とすべての狐火が消えた。どこかで狐が笑っている……']]);return;}
   sfx('shiny');if(OWC.lseq.length<4){talk([['','灯籠に、青白い狐火がともった。']]);return;}
-  owSetFlag('kitsune');save();sfx('win');talk([['','四つの灯籠に、狐火がそろった！'],['','鳥居をふさいでいた結界が、すうっと消えていく……']]);
+  owSetFlag('kitsune');owStamp('g:toro');save();sfx('win');talk([['','四つの灯籠に、狐火がそろった！'],['','鳥居をふさいでいた結界が、すうっと消えていく……']]);
 }
 /* 押せる岩: マップに入るたびに元の位置にもどる */
 /* うめた穴は、すべる氷塊の部屋をのぞいて、ずっとうまったまま(帰り道がなくならないように) */
@@ -5482,7 +5568,7 @@ function owBackToTown(){const m=owMap();if(!m||B||ui.dlg)return;
   if(OWC.chase&&OWC.chase.map===state.ow.map){ui.owBack=false;ui.toast='いまは、にげるのに必死でもどれない！';render();return;}
   if(OWC.ride||OWC.fly||OWC.slide)return;
   if(!ui.owBack){ui.owBack=true;ui.toast='もう一度押すと、町の駅の前へもどります';render();return;}
-  const t=MAPS[m.town],sp=t.station||t.spawn;ui.owBack=false;OWC.mv=null;OWC.held=null;OWC.rk=null;OWC.crack=null;owCancelPath();owVolcReset();owTorchOut();state.owCold=0;state.ow={map:m.town,x:sp.x,y:sp.y,dir:sp.dir||'down'};sfx('sel');ui.toast=t.name+'の駅へもどった';save();render();}
+  const t=MAPS[m.town],sp=t.station||t.spawn;ui.owBack=false;OWC.mv=null;OWC.held=null;OWC.rk=null;OWC.crack=null;owCancelPath();owVolcReset();owTorchOut();state.owCold=0;state.ow={map:m.town,x:sp.x,y:sp.y,dir:sp.dir||'down'};owFoot();sfx('sel');ui.toast=t.name+'の駅へもどった';save();render();}
 const owRockAt=(m,x,y)=>m.rocks?owRocks(m).rocks.findIndex(r=>r[0]===x&&r[1]===y):-1;
 /* ---- 移動 ---- */
 const OWD={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
@@ -5528,14 +5614,15 @@ function owTryMove(dir){
 function owArrive(){
   const m=owMap(),o=state.ow,w=m.warps&&m.warps[o.x+','+o.y],here=m.rows[o.y][o.x];
   state.owSteps=(state.owSteps||0)+1;dailyInc('walk');if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
-  if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];OWC.slide=null;OWC.crack=null;if(OWC.chase&&OWC.chase.map===o.map&&m.chase)owSetFlag(m.chase.done);owVolcReset();owTorchOut();if(w.setFlag)owSetFlag(w.setFlag);if(!MAPS[w.to].cold)state.owCold=0;owCancelPath();ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
+  if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};owFoot();OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];OWC.slide=null;OWC.crack=null;if(OWC.chase&&OWC.chase.map===o.map&&m.chase)owSetFlag(m.chase.done);owVolcReset();owTorchOut();if(w.setFlag)owSetFlag(w.setFlag);if(!MAPS[w.to].cold)state.owCold=0;owCancelPath();ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
+  owFoot();owStampTiles(m,o,here);
   if(!'&$?!^~uWav'.includes(here)&&!owHole(o.x,o.y)){OWC.lastSafe={map:o.map,x:o.x,y:o.y};if(m.rest&&m.rest.includes(here))OWC.lastRest={map:o.map,x:o.x,y:o.y};}
   if(here==='?'){OWC.crumb=OWC.crumb||{};const ck=o.x+','+o.y,b=OWC.crumb[ck];if(!b||performance.now()-b>=9000)OWC.crumb[ck]=performance.now();}
   if(state.owTorch>0){state.owTorch--;if(!state.owTorch){ui.toast='火種が燃えつきてしまった……';render();}}
   if(m.cold&&here!=='i'&&!(OWC.chase&&OWC.chase.map===o.map)){if(owColdAdd(m,here==='y'?2:1))return;}
   if(here==='u'){if(owThin(m,o))return;}else if(OWC.crack){OWC.crack=null;ui.toast='うしろで、割れた氷がまた凍りついていく……';render();}
   if(here==='i'){OWC.slide=o.dir;}else if(OW_CUR[here]){OWC.slide=OW_CUR[here];o.dir=OW_CUR[here];}else OWC.slide=null;
-  if(m.rings){const rg=m.rings.find(r=>(r[0]===o.x&&r[1]===o.y)||(r[2]===o.x&&r[3]===o.y));if(rg){const to=rg[0]===o.x&&rg[1]===o.y?[rg[2],rg[3]]:[rg[0],rg[1]];o.x=to[0];o.y=to[1];OWC.held=null;OWC.mv=null;sfx('shiny');ui.toast='キノコの輪に足をふみ入れると、ふわりと体がうき上がった……';render();return;}}
+  if(m.rings){const rg=m.rings.find(r=>(r[0]===o.x&&r[1]===o.y)||(r[2]===o.x&&r[3]===o.y));if(rg){const to=rg[0]===o.x&&rg[1]===o.y?[rg[2],rg[3]]:[rg[0],rg[1]];o.x=to[0];o.y=to[1];OWC.held=null;OWC.mv=null;owStamp('g:ring');sfx('shiny');ui.toast='キノコの輪に足をふみ入れると、ふわりと体がうき上がった……';render();return;}}
   if(OWC.slide)return;
   if(here==='Q'){OWC.stuck=performance.now()+650;OWC.held=null;owCancelPath();ui.toast='クモの糸にからまった！';render();}
   const enc=m.enc||'T';
@@ -5555,7 +5642,7 @@ function owColdAdd(m,n){
   if(v>=1){owFreeze();return true;}
   if(v>=.75&&!OWC.coldWarn){OWC.coldWarn=true;ui.toast=m.light?'提灯の火が小さくなってきた……！ 灯籠で火をもらおう！':m.air?'息が苦しくなってきた……！ 泡のわく場所で息をつごう！':m.heat?'暑さで頭がくらくらする……湧き水で体を冷やそう！':'体が冷えきってきた……焚き火であたたまろう！';render();}
   if(v<.75)OWC.coldWarn=false;return false;}
-function owWarm(msg){state.owCold=0;OWC.coldWarn=false;const o=state.ow;state.owFire={map:o.map,x:o.x,y:o.y,dir:o.dir};save();}
+function owWarm(msg){owStamp('g:warm');state.owCold=0;OWC.coldWarn=false;const o=state.ow;state.owFire={map:o.map,x:o.x,y:o.y,dir:o.dir};save();}
 /* 目ざめる場所(焚き火・湧き水)が、いまのマップでも正しいか確かめる。古いセーブの場所が壁の中になっていたら使わない */
 function owFireOK(f){if(!f||!MAPS[f.map])return false;const m=MAPS[f.map],c=(m.rows[f.y]||'')[f.x];if(c===undefined||OW_SOLID.includes(c)||'av~u?&$'.includes(c))return false;
   return m.objs.some(([k,x,y,w=1,h=1])=>(k==='takibi'||k==='izumi'||k==='awa'||k==='tourou')&&f.x>=x-1&&f.x<=x+w&&f.y>=y-1&&f.y<=y+h);}
@@ -5580,6 +5667,127 @@ function owThin(m,o){
 function owWeatherNote(){return '';}
 function owWeatherChip(){return '';}
 function owBand(text){ui.band={text,c:TIMES[state.time].c,t:Date.now()};}
+/* ===== T2 みちくさ踏破(足あと・スタンプ・みちくさ点・寄り道ボーナス) ===== */
+/* しかけスタンプ16種。id は 'g:' + 名前。取ると +5点 */
+const OW_STAMPS=[
+  ['g:signal','信号','信号が青のあいだに、車道をわたる'],
+  ['g:power','配電盤','止まっている機械の動力レバーを上げる'],
+  ['g:tide','小島','潮が引いたときだけ渡れる小島へ行く'],
+  ['g:fish','釣り','釣りざおで魚を釣り上げる'],
+  ['g:trash','ゴミ箱','ゴミ箱や潮だまりをのぞく'],
+  ['g:ride','トロッコ','トロッコやカヌーに乗る'],
+  ['g:geyser','間欠泉','間欠泉に吹き飛ばされる'],
+  ['g:float','流氷','流れる氷や亀の背に乗る'],
+  ['g:warm','たき火','たき火や湧き水で体を休める'],
+  ['g:gust','突風','吊り橋で、風が出てきても立ちつづける'],
+  ['g:toro','灯籠','灯籠に正しい順番で火をともす'],
+  ['g:ring','キノコの輪','キノコの輪に足をふみ入れる'],
+  ['g:mirror','湖の鏡','鏡の湖で、鏡の中へ入る'],
+  ['g:warashi','座敷わらし','座敷わらしと遊ぶ'],
+  ['g:feast','お膳','お膳のごちそうをいただく'],
+  ['g:aurora','オーロラ','光の橋を渡る']];
+/* 通れない区画の手動リスト {mapId:[区画番号...]}(自動の到達判定でも足りないとき用) */
+const FOOT_SKIP={};
+const FOOT_IN={};let FOOT_IN_OK=false;
+const FOOT_C={};
+function footIn(){if(FOOT_IN_OK)return;FOOT_IN_OK=true;for(const id in MAPS){const w=MAPS[id].warps;if(w)for(const k in w){const v=w[k];(FOOT_IN[v.to]=FOOT_IN[v.to]||[]).push([v.x,v.y]);}}}
+/* 4x4マスの区画に分け、スポーン・入口から歩いて行ける区画だけを数える(結果はキャッシュ) */
+function footInfo(id){
+  if(FOOT_C[id])return FOOT_C[id];
+  const m=MAPS[id],R=m.rows.length,C=Math.max(...m.rows.map(r=>r.length)),bw=Math.ceil(C/4),bh=Math.ceil(R/4);footIn();
+  const seen=new Uint8Array(R*C),st=[];
+  const ok=(x,y)=>{const ch=(m.rows[y]||'')[x];if(ch===undefined)return false;if(!OW_SOLID.includes(ch))return true;return((ch==='~'||ch==='W')&&(m.floats||m.ground==='snow'))||(ch==='O'&&!!m.rocks)||ch==='+';};
+  const add=(x,y)=>{if(x>=0&&y>=0&&x<C&&y<R&&!seen[y*C+x]&&ok(x,y)){seen[y*C+x]=1;st.push(x,y);}};
+  if(m.spawn)add(m.spawn.x,m.spawn.y);if(m.station)add(m.station.x,m.station.y);
+  (FOOT_IN[id]||[]).forEach(([x,y])=>add(x,y));
+  (m.rings||[]).forEach(r=>{add(r[0],r[1]);add(r[2],r[3]);});
+  Object.values(m.jumps||{}).forEach(j=>add(j[0],j[1]));
+  [m.fallTo,m.tideSafe].forEach(p=>{if(p)add(p.x,p.y);});
+  while(st.length){const y=st.pop(),x=st.pop();add(x+1,y);add(x-1,y);add(x,y+1);add(x,y-1);}
+  const nb=bw*bh,valid=new Uint8Array(nb),skip=FOOT_SKIP[id]||[];let total=0;
+  for(let y=0;y<R;y++)for(let x=0;x<C;x++)if(seen[y*C+x]){const i=(y>>2)*bw+(x>>2);if(!valid[i]&&!skip.includes(i)){valid[i]=1;total++;}}
+  return FOOT_C[id]={bw,bh,nb,valid,total};
+}
+function footBit(id,i){const s=state.foot&&state.foot[id];if(!s)return false;return !!(((parseInt(s[i>>2],16)||0)>>(i&3))&1);}
+function footSetBit(id,i,fi){let s=state.foot[id]||'';const n=Math.ceil(fi.nb/4);if(s.length<n)s=s.padEnd(n,'0');const k=i>>2,c=(parseInt(s[k],16)||0)|(1<<(i&3));state.foot[id]=s.slice(0,k)+c.toString(16)+s.slice(k+1);}
+function footCount(id){const fi=footInfo(id);let n=0;for(let i=0;i<fi.nb;i++)if(fi.valid[i]&&footBit(id,i))n++;return n;}
+const footPct=id=>{const fi=footInfo(id);return fi.total?footCount(id)/fi.total:0;};
+const footShow=id=>{const p=footPct(id);return p>=1?100:Math.floor(p*100);};
+function owPoint(n){state.mpt=(state.mpt||0)+n;state.mptAll=(state.mptAll||0)+n;}
+const mchiTitle=()=>(state.mptAll||0)>=1000?'みちくさ名人':'';
+const detourBar=d=>'▮'.repeat(d)+'▯'.repeat(5-d);
+/* マップ左上の小さな札: 踏破率と寄り道の段 */
+function owSubHtml(m){
+  const id=state.ow.map,hub=id===m.town,pct=footShow(id),d=state.detour||0;
+  return `${hub?`<button class="ow-foot ow-mchi" data-act="mchi" aria-label="みちくさ帳を開く">踏破 ${pct}% ・ みちくさ帳</button>`:`<span class="ow-foot">踏破 ${pct}%</span>`}${hub?'':`<span class="ow-detour num">寄り道 ${detourBar(d)} +${d*10}%</span>`}`;
+}
+function owFootUi(glow){const m=owMap();if(!m)return;const s=document.querySelector('.ow-sub');if(!s)return;s.innerHTML=owSubHtml(m);if(glow){const f=s.querySelector('.ow-foot');if(f){f.classList.add('glow');setTimeout(()=>f.classList.remove('glow'),1400);}}}
+/* いまの位置の区画に足あとをつける(初めての区画なら +1点、寄り道の段、踏破スタンプ)。駅のあるマップでは寄り道が0に戻る */
+function owFoot(){
+  const o=state&&state.ow,m=o&&MAPS[o.map];if(!m||!m.rows)return;
+  if(!state.foot)state.foot={};
+  if(o.map===m.town){state.detour=0;state.detourN=0;}
+  const fi=footInfo(o.map),i=(o.y>>2)*fi.bw+(o.x>>2);
+  if(!fi.valid[i]||footBit(o.map,i))return;
+  footSetBit(o.map,i,fi);owPoint(1);
+  if(o.map!==m.town){state.detourN=(state.detourN||0)+1;const d=Math.min(5,Math.floor(state.detourN/10));if(d>(state.detour||0)){state.detour=d;owStampFx('d','寄り道 '+d+'段',`経験値と円 +${d*10}%`);}}
+  const n=footCount(o.map),p=n/fi.total;state.stamps=state.stamps||{};
+  if(p>=.8&&!state.stamps[o.map]){state.stamps[o.map]=1;owPoint(10);owStampFx('s','踏破 80%',`${m.name} +10点`);}
+  if(p>=1&&state.stamps[o.map]!==2){state.stamps[o.map]=2;owPoint(20);addStars(3);owStampFx('o','踏破 100%',`${m.name} +20点 ・ 流星石★3`);}
+  owFootUi(n%5===0);
+}
+/* スタンプの演出: 押された札が落ちてくる(2秒)。戦闘中などマップが見えないときは順番待ちにして、マップにもどってから出す */
+function stampHtml(e){return `<div class="ow-stamp k-${e.kind}" role="status"><div class="stp"><small>${e.kind==='g'?'しかけスタンプ':e.kind==='d'?'寄り道ボーナス':'みちくさ踏破'}</small><b>${esc(e.title)}</b><span>${esc(e.sub)}</span></div></div>`;}
+function owStampFx(kind,title,sub){ui.stampQ=ui.stampQ||[];ui.stampQ.push({kind,title,sub});sfx('stamp');owStampShow();}
+function owStampShow(){
+  if(ui.stampCur||!ui.stampQ||!ui.stampQ.length)return;const cv=document.querySelector('.ow-cv');if(!cv)return;
+  const e=ui.stampCur=ui.stampQ.shift();cv.insertAdjacentHTML('beforeend',stampHtml(e));
+  setTimeout(()=>{if(ui.stampCur===e)ui.stampCur=null;const x=document.querySelector('.ow-stamp');if(x)x.remove();owStampShow();},2000);}
+/* しかけスタンプ: 初めてのときだけ +5点 */
+function owStamp(id){
+  if(!state.stamps)state.stamps={};if(state.stamps[id])return false;
+  const d=OW_STAMPS.find(x=>x[0]===id);if(!d)return false;
+  state.stamps[id]=1;owPoint(5);owStampFx('g',d[1],'しかけスタンプ +5点');save();return true;
+}
+/* 歩いてたどりついたマスで起きるしかけスタンプ */
+function owStampTiles(m,o,here){
+  if(m.cars&&m.cars.lanes&&m.cars.lanes.some(l=>l.y===o.y)&&owPedGreen()!=='stop')owStamp('g:signal');
+  if(here==='U'&&!owTideHigh())owStamp('g:tide');
+  if('~W'.includes(here)&&m.floats&&owFloatAt(m,o.x,o.y))owStamp('g:float');
+  if(m.wind&&here==='H'&&owGust()!=='calm')owStamp('g:gust');
+  if(m.aurora&&(here==='a'||here==='v')&&owFloeOn(here))owStamp('g:aurora');
+}
+/* 寄り道ボーナスの倍率(野生戦だけ)。ぬし・配合杯・ライバル・塔では 1 */
+const detourMul=()=>B&&!B.boss&&!B.cup&&!B.tower&&!B.rival&&!B.trainer?1+.1*Math.min(5,state.detour||0):1;
+/* みちくさ帳の交換品 */
+const MEX=[
+  {id:'kirakira',n:'きらきらの砂',pt:15,items:{kirakira:1}},
+  {id:'kai',n:'色変わりの貝',pt:40,items:{kai:1}},
+  {id:'saino',n:'才能のかけら',pt:80,items:{saino:1},lim:'day'},
+  {id:'star',n:'流星石 ★10',pt:50,stars:10,lim:'day'},
+  {id:'tenpu',n:'天賦の宝珠',pt:400,items:{tenpu:1},lim:'once'}];
+function mexLeft(x){
+  if(x.lim==='day'){dailyRoll();return state.daily.got['mx:'+x.id]?0:1;}
+  if(x.lim==='once')return state.flags['mx:'+x.id]?0:1;return 1;
+}
+function mexBuy(id){
+  const x=MEX.find(q=>q.id===id);if(!x||(state.mpt||0)<x.pt||!mexLeft(x))return false;
+  state.mpt-=x.pt;if(x.lim==='day')state.daily.got['mx:'+x.id]=1;if(x.lim==='once')state.flags['mx:'+x.id]=true;
+  for(const [k,n] of Object.entries(x.items||{}))state.items[k]=(state.items[k]||0)+n;if(x.stars)addStars(x.stars);
+  save();return true;
+}
+function renderMchi(){
+  dailyRoll();const mt=mchiTitle(),nst=OW_STAMPS.filter(d=>state.stamps[d[0]]).length;
+  const ex=MEX.map(x=>{const left=mexLeft(x),can=(state.mpt||0)>=x.pt&&left;return `<div class="mex ${left?'':'done'}"><div class="stack tight"><b>${x.n}</b><span class="small muted num">${x.pt}点${x.lim==='day'?' ・ 1日1回':x.lim==='once'?' ・ 1回だけ':''}</span></div><button class="btn sm ${can?'primary':''}" data-act="mex" data-id="${x.id}" ${can?'':'disabled'}>${left?'交換する':x.lim==='day'?'今日は済み':'交換済み'}</button></div>`;}).join('');
+  const grid=OW_STAMPS.map(d=>{const g=state.stamps[d[0]];return `<div class="mst ${g?'got':''}"><span class="mk">${g?'済':'？'}</span><div class="stack tight"><b>${g?d[1]:'？？？'}</b><span class="small muted">${d[2]}</span></div></div>`;}).join('');
+  const towns=TOWNS.filter(t=>townOpen(t)&&Object.values(MAPS).some(m=>m.town===t.id));
+  const rows=t=>Object.entries(MAPS).filter(([,m])=>m.town===t.id).map(([id,m])=>{const p=footShow(id),s=(state.stamps||{})[id]||0;return `<div class="frow"><span class="fn">${esc(m.name)}</span><span class="fb"><i style="width:${p}%"></i></span><b class="num">${p}%</b><span class="fs ${s===2?'gold':s===1?'silv':''}">${s===2?'金':s===1?'銀':'―'}</span></div>`;}).join('');
+  const foot=towns.map(t=>`<details class="panel foot-t" style="--tl:${TLC[t.id]||'#ffd21f'}" ${t.id===state.town?'open':''}><summary><b>${t.name}</b></summary><div class="flist">${rows(t)}</div></details>`).join('');
+  return `<div class="panel stack mpt"><div class="row between"><div class="stack tight"><span class="eyebrow">みちくさ点</span><b class="big num">${state.mpt||0}<small>点</small></b></div><div class="stack tight" style="text-align:right"><span class="small muted num">累計 ${state.mptAll||0}点</span><span class="small ${mt?'hl':'muted'}">${mt?'称号「'+mt+'」':'名人まで あと '+(1000-(state.mptAll||0))+'点'}</span></div></div><p class="small muted">新しい区画 +1点 ・ しかけ +5点 ・ 踏破80% +10点 ・ 踏破100% +20点と流星石★3</p></div>
+    <div class="panel stack"><h3>交換所</h3><div class="list">${ex}</div></div>
+    <div class="panel stack"><div class="row between"><h3>しかけスタンプ</h3><span class="lv num">${nst}/${OW_STAMPS.length}</span></div><div class="mstamps">${grid}</div></div>
+    <div class="stack"><h3>足あと帳</h3><p class="small muted">4×4マスの区画を、ぜんぶ歩くと100%。金は100%、銀は80%。</p>${foot}</div>`;
+}
 function owTimePass(msg){
   owCancelPath();
   const before=owTideHigh();advanceTime();const m=owMap(),o=state.ow;let t=msg||'';const bt=[`${TIMES[state.time].n}になった`];
@@ -5607,7 +5815,7 @@ function owFishPull(){
   if(f.phase!=='bite'){ui.toast='早すぎた！ 魚に気づかれた。';render();return;}
   const m=owMap(),t=TOWN[m.town],fs=m.fish,tb=fs.table.filter(([,,tm])=>timeOK(tm,state.time)).map(([s,w])=>({w,s}));
   const n=Math.random()<.25?2:1,foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(OW_LV(fs.lv[0],1.25),OW_LV(fs.lv[1],1.25))]);
-  ui.toast='';save();startBattle(foes,{field:`${t.name}・釣り`,scene:'port'});
+  ui.toast='';owStamp('g:fish');save();startBattle(foes,{field:`${t.name}・釣り`,scene:'port'});
 }
 /* はじめの3勝まで: 野生は1体だけ、Lvは先頭のなかま-1まで(こもれび町のぬしを倒したあとは補正なし) */
 function owEarly(foes){
@@ -5629,7 +5837,7 @@ function owTrash(k,kind){
   const pool=kind==='pool',nm=pool?'潮だまり':'ゴミ箱';if(pool&&owTideHigh()){talk([['','潮だまりだ。いまは潮が満ちていて、中がよく見えない。']]);return;}
   const d=dayKey();if(!state.owTrash||state.owTrash.d!==d)state.owTrash={d,u:{}};
   const id=state.ow.map+k;if(state.owTrash.u[id]){talk([['',`${nm}だ。今日はもう何もなさそうだ。`]]);return;}
-  state.owTrash.u[id]=true;const r=Math.random();
+  state.owTrash.u[id]=true;owStamp('g:trash');const r=Math.random();
   const look=`${nm}をのぞきこんだ……`;
   if(r<.3&&state.party.some(x=>x.hp>0)){save();talk([['',look],['','なにかが飛び出してきた！']],()=>owEncounter(owMap().field));return;}
   if(r<.75){const it=pool?pick(['tea','bansoko','drink','tea','bansoko','bansoko','tea','kai']):pick(['bansoko','bansoko','tea','drink','onigiri']);state.items[it]=(state.items[it]||0)+1;sfx('shiny');save();talk([['',look],['',pool?`${ITEMS[it].n}を見つけた！`:`${ITEMS[it].n}が捨てられていた。もらっておこう。`]]);return;}
@@ -5662,7 +5870,7 @@ function owA(){
     if(kk==='lighthouse'){talk([['',m.town==='ryuhyo'?'岬の灯台だ。流氷の季節は、夜通し海を照らしている。':'潮見浜の灯台だ。夜になると、海を照らす。']]);return;}
     if(kk==='hyouheki'&&!owFlag(flag)){if(!owFlag('tsuruhashi')){talk([['','分厚い氷の壁がふさいでいる。素手ではびくともしない。'],['','(つるはしがあれば、くだけそうだ)']]);return;}owSetFlag(flag);sfx('win');save();talk([['','つるはしをふりかぶった……！'],['','ガキィン！ ガキィン！ ……バリーン！'],['','氷の壁をくだいた！']]);return;}
     if(kk==='point'){state.owFlags=state.owFlags||{};state.owFlags[flag]=!state.owFlags[flag];sfx('sel');save();talk([['','ポイントのレバーを切りかえた！'],['','ガシャン……どこかで線路の分かれ道が動いた。']]);return;}
-    if(kk==='power'){if(owFlag(flag)){talk([['','動力のレバーは上がったままだ。遠くで機械がうなっている。']]);return;}owSetFlag(flag);sfx('win');save();talk([['','古い硫黄鉱山の、動力のレバーだ。'],['','力いっぱい引き上げた……！'],['','ゴウン、ゴウン……。谷じゅうのトロッコの線路に、電気が通った！']]);return;}
+    if(kk==='power'){if(owFlag(flag)){talk([['','動力のレバーは上がったままだ。遠くで機械がうなっている。']]);return;}owSetFlag(flag);owStamp('g:power');sfx('win');save();talk([['','古い硫黄鉱山の、動力のレバーだ。'],['','力いっぱい引き上げた……！'],['','ゴウン、ゴウン……。谷じゅうのトロッコの線路に、電気が通った！']]);return;}
     if(kk==='modoshi'){if(!ui.rkAsk){ui.rkAsk=true;talk([['','氷の壁に、古い文字がきざまれている。'],['','「氷塊をはじめの場所にもどしたい者は、もう一度ここにふれよ」']]);return;}ui.rkAsk=false;if(state.owRk)delete state.owRk[state.ow.map];OWC.rk=null;sfx('sel');save();talk([['','ゴゴゴ……。洞窟じゅうの氷塊が、はじめの場所にもどった。']]);return;}
     if(kk==='tourou'){owWarm();sfx('heal');talk([['','石の灯籠に、あたたかい火がともっている。'],['','提灯に火をもらった。まわりが明るくなった！'],['','(灯がもどった。道を見失ったときは、ここへもどってくる)']]);return;}
     if(kk==='coin'&&!owFlag(flag)){owSetFlag(flag);sfx('win');save();const n=(m.fareAll||[]).filter(owFlag).length;talk([['','草のかげで、古い銭が光っている。'],['',`六文銭のかけらを拾った！(${n}/${(m.fareAll||[]).length})`]]);return;}
@@ -5777,7 +5985,7 @@ function renderOverworld(){
   const m=owMap(),tm=TIMES[state.time];
   return `<section class="ow" aria-label="${m.name}のマップ">
     <div class="ow-screen"><div class="ow-cv"><canvas id="owc" width="${OWC.vw*TS*OWSCALE}" height="${OWC.vh*TS*OWSCALE}" aria-label="${m.name}を見下ろしたマップ。主人公が立っている"></canvas>
-      <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}</span></div>${ui.band?`<div class="ow-band" style="--tc:${ui.band.c}" role="status"><b>${esc(ui.band.text)}</b></div>`:''}${ui.heal?`<button class="ow-heal" data-act="owHeal">${esc(ui.heal)}</button>`:''}${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
+      <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}</span><div class="ow-sub">${owSubHtml(m)}</div></div>${ui.stampCur?stampHtml(ui.stampCur):''}${ui.band?`<div class="ow-band" style="--tc:${ui.band.c}" role="status"><b>${esc(ui.band.text)}</b></div>`:''}${ui.heal?`<button class="ow-heal" data-act="owHeal">${esc(ui.heal)}</button>`:''}${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
     <div class="ow-pad">
       <div class="dpad">${['up','left','right','down'].map(d=>`<button class="dp dp-${d}" data-owdir="${d}" aria-label="${{up:'上',down:'下',left:'左',right:'右'}[d]}">${{up:'▲',down:'▼',left:'◀',right:'▶'}[d]}</button>`).join('')}<span class="dp-c"></span></div>
       ${state.ow.map!==m.town?`<button class="ow-back${ui.owBack?' on':''}" data-act="owBack" aria-label="町の駅へもどる">${ui.owBack?'もう一度で<br>もどる':'駅へ<br>もどる'}</button>`:''}
@@ -5792,7 +6000,7 @@ function wildCard(t){
 }
 function renderStationIn(){
   const h=renderMap(),cut=h.indexOf('<section class="town-grid">');const t=TOWN[state.town];
-  return `${h.slice(0,cut)}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
+  return `${h.slice(0,cut)}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
 }
 /* 建物の中 */
 function renderInside(){
@@ -5801,6 +6009,7 @@ function renderInside(){
   if(k==='sauna')return head(t.sento,'なかま全員のHPとMPが全回復する。')+`<div class="panel stack"><div class="row between"><b>${t.id==='kasumi'?'ととのう':'ひとっ風呂'}</b><span class="lv num">${t.sentoP}円</span></div><div><button class="btn primary" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.id==='kasumi'?'サウナに入る':'お湯につかる'}</button></div></div><div class="panel stack"><h4>パーティ</h4><div class="list">${state.party.map(m=>mrow(m,false,'gosel')).join('')}</div></div>`;
   if(k==='dome')return head('霞ヶ丘ドーム','配合杯の会場。3試合を勝ち抜けば優勝。')+cupsPanel(alive);
   if(k==='board')return head('掲示板','町の人からの依頼がはり出されている。')+reqBoard(t);
+  if(k==='mchi')return head('みちくさ帳','寄り道して集めた足あととスタンプ。みちくさ点を品物と交換できる。')+renderMchi();
   return head('建物','');
 }
 /* 入力 */
@@ -5870,7 +6079,7 @@ function randTalent(lo,hi){const t={};STATS.forEach(k=>t[k]=ri(lo,hi));return t;
 const KEY='michikusa-save-v1';
 let state=null, B=null, tempUid=-1;
 const ui={tab:'map',sel:null,bA:null,bB:null,bSlot:'A',inh:[],trs:[],toast:'',confirmRel:false,dexSel:null,result:null,confirmReset:false,dlg:null,renaming:false,cats:[]};
-function fresh(){return {v:1,started:false,yen:300,items:{bansoko:3,tea:1,drink:0,onigiri:2},party:[],box:[],uidN:1,seen:{},owned:{},boss:{},town:'komorebi',breeds:0,time:1,steps:0,reqDone:{},cups:{},rival:{},flags:{},shinySeen:{},dexClaim:{},sound:false,bgmVol:.75,seVol:.75,lure:0,daycare:[],wins:0};}
+function fresh(){return {v:1,started:false,yen:300,items:{bansoko:3,tea:1,drink:0,onigiri:2},party:[],box:[],uidN:1,seen:{},owned:{},boss:{},town:'komorebi',breeds:0,time:1,steps:0,reqDone:{},cups:{},rival:{},flags:{},shinySeen:{},dexClaim:{},sound:false,bgmVol:.75,seVol:.75,lure:0,daycare:[],wins:0,foot:{},mpt:0,mptAll:0,stamps:{},detour:0,detourN:0,dexReg:{},seenAt:{}};}
 function save(){if(state)state.savedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}cloudSchedule();}
 function load(){try{const s=localStorage.getItem(KEY);if(s){const o=JSON.parse(s);if(o&&o.v===1)return o;}}catch(e){}return null;}
 
@@ -6024,7 +6233,7 @@ function render(){
   const rw=app.querySelector('.railwrap'),rc=rw&&rw.querySelector('.station.cur');if(rc&&rw.scrollWidth>rw.clientWidth)rw.scrollLeft=rc.offsetLeft-(rw.clientWidth-rc.offsetWidth)/2;
   ui._st=ui.tab+(B?'b':'')+(ui.station?'s':'')+(ui.inside||'');const nm=document.getElementById('main');if(nm&&keep)nm.scrollTop=keep;
   if(!walking&&ui.wmenu)ui.wmenu=false;
-  if(document.getElementById('owc')){owResize();owEnsureLoop();if(ui.band){clearTimeout(OWC.bdt);const bv=ui.band;OWC.bdt=setTimeout(()=>{if(ui.band===bv){ui.band=null;const e=document.querySelector('.ow-band');if(e)e.remove();}},2000);}if(ui.toast){clearTimeout(OWC.tt);const tv=ui.toast;OWC.tt=setTimeout(()=>{if(ui.toast===tv){ui.toast='';const e=document.querySelector('.ow-toast');if(e)e.remove();}},2600);}}
+  if(document.getElementById('owc')){owResize();owEnsureLoop();owStampShow();if(ui.band){clearTimeout(OWC.bdt);const bv=ui.band;OWC.bdt=setTimeout(()=>{if(ui.band===bv){ui.band=null;const e=document.querySelector('.ow-band');if(e)e.remove();}},2000);}if(ui.toast){clearTimeout(OWC.tt);const tv=ui.toast;OWC.tt=setTimeout(()=>{if(ui.toast===tv){ui.toast='';const e=document.querySelector('.ow-toast');if(e)e.remove();}},2600);}}
   bgmUpdate();
 }
 /* 会話ウィンドウ */
@@ -6053,7 +6262,7 @@ function renderHeader(walking){
   const t=TOWN[state.town],tm=TIMES[state.time];
   const tabs=[['map','探索'],['party','なかま'],['breed','配合'],['gacha','ガチャ'],['tower','星界の塔'],['dex','図鑑'],['shop','コンビニ']];
   const dot=reqReadyCount();
-  return `<header class="top2"><span class="tchip" style="--tc:${tm.c}"><i></i>${tm.n}</span>${owWeatherChip()}<span class="loc"><span class="loc-code">${t.code.slice(0,2)}<b>${t.code.slice(2)}</b></span><span class="loc-name">${t.name}</span></span><span class="grow"></span><b class="yen num">${state.yen.toLocaleString()}<small>円</small></b><b class="stars num" title="流星石">★${(state.stars||0).toLocaleString()}</b><button class="ib" data-act="bgm" aria-pressed="${!!state.bgm}" aria-label="BGM ${state.bgm?'オン':'オフ'}" title="${state.bgm&&BGM.cur?'♪ '+(SONG_NAME[BGM.cur]||''):'BGM'}">♪</button><button class="ib" data-act="sound" aria-pressed="${!!state.sound}" aria-label="効果音 ${state.sound?'オン':'オフ'}">SE</button>${canFull()?`<button class="ib" data-act="fs" aria-label="${document.fullscreenElement?'全画面をやめる':'全画面にする'}"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">${document.fullscreenElement?'<path d="M5 1v4H1M9 1v4h4M5 13V9H1M9 13V9h4"/>':'<path d="M1 5V1h4M13 5V1H9M1 9v4h4M13 9v4H9"/>'}</svg></button>`:''}${walking?`<button class="ib wmenu-b" data-act="wmenu" aria-pressed="${!!ui.wmenu}" aria-label="メニューを開く(Bボタン長押しでも開く)">${ui.wmenu?'×':'☰'}</button>`:''}</header>
+  return `<header class="top2"><span class="tchip" style="--tc:${tm.c}"><i></i>${tm.n}</span>${owWeatherChip()}<span class="loc"><span class="loc-code">${t.code.slice(0,2)}<b>${t.code.slice(2)}</b></span><span class="loc-name">${t.name}</span></span>${mchiTitle()?'<span class="ttl" title="みちくさ名人">名人</span>':''}${state.flags.hakase?'<span class="ttl" title="魔生物博士">博士</span>':''}<span class="grow"></span><b class="yen num">${state.yen.toLocaleString()}<small>円</small></b><b class="stars num" title="流星石">★${(state.stars||0).toLocaleString()}</b><button class="ib" data-act="bgm" aria-pressed="${!!state.bgm}" aria-label="BGM ${state.bgm?'オン':'オフ'}" title="${state.bgm&&BGM.cur?'♪ '+(SONG_NAME[BGM.cur]||''):'BGM'}">♪</button><button class="ib" data-act="sound" aria-pressed="${!!state.sound}" aria-label="効果音 ${state.sound?'オン':'オフ'}">SE</button>${canFull()?`<button class="ib" data-act="fs" aria-label="${document.fullscreenElement?'全画面をやめる':'全画面にする'}"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">${document.fullscreenElement?'<path d="M5 1v4H1M9 1v4h4M5 13V9H1M9 13V9h4"/>':'<path d="M1 5V1h4M13 5V1H9M1 9v4h4M13 9v4H9"/>'}</svg></button>`:''}${walking?`<button class="ib wmenu-b" data-act="wmenu" aria-pressed="${!!ui.wmenu}" aria-label="メニューを開く(Bボタン長押しでも開く)">${ui.wmenu?'×':'☰'}</button>`:''}</header>
     ${walking&&!ui.wmenu?'':`<nav class="tabs" aria-label="メニュー">${tabs.map(([k,n])=>`<button class="tab" data-act="tab" data-v="${k}" ${ui.tab===k?'aria-current="page"':''}>${n}${k==='map'&&dot?`<i class="ndot" title="達成できる依頼があります">${dot}</i>`:''}${k==='gacha'&&missionReady()?`<i class="ndot" title="受け取れるミッションがあります">${missionReady()}</i>`:''}</button>`).join('')}</nav>${ui.tab!=='party'?renderPartyBar():''}`}`;
 }
 function renderTab(){if(ui.tab==='map'&&MAPS[state.town]){owEnsureState();return ui.station?renderStationIn():ui.inside?renderInside():renderOverworld();}return ({map:renderMap,party:renderParty,breed:renderBreed,gacha:renderGacha,tower:renderTower,dex:renderDex,shop:renderShop}[ui.tab]||renderMap)();}
@@ -6614,16 +6823,19 @@ function renderDex(){
     det=`<div class="panel stack"><div class="dhead">${seal(sel.id,'lg',true,false)}${state.shinySeen[sel.id]?seal(sel.id,'sm',true,true):''}<div class="stack tight"><span class="eyebrow">No.${String(SPL.indexOf(sel)+1).padStart(2,'0')} ・ ${FAM[sel.fam].n} ・ ${RANKS[sel.rank]}ランク</span><h2>${sel.name}</h2><span class="small muted">モチーフ: ${sel.motif}</span></div></div>
       ${ow?`<p>${sel.desc}</p><p class="small">特性: ${TR[sel.trait].n} ― ${TR[sel.trait].d}${TR[sel.trait].up?`(上位化すると「${TR[TR[sel.trait].up].n}」)`:''}</p><p class="small">覚える特技: ${sel.skills.map(([lv,id])=>`${SK[id].n}(Lv${lv})`).join('・')}</p>`:'<p class="small muted">見かけたことがある。なかまにすると詳しい記録が見られる。</p>'}
       <p class="small muted">${HAB[sel.id]?'出現: '+HAB[sel.id].join(' / '):sel.special?'野生では見つからない。特殊配合でのみ生まれる。':'野生では見つからない。配合で生み出そう。'}</p>
+      <p class="small muted">${seenAtText(sel.id)}</p>
       ${rec.map(r=>`<p class="small" style="color:var(--good)">${recipeText(r)}</p>`).join('')}</div>`;
   }
   const famProg=FK.map(f=>{const all=DL.filter(s=>s.fam===f),o=all.filter(s=>state.owned[s.id]).length;return `<span class="fp ${o===all.length?'full':''}" style="--fam:${FAM[f].c}"><b>${FAM[f].n}</b><span class="num">${o}/${all.length}</span></span>`;}).join('');
-  const ms=DEX_MS.map(x=>{const got=state.dexClaim[x.n],ok=own>=x.n;return `<div class="ms ${got?'got':ok?'ok':''}"><b class="num">${x.n}種</b><span class="small muted">${rewardText(x.reward)}</span>${got?'<span class="badge good">受取済み</span>':`<button class="btn sm ${ok?'primary':''}" data-act="dexms" data-n="${x.n}" ${ok?'':'disabled'}>受け取る</button>`}</div>`;}).join('');
+  const msL=[...DEX_MS].sort((a,b)=>(a.all?1:0)-(b.all?1:0)||a.n-b.n);
+  const ms=msL.map(x=>{const k=dexKey(x),got=state.dexClaim[k],ok=own>=x.n;return `<div class="ms ${got?'got':ok?'ok':''}"><b class="num">${x.all?'全種 '+x.n+'種':x.n+'種'}</b><span class="small muted">${msText(x)}</span>${got?'<span class="badge good">受取済み</span>':`<button class="btn sm ${ok?'primary':''}" data-act="dexms" data-n="${k}" ${ok?'':'disabled'}>受け取る</button>`}</div>`;}).join('');
   const groups=FK.map(f=>`<div class="dexgroup"><h4 style="--fam:${FAM[f].c}">${FAM[f].n}</h4><div class="dex">${DL.filter(s=>s.fam===f).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id],i=SPL.indexOf(s);return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`).join('');
   return `<section class="stack"><div class="row between"><h2>魔生物図鑑</h2><span class="lv num">見つけた ${seen} ・ なかまにした ${own} / ${DL.length}</span></div>
     <div class="progress" role="progressbar" aria-valuenow="${own}" aria-valuemax="${DL.length}"><i style="width:${own/DL.length*100}%"></i></div>
     <div class="famprog">${famProg}</div>
-    <details class="panel rules"><summary>図鑑の記念品(${DEX_MS.filter(x=>own>=x.n&&!state.dexClaim[x.n]).length}個受け取れる)</summary><div class="mslist">${ms}</div></details>
-    ${det}${groups}<div class="dexgroup"><h4 style="--fam:#ffd36a">ガチャ限定(星降りの祠)</h4><div class="dex">${SPL.filter(s=>s.gacha).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id];return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">${RANKS[s.rank]}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div></section>`;
+    <details class="panel rules"><summary>図鑑の記念品(${DEX_MS.filter(x=>own>=x.n&&!state.dexClaim[dexKey(x)]).length}個受け取れる)</summary><div class="mslist">${ms}</div></details>
+    <div class="dmode" role="group" aria-label="図鑑の見かた"><button data-act="dexmode" data-v="fam" aria-pressed="${ui.dexMode!=='reg'}">系統別</button><button data-act="dexmode" data-v="reg" aria-pressed="${ui.dexMode==='reg'}">地域別</button></div>
+    ${det}${ui.dexMode==='reg'?renderDexReg(DL):groups}${ui.dexMode==='reg'?'':`<div class="dexgroup"><h4 style="--fam:#ffd36a">ガチャ限定(星降りの祠)</h4><div class="dex">${SPL.filter(s=>s.gacha).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id];return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">${RANKS[s.rank]}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`}</section>`;
 }
 const itemOpen=it=>!it.open||townOpen(TOWN[it.open]);
 function renderShop(){
@@ -6671,6 +6883,7 @@ function startBattle(foes,opt){
   const cnt={};enemies.forEach(c=>cnt[c.label]=(cnt[c.label]||0)+1);
   const idx={};enemies.forEach(c=>{if(cnt[c.label]>1){idx[c.label]=(idx[c.label]||0)+1;c.label+='ABC'[idx[c.label]-1];}});
   const seen0={...state.seen},own0={...state.owned},stars0=state.stars||0;
+  enemies.forEach(c=>{if(!state.seen[c.mon.sp]){state.seenAt=state.seenAt||{};state.seenAt[c.mon.sp]=[state.town,state.time,typeof wxNow==='function'?wxNow():null];}});
   enemies.forEach(c=>{state.seen[c.mon.sp]=true;if(c.mon.shiny)state.shinySeen[c.mon.sp]=true;});
   B={seen0,own0,stars0,allies,enemies,turn:1,log:[],phase:'input',inputIdx:0,cmds:[],target:0,menu:'main',boss:!!opt.boss,ura:!!opt.ura,wild:opt.wild||0,town:opt.town,field:opt.field,scene:opt.scene||'inaka',
     cup:opt.cup||null,rival:opt.rival||null,tower:opt.tower||0,towerBoss:!!opt.towerBoss,trainer:opt.trainer||null,onigiri:false,auto:false,result:null,fx:null,pops:[],intro:true,lockUntil:performance.now()+900,next:null,after:null};
@@ -6952,6 +7165,7 @@ function win(){
   const def=B.enemies.filter(c=>c.hp<=0&&!c.gone);
   let exp=0,yen=0;
   for(const c of def){const r=SP[c.mon.sp].rank,lv=c.mon.lv;exp+=Math.floor(3.5*Math.pow(lv,1.5)*(1+.25*r)*(c.boss?3:B.trainer?1.5:1)*(SP[c.mon.sp].expx||1));yen+=Math.floor(lv*2.5*(1+.3*r))+ri(0,5);}
+  const dm=def.length?detourMul():1;if(dm>1){exp=Math.floor(exp*dm);yen=Math.floor(yen*dm);}
   const BB=B.boss?(B.ura?TOWN[B.town].ura:TOWN[B.town].boss):null;
   if(BB)yen+=B.wild?Math.floor(BB.reward*(1+.5*B.wild)):BB.reward;
   syncAllies();
@@ -7000,7 +7214,7 @@ function win(){
   const news=[];for(const c of B.enemies){const id=c.mon.sp;if(news.some(n=>n.id===id))continue;const no=SPL.indexOf(SP[id])+1;
     if(!B.seen0[id])news.push({id,no,own:!!state.owned[id]});else if(!B.own0[id]&&state.owned[id])news.push({id,no,own:true,again:true});}
   const head=!def.length?(B.enemies.some(c=>c.fled)?'逃げられた……':'スカウト成功！'):'勝利！';
-  const rw={head,exp:def.length?exp:0,yen,bonus:0,drops:rwDrops,news,mem,stars:(state.stars||0)-B.stars0};
+  const rw={head,exp:def.length?exp:0,yen,bonus:dm>1?Math.round((dm-1)*100):0,drops:rwDrops,news,mem,stars:(state.stars||0)-B.stars0};
   B.result={win:true,lines,rw};save();
   const up=mem.some(x=>x.lv1>x.lv0);jingle('win');
   if(up)rwSfx(rwPlan(rw).up,'lvup');
@@ -7125,7 +7339,7 @@ function explore(fid){
 const H={
   starter:d=>{const m=newMon(d.id,3,{talent:randTalent(8,12)});m.gen=0;state.party=[m];state.owned[d.id]=true;state.seen[d.id]=true;state.started=true;state.flags.intro=true;state.flags.v2=true;state.flags.gacha=true;state.stars=50;state.login={last:dayKey(),streak:1};ui.sel=m.uid;ui.toast=`${SP[d.id].name}が相棒になった！ まずは田んぼのあぜ道でなかまをスカウトしよう。`;save();render();talk(STORY.intro);},
   tab:d=>{ui.tab=d.v;ui.toast='';ui.confirmRel=false;ui.renaming=false;ui.detailOpen=false;sfx('sel');render();scrollTop0();},
-  town:d=>{const t=TOWN[d.id];if(!townOpen(t))return;state.town=d.id;if(MAPS[d.id]){const s=MAPS[d.id].station;state.ow={map:d.id,x:s.x,y:s.y,dir:s.dir};ui.station=false;ui.inside=null;OWC.cars=null;}ui.toast=`ミチクサ線で${t.name}へ移動した。`;save();render();const fk='visit_'+d.id;if(STORY[fk]&&!state.flags[fk]){state.flags[fk]=true;save();talk(STORY[fk]);}},
+  town:d=>{const t=TOWN[d.id];if(!townOpen(t))return;state.town=d.id;if(MAPS[d.id]){const s=MAPS[d.id].station;state.ow={map:d.id,x:s.x,y:s.y,dir:s.dir};owFoot();ui.station=false;ui.inside=null;OWC.cars=null;}ui.toast=`ミチクサ線で${t.name}へ移動した。`;save();render();const fk='visit_'+d.id;if(STORY[fk]&&!state.flags[fk]){state.flags[fk]=true;save();talk(STORY[fk]);}},
   explore:d=>explore(d.f),
   ura:()=>{const t=TOWN[state.town];if(!t.ura||!state.boss[t.id])return;startBattle(t.ura.foes,{boss:true,ura:true,town:t.id,field:t.ura.title,scene:t.ura.scene});},
   sainoOpen:()=>{ui.sainoPick=ui.sainoPick===ui.sel?null:ui.sel;ui.tenpuAsk=null;render();},
@@ -7187,15 +7401,19 @@ const H={
   bNew:()=>{ui.bNew=!ui.bNew;render();},
   rest:()=>{advanceTime();ui.toast=`ベンチでひと休み。${TIMES[state.time].n}になった。`;save();render();},
   req:d=>{const r=REQUESTS.find(x=>x.id===d.id);if(!r||state.reqDone[r.id])return;const m=reqMatch(r.need);if(!m)return;state.reqDone[r.id]=true;addStars(2);const got=giveReward(r.reward)+'・流星石★2';sfx('win');save();talk([[r.from,m.dex?'すごい記録ですね！ お礼を受け取ってください。':`${mName(m)}……！ 見せてくれてありがとう。これはお礼です。`],['',`${got} を受け取った。`]]);},
-  dexms:d=>{const n=+d.n,x=DEX_MS.find(q=>q.n===n),own=dexList().filter(s=>state.owned[s.id]).length;if(!x||state.dexClaim[n]||own<n)return;state.dexClaim[n]=true;addStars(5);ui.toast=`図鑑の記念品として ${giveReward(x.reward)} を受け取った！`;sfx('win');save();render();},
+  dexms:d=>{if(dexMsClaim(d.n))render();},
   sound:()=>{state.sound=!state.sound;ambSync();save();render();sfx('ui_ok');},
   vol:d=>{const se=d.k==='se';state[se?'seVol':'bgmVol']=+d.v;audioVolumes();ambSync();if(!se&&state.bgm&&!BGM.timer)bgmUpdate();save();render();if(se)sfx('ui_ok');},
   bgm:()=>{state.bgm=!state.bgm;if(state.bgm){try{bgmCtx().resume();}catch(e){}}else bgmStop(),BGM.cur=null;save();render();},
   owA:()=>owA(),
   owBack:()=>owBackToTown(),
   fs:()=>{try{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{});}catch(e){}},
-  owLeave:()=>{ui.inside=null;sfx('sel');render();},
-  owExit:()=>{ui.station=false;ui.inside=null;const s=MAPS[state.town].station;state.ow={map:state.town,x:s.x,y:s.y,dir:s.dir};sfx('sel');save();render();},
+  owLeave:()=>{ui.inside=null;if(ui.mchiBack){ui.mchiBack=false;ui.station=true;}sfx('sel');render();},
+  mchi:()=>{ui.mchiBack=!!ui.station;ui.station=false;ui.inside='mchi';sfx('sel');render();scrollTop0();},
+  mex:d=>{if(mexBuy(d.id))sfx('win');render();},
+  dexmode:d=>{ui.dexMode=d.v;sfx('sel');render();},
+  regClaim:d=>{regClaim(d.id);render();},
+  owExit:()=>{ui.station=false;ui.inside=null;const s=MAPS[state.town].station;state.ow={map:state.town,x:s.x,y:s.y,dir:s.dir};owFoot();sfx('sel');save();render();},
   dlgSkip:()=>{const d=ui.dlg;if(!d)return;if(d.i<d.lines.length-1){d.i=d.lines.length-1;render();}else H.dlgNext();},
   wmenu:()=>{ui.wmenu=!ui.wmenu;sfx('sel');render();},
   owHeal:()=>{ui.heal=null;const m=state.party.find(x=>x.hp>0);const k=['bansoko','tea','onigiri','drink'].find(q=>state.items[q]>0&&ITEMS[q].hp);if(m&&k){const it=ITEMS[k],s=calc(m);m.hp=Math.min(s.hp,m.hp+it.hp);state.items[k]--;sfx('sel');ui.toast=`${ITEMS[k].n}で${mName(m)}を回復した`;save();}render();},
@@ -7276,6 +7494,7 @@ function migrate(){
   state.seVol=state.seVol==null?.75:Math.round(Math.max(0,Math.min(1,+state.seVol||0))*4)/4;
   if(state.stars==null)state.stars=0;
   for(const k in d)if(state[k]==null)state[k]=d[k];
+  const d2={foot:{},mpt:0,mptAll:0,stamps:{},detour:0,detourN:0,dexReg:{},seenAt:{}};for(const k in d2)if(state[k]==null)state[k]=d2[k];
   if(!state.flags.star20){state.flags.star20=true;if(state.started){const a=state.stars||0,b=Math.floor(a/20);state.stars=b;ui.starMig={a,b};}}
   allMons().forEach(m=>{if(m.shiny)state.shinySeen[m.sp]=true;});
   if(state.started)state.flags.intro=true;
@@ -7284,6 +7503,7 @@ function start(data){
   state=(data&&data.state)||load()||fresh();
   if(!state.items)state.items={bansoko:0,tea:0,drink:0,onigiri:0};
   migrate();
+  try{owFoot();}catch(e){}
   render();
   cloudInit();
   if(state.started&&!state.flags.v2){state.flags.v2=true;save();talk(STORY.v2news,()=>gachaRetro());}

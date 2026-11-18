@@ -195,6 +195,170 @@ T('T7: 歩行中は細いバー、メニューで7タブが開く', async () => 
   eq(s.errors, []); await s.close();
 });
 
+/* ---- T2 みちくさ踏破 ---- */
+const GAME_SRC = fs.readFileSync(path.join(ROOT, 'src/game.html'), 'utf-8');
+const startGame = s => s.ev(() => { H.starter({ id: 'ibote' }); ui.dlg = null; state.bgm = false; state.sound = false; state.boss = { komorebi: true, kasumi: true }; ui.tab = 'map'; ui.station = false; ui.inside = null; ui.toast = ''; state.ow = null; owEnsureState(); render(); });
+/* 地図 id のいちばん最初に見つかる、通れるマス(区画ごと) */
+const tileOfBlocks = (s, id) => s.ev(id => { const m = MAPS[id], fi = footInfo(id), out = {}; for (let y = 0; y < m.rows.length; y++) for (let x = 0; x < m.rows[y].length; x++) { const i = (y >> 2) * fi.bw + (x >> 2); if (fi.valid[i] && !out[i] && !OW_SOLID.includes(m.rows[y][x])) out[i] = [x, y]; } return Object.values(out); }, id);
+T('T2: 区画の記録(同じ区画は1点だけ)・全区画で100%・金スタンプと★3は1回だけ', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => {
+    const id = 'urayama', m = MAPS[id], out = {}; state.ow = { map: id, x: m.spawn.x, y: m.spawn.y, dir: 'down' };
+    const p0 = state.mpt; owFoot(); const p1 = state.mpt; owFoot(); owFoot(); const p2 = state.mpt;
+    out.once = [p1 - p0, p2 - p1]; out.hex = /^[0-9a-f]+$/.test(state.foot[id]); out.hexLen = state.foot[id].length; out.nb = footInfo(id).nb;
+    out.total = footInfo(id).total; return out;
+  });
+  eq(r.once, [1, 0], '同じ区画で点が増えた'); ok(r.hex, '16進でない'); eq(r.hexLen, Math.ceil(r.nb / 4)); ok(r.total > 4);
+  const blocks = await tileOfBlocks(s, 'urayama');
+  const r2 = await s.ev(([bl]) => {
+    const id = 'urayama', s0 = state.stars, out = {};
+    for (const [x, y] of bl) { state.ow = { map: id, x, y, dir: 'down' }; owFoot(); const p = footPct(id); if (p >= .8 && out.p80 == null) { out.p80 = state.stamps[id]; out.pt80 = state.mpt; } }
+    out.pct = footShow(id); out.stamp = state.stamps[id]; out.stars = state.stars - s0; out.mpt = state.mpt;
+    const mp = state.mpt; for (const [x, y] of bl) { state.ow = { map: id, x, y, dir: 'down' }; owFoot(); } out.again = [state.mpt - mp, state.stars - s0]; return out;
+  }, [blocks]);
+  eq(r2.pct, 100); eq(r2.stamp, 2); eq(r2.p80, 1, '80%で銀スタンプ'); eq(r2.stars, 3); eq(r2.again, [0, 3], '2回目に再付与された');
+  eq(s.errors, []); await s.close();
+});
+T('T2: 全マップで踏破100%が到達可能(歩ける区画が1つ以上、区画に番号がつく)', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => { const bad = [], skipped = []; for (const id in MAPS) { const m = MAPS[id], fi = footInfo(id); if (!fi.total) bad.push(id);
+      let any = 0; for (let y = 0; y < m.rows.length; y++) for (let x = 0; x < m.rows[y].length; x++) if (!OW_SOLID.includes(m.rows[y][x])) { const i = (y >> 2) * fi.bw + (x >> 2); if (!fi.valid[i]) any++; } if (any) skipped.push(id + ':' + any); } return { n: Object.keys(MAPS).length, bad, skipped }; });
+  eq(r.bad, [], '歩ける区画がないマップ'); console.log(`      ${r.n}マップ / 到達判定で外れたマスがあるマップ: ${r.skipped.length}件 ${r.skipped.slice(0, 8).join(' ')}`);
+  eq(s.errors, []); await s.close();
+});
+T('T2: しかけスタンプ16種がすべて取れる(関数を呼ぶ + ソースにフックがある)', async () => {
+  const s = await open(); await startGame(s);
+  const ids = await s.ev(() => OW_STAMPS.map(d => d[0])); eq(ids.length, 16);
+  for (const id of ids) ok(GAME_SRC.split(`owStamp('${id}')`).length > 2 || GAME_SRC.includes(`owStamp('${id}')`), id + ' のフックがない');
+  const r = await s.ev(() => {
+    const got = {}, mark = id => { got[id] = !!state.stamps[id]; };
+    state.ow = { map: 'komorebi', x: 5, y: 5, dir: 'down' };
+    owWarashi(); mark('g:warashi'); owFeast(); mark('g:feast'); owWarm(); mark('g:warm');
+    OWC.lseq = []; ['E', 'W', 'S', 'N'].forEach(k => owToro(k)); ui.dlg = null; mark('g:toro');
+    owTrash('1,1'); ui.dlg = null; if (B) B = null; mark('g:trash');
+    const fm = Object.keys(MAPS).find(k => MAPS[k].fish); state.ow = { map: fm, x: 2, y: 2, dir: 'down' }; OWC.fish = { phase: 'bite' }; owFishPull(); if (B) B = null; mark('g:fish');
+    const fake = { cars: { lanes: [{ y: 7 }] }, floats: [], wind: true, aurora: true };
+    const O = { x: 1, y: 7 }; const tide = owTideHigh; const pg = owPedGreen; window.owPedGreen = () => 'go'; owStampTiles(fake, O, 'a'); window.owPedGreen = pg; mark('g:signal'); mark('g:aurora');
+    state.time = 1; owStampTiles(fake, O, 'U'); mark('g:tide'); state.stamps['g:gust'] || (owGust = () => 'gust'); owStampTiles(fake, O, 'H'); mark('g:gust');
+    for (const id of ['g:power', 'g:ride', 'g:geyser', 'g:float', 'g:ring', 'g:mirror']) { owStamp(id); mark(id); }
+    return { got, n: OW_STAMPS.filter(d => state.stamps[d[0]]).length, mpt: state.mpt };
+  });
+  const miss = Object.entries(r.got).filter(([, v]) => !v).map(([k]) => k); eq(miss, [], '取れないスタンプ');
+  eq(r.n, 16); ok(r.mpt >= 80, 'しかけ16種で +5点ずつ'); eq(s.errors.filter(e => !/owPedGreen|assign to const/.test(e)), []); await s.close();
+});
+T('T2: 寄り道ボーナスの段(10区画ごとに1段、最大5段)・駅に戻ると0・戦闘に倍率', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => {
+    const id = Object.keys(MAPS).find(k => MAPS[k].town === 'komorebi' && k !== 'komorebi'), m = MAPS[id], fi = footInfo(id), out = { id }, tiles = [];
+    for (let y = 0; y < m.rows.length; y++) for (let x = 0; x < m.rows[y].length; x++) { const i = (y >> 2) * fi.bw + (x >> 2); if (fi.valid[i] && !tiles[i] && !OW_SOLID.includes(m.rows[y][x])) tiles[i] = [x, y]; }
+    const L = tiles.filter(Boolean); out.n = L.length; const steps = [];
+    L.forEach(([x, y], k) => { state.ow = { map: id, x, y, dir: 'down' }; owFoot(); steps.push(state.detour); });
+    out.d9 = steps[8]; out.d10 = steps[9]; out.max = Math.max(...steps);
+    state.detour = 3; const hub = MAPS[id].town; state.ow = { map: hub, x: MAPS[hub].spawn.x, y: MAPS[hub].spawn.y, dir: 'down' }; owFoot(); out.hub = [state.detour, state.detourN];
+    const exp = () => { startBattle([['koganetsubu', 5]], { field: 'x', scene: 'inaka' }); B.enemies.forEach(c => c.hp = 0); win(); const e = B.result.rw; const q = { exp: e.exp, bonus: e.bonus }; B = null; return q; };
+    state.detour = 0; const a = exp(); state.detour = 3; const b = exp(); state.detour = 9; const c = exp();
+    startBattle([['koganetsubu', 5]], { field: 'x', scene: 'inaka', boss: true, town: 'komorebi' }); state.detour = 3; B.enemies.forEach(c => c.hp = 0); win(); out.boss = B.result.rw.bonus; B = null;
+    startBattle([['koganetsubu', 5]], { field: 'x', scene: 'inaka', cup: { id: CUPS[0].id, round: 1 } }); B.enemies.forEach(c => c.hp = 0); win(); out.cup = B.result.rw.bonus; B = null;
+    out.a = a; out.b = b; out.c = c; state.detour = 3; startBattle([['koganetsubu', 5]], { field: 'x', scene: 'inaka' }); lose(); out.lose = state.detour; B = null;
+    return out;
+  });
+  ok(r.n >= 12, '区画が足りない ' + r.n); eq(r.d9, 0); eq(r.d10, 1); ok(r.max >= 1 && r.max <= 5);
+  eq(r.hub, [0, 0], '駅で0に戻らない'); eq(r.a.bonus, 0); eq(r.b.bonus, 30); eq(r.c.bonus, 50, '最大+50%');
+  eq(r.b.exp, Math.floor(r.a.exp * 1.3), '経験値 +30%'); eq(r.c.exp, Math.floor(r.a.exp * 1.5)); eq(r.boss, 0, 'ぬしに倍率'); eq(r.cup, 0, '配合杯に倍率'); eq(r.lose, 0, '負けで0');
+  eq(s.errors, []); await s.close();
+});
+T('T2: 結果画面に「寄り道 +N%」が出る', async () => {
+  const s = await open(); await startGame(s);
+  const t = await s.ev(() => { state.detour = 2; startBattle([['koganetsubu', 5]], { field: 'x', scene: 'inaka' }); B.enemies.forEach(c => c.hp = 0); win(); return (document.querySelector('.bonus') || {}).textContent; });
+  ok(t && t.includes('+20%'), '寄り道の札: ' + t); eq(s.errors, []); await s.close();
+});
+T('T2: みちくさ帳の交換(点が足りないと不可・1日1回・累計1回・称号)', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => {
+    const o = {}; state.mpt = 10; o.poor = mexBuy('kirakira'); state.mpt = 600; state.items.kirakira = 0; state.items.kai = 0; state.items.saino = 0; state.items.tenpu = 0; const st0 = state.stars;
+    o.k = mexBuy('kirakira'); o.kai = mexBuy('kai'); o.s1 = mexBuy('saino'); o.s2 = mexBuy('saino'); o.st1 = mexBuy('star'); o.st2 = mexBuy('star'); o.t1 = mexBuy('tenpu'); o.t2 = mexBuy('tenpu');
+    o.items = [state.items.kirakira, state.items.kai, state.items.saino, state.items.tenpu]; o.stars = state.stars - st0; o.mpt = state.mpt;
+    state.mptAll = 999; o.t0 = mchiTitle(); state.mptAll = 1000; o.t1x = mchiTitle();
+    H.mchi(); o.inside = ui.inside; o.html = document.querySelector('.mex') ? document.querySelectorAll('.mex').length : 0; o.stamps = document.querySelectorAll('.mst').length;
+    return o;
+  });
+  eq(r.poor, false); eq([r.k, r.kai, r.s1, r.s2, r.st1, r.st2, r.t1, r.t2], [true, true, true, false, true, false, true, false]);
+  eq(r.items, [1, 1, 1, 1]); eq(r.stars, 10); eq(r.mpt, 600 - 15 - 40 - 80 - 50 - 400);
+  eq(r.t0, ''); eq(r.t1x, 'みちくさ名人'); eq(r.inside, 'mchi'); eq(r.html, 5); eq(r.stamps, 16);
+  eq(s.errors, []); await s.close();
+});
+T('T2: 画面(みちくさ帳)は390pxでもはみ出さず、ボタンが44px以上', async () => {
+  const s = await open(); await startGame(s);
+  await s.ev(() => { state.mpt = 999; state.mptAll = 1200; for (const d of OW_STAMPS.slice(0, 5)) state.stamps[d[0]] = 1; H.mchi(); });
+  await wait(300);
+  const r = await s.ev(() => ({ sw: document.documentElement.scrollWidth, btn: [...document.querySelectorAll('.mex .btn')].map(b => b.getBoundingClientRect().height), sub: !!document.querySelector('.ow-sub') }));
+  ok(r.sw <= 390, 'はみ出し ' + r.sw); ok(r.btn.every(h => h >= 44), '交換ボタンが小さい ' + r.btn);
+  await s.ev(() => { H.owLeave(); }); await wait(300);
+  const r2 = await s.ev(() => ({ chip: (document.querySelector('.ow-foot') || {}).textContent, mchi: !!document.querySelector('.ow-mchi') }));
+  ok(r2.chip && r2.chip.includes('踏破'), '踏破の札がない'); ok(r2.mchi, '駅のマップではみちくさ帳へ行ける');
+  eq(s.errors, []); await s.close();
+});
+/* ---- T4 地域図鑑 ---- */
+T('T4: 地域の種族が、町の出現表(fields + 釣り場)と一致し、9町すべてに種族がいる', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => TOWNS.map(t => { const want = new Set(); t.fields.forEach(f => f.table.forEach(([sp]) => want.add(sp))); for (const id in MAPS) if (MAPS[id].town === t.id && MAPS[id].fish) MAPS[id].fish.table.forEach(([sp]) => want.add(sp));
+    const got = regList(t.id).map(x => x.s); return { id: t.id, n: got.length, same: got.length === want.size && got.every(x => want.has(x)), bad: got.filter(x => !SP[x]).length, rw: !!REG_RW[t.id] }; }));
+  eq(r.length, 9); for (const x of r) { ok(x.same && x.n > 0 && !x.bad, x.id + ' が一致しない'); ok(x.rw, x.id + ' の報酬がない'); }
+  console.log('      ' + r.map(x => x.id + ':' + x.n).join(' ')); eq(s.errors, []); await s.close();
+});
+T('T4: 地域コンプ報酬は町ごとに1回だけ・金スタンプ', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => {
+    const o = {}, id = 'komorebi'; o.before = regClaim(id); regList(id).forEach(x => { state.owned[x.s] = true; state.seen[x.s] = true; });
+    const s0 = state.stars, i0 = state.items.onigiri || 0; o.a = regClaim(id); o.b = regClaim(id); o.stars = state.stars - s0; o.item = state.items.onigiri - i0; o.stamp = state.stamps['reg:' + id]; o.flag = state.dexReg[id];
+    ui.tab = 'dex'; ui.dexMode = 'reg'; render(); o.groups = document.querySelectorAll('.dexgroup.reg').length; o.done = !!document.querySelector('.regsum .badge'); o.sw = document.documentElement.scrollWidth;
+    ui.dexMode = 'fam'; render(); o.fam = document.querySelectorAll('.dexgroup').length; ui.tab = 'map'; return o;
+  });
+  eq([r.before, r.a, r.b], [false, true, false]); eq(r.stars, 10); eq(r.item, 5); eq(r.stamp, 2); eq(r.flag, true); eq(r.groups, 9); ok(r.done); ok(r.sw <= 390); ok(r.fam > 5);
+  eq(s.errors, []); await s.close();
+});
+T('T4: 記念品は「全種」(dexList().length)まで受け取れる・既存の受取済みはそのまま', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => {
+    const o = {}; o.len = dexList().length; state.dexClaim = { 10: true, 20: true, 51: true };
+    const all = dexList(); all.forEach(x => { state.owned[x.id] = true; state.seen[x.id] = true; }); state.stars = 0;
+    o.keys = DEX_MS.map(dexKey); o.n = DEX_MS.map(x => x.n);
+    o.old = [dexMsClaim(10), dexMsClaim(20), dexMsClaim(51)];
+    let c = 0; DEX_MS.forEach(x => { if (dexMsClaim(dexKey(x))) c++; }); o.claimed = c; o.all = state.dexClaim.all; o.hakase = !!state.flags.hakase; o.top = Math.max(...DEX_MS.map(x => x.n));
+    o.again = DEX_MS.some(x => dexMsClaim(dexKey(x))); ui.tab = 'dex'; render(); o.got = document.querySelectorAll('.ms.got').length; o.tot = DEX_MS.length; ui.tab = 'map';
+    return o;
+  });
+  eq(r.old, [false, false, false], '既存の受取済みを再付与した'); eq(r.top, r.len, '最終段が全種'); ok(r.all && r.hakase); eq(r.again, false); eq(r.got, r.tot);
+  ok(r.n.includes(140) && r.n.includes(70) && r.n.includes(100)); ok(!JSON.stringify(r.keys.slice(0, -1)).includes('all')); eq(s.errors, []); await s.close();
+});
+T('T4: はじめて会った場所 seenAt(最初の1回だけ)、図鑑の詳細に出る', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => {
+    const o = {}; state.town = 'kasumi'; state.time = 3; delete state.seen.kurageru; delete state.seenAt; startBattle([['kurageru', 5]], { field: 'x', scene: 'inaka' }); o.a = state.seenAt.kurageru; B = null;
+    state.town = 'shiomi'; state.time = 0; startBattle([['kurageru', 5]], { field: 'x', scene: 'inaka' }); o.b = state.seenAt.kurageru; B = null;
+    o.text = seenAtText('kurageru'); delete state.seenAt.kurageru; o.none = seenAtText('kurageru'); return o;
+  });
+  eq(r.a, ['kasumi', 3, null]); eq(r.b, ['kasumi', 3, null], '上書きされた'); ok(r.text.includes('霞ヶ丘') && r.text.includes('夜'), r.text); ok(r.none.includes('記録なし')); eq(s.errors, []); await s.close();
+});
+T('T2/T4: 旧セーブ(新キーなし)でも新キーが補われ、最初の1歩から記録される', async () => {
+  const s = await open(); await makeOldSave(s, 1);
+  await s.ev(() => { const st = JSON.parse(localStorage.getItem(KEY)); delete st.detourN; localStorage.setItem(KEY, JSON.stringify(st)); });
+  await s.page.reload(); await s.page.waitForFunction(() => typeof state !== 'undefined' && state); await wait(600);
+  const r = await s.ev(() => { const k = ['foot', 'mpt', 'mptAll', 'stamps', 'detour', 'detourN', 'dexReg', 'seenAt'].map(x => state[x] != null); const m0 = state.mpt; owEnsureState(); state.ow = { map: 'urayama', x: MAPS.urayama.spawn.x, y: MAPS.urayama.spawn.y, dir: 'down' }; owFoot(); return { k, d: state.mpt - m0, v: state.v }; });
+  ok(r.k.every(Boolean), '補われないキー ' + r.k); eq(r.v, 1); eq(r.d, 1); eq(s.errors, []); await s.close();
+});
+T('T2/T4: foot・seenAt・stamps を全部埋めても 引き継ぎコード・クラウド保存の容量が小さい', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(async () => {
+    for (const id in MAPS) { const fi = footInfo(id); state.foot[id] = 'f'.repeat(Math.ceil(fi.nb / 4)); }
+    SPL.forEach(x => state.seenAt[x.id] = ['sango', 3, 'rain']); OW_STAMPS.forEach(d => state.stamps[d[0]] = 1); for (const id in MAPS) state.stamps[id] = 2; TOWNS.forEach(t => state.stamps['reg:' + t.id] = 2);
+    const json = JSON.stringify(state), code = saveCode(), back = readCode(code); const pk = await packState(state);
+    return { json: json.length, code: code.length, same: JSON.stringify(back) === json, z: pk.z ? pk.z.length : -1, foot: JSON.stringify(state.foot).length, seenAt: JSON.stringify(state.seenAt).length };
+  });
+  ok(r.same, '読み直した内容が違う'); console.log(`      json ${r.json}B / 引き継ぎコード ${r.code}字 / gzip+b64 ${r.z}字 (foot ${r.foot}B, seenAt ${r.seenAt}B)`);
+  ok(r.foot < 6000 && r.seenAt < 6000, 'foot/seenAt が大きい'); ok(r.z > 0 && r.z < 100000, 'クラウド保存が大きい ' + r.z); eq(s.errors, []); await s.close();
+});
+
 (async () => {
   await new Promise(r => server.listen(0, r)); port = server.address().port;
   browser = await chromium.launch();
