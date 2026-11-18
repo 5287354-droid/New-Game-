@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="4a30e3d4b0";</script>
+<script>window.JG_APP=true;window.JG_VER="6edbd271f5";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -56,6 +56,23 @@ h1{font-size:clamp(28px,6vw,44px)} h2{font-size:24px} h3{font-size:18px} h4{font
 .tchip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;border:1px solid var(--tc);color:var(--tc);font-size:13px}
 .shflash{position:fixed;inset:0;z-index:99;background:#fff;pointer-events:none;animation:shflash .5s ease-out forwards}
 @keyframes shflash{0%{opacity:.9}100%{opacity:0}}
+/* 駅サイン調の演出: 黒い帯が左から流れ込み、白フラッシュと画面揺れを合わせる(光のにじみなし) */
+.sgfx{position:fixed;inset:0;z-index:98;pointer-events:none;overflow:hidden}
+.sgfx .sg-fl{position:absolute;inset:0;background:#fff;opacity:0;animation:sgfl .28s ease-out}
+.sgfx .sg-bar{position:absolute;left:0;right:0;top:36%;background:#000;border-top:3px solid #fff;border-bottom:3px solid #fff;padding:14px 18px 14px 22px;display:flex;align-items:center;gap:14px;transform:translateX(-105%);animation:sgin .32s cubic-bezier(.2,.8,.2,1) .06s forwards,sgout .3s ease-in 1.9s forwards}
+.sgfx .sg-bar::before{content:"";align-self:stretch;width:10px;background:var(--sc,#62c46e);flex:none}
+.sgfx .sg-code{font-family:var(--f-num,'Barlow Condensed',sans-serif);font-weight:700;font-size:30px;color:#000;background:#fff;padding:0 8px;border-radius:3px;flex:none}
+.sgfx .sg-t{font-family:var(--f-disp);font-weight:700;color:#fff;line-height:1.2;min-width:0}
+.sgfx .sg-t small{display:block;font-size:12px;letter-spacing:.2em;color:var(--sc,#62c46e)}
+.sgfx .sg-t b{display:block;font-size:26px;overflow-wrap:anywhere}
+.sgfx .sg-ln{position:absolute;left:0;right:0;height:3px;background:var(--sc,#62c46e);transform:translateX(-105%);animation:sgin .4s ease-out forwards,sgout .3s ease-in 1.9s forwards}
+@keyframes sgfl{0%{opacity:.85}100%{opacity:0}}
+@keyframes sgin{to{transform:none}}
+@keyframes sgout{to{transform:translateX(105%)}}
+body.sgshake .shell{animation:sgshk .36s steps(1,end)}
+@keyframes sgshk{0%{translate:0 0}14%{translate:-6px 2px}28%{translate:6px -2px}43%{translate:-4px 1px}58%{translate:4px -1px}72%{translate:-2px 0}100%{translate:0 0}}
+@media (prefers-reduced-motion:reduce){.sgfx .sg-fl{display:none}.sgfx .sg-bar,.sgfx .sg-ln{transform:none;animation:none!important}body.sgshake .shell{animation:none}}
+
 .mk.sh{background:linear-gradient(90deg,#ff7a8a,#ffd24a,#6ad8a0,#6aa0ff);color:#1a1020}
 .wxrow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.wxc{display:flex;flex-direction:column;gap:2px;padding:6px 8px;border-left:4px solid var(--tc);background:color-mix(in srgb,var(--tc) 12%,transparent);min-height:58px}.wxc small{font-size:11px;opacity:.8}.wxc b{font-size:16px}.wxc.now b{color:var(--tc)}.wxh{display:flex;gap:2px;flex-wrap:wrap}.wxh .seal{width:24px;height:24px}
 .tchip i{width:8px;height:8px;border-radius:50%;background:var(--tc);box-shadow:0 0 8px var(--tc)}
@@ -573,6 +590,8 @@ img,canvas{-webkit-user-drag:none;user-drag:none}
 .shell.walking #owc{width:auto;height:auto}
 .ow-toast{position:absolute;left:50%;top:44px;transform:translateX(-50%);max-width:calc(100% - 24px);width:max-content;padding:6px 12px;border-radius:8px;background:var(--win);border:2px solid var(--accent);font-family:var(--f-disp);font-size:14px;animation:slideIn .3s ease-out;pointer-events:none}
 .ow-pad{--pd:clamp(168px,22dvh,190px)}
+.ow-pad.has-back{--pd:min(clamp(168px,22dvh,190px),calc((min(100vw,var(--shellw,100vw)) - 130px)/1.84))}
+.ow-pad.has-back .ow-back{min-width:52px;min-height:48px;flex:none;padding:6px 6px}
 .shell.walking{gap:6px}.shell.walking .ow-pad{padding:0 10px}
 @media (orientation:landscape) and (max-height:520px){.shell.walking .ow{position:relative}.shell.walking .ow-pad{--pd:clamp(120px,40dvh,170px);position:absolute;left:0;right:0;bottom:0;pointer-events:none}.shell.walking .ow-pad .dpad,.shell.walking .ow-pad .abtn,.shell.walking .ow-pad .ow-back{pointer-events:auto;opacity:.85}}
 .ow-pad .dpad{width:var(--pd);height:var(--pd)}
@@ -588,7 +607,7 @@ img,canvas{-webkit-user-drag:none;user-drag:none}
 .shell.inbattle .main{overflow:hidden;padding-bottom:0}
 .shell .battle{height:100%;min-height:0;display:flex;flex-direction:column;gap:6px}
 .shell .bhead{flex:none;flex-wrap:nowrap;gap:8px;min-width:0;align-items:center}
-.shell .bhead h3{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+.shell .bhead h3{font-size:15px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;min-width:0;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .shell .bhead .small{display:none}
 .shell .stage{flex:1 0 auto;min-height:0;padding:10px 6px 6px}
 .shell .side.foes{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
@@ -686,7 +705,7 @@ body.bshake2 .battle{animation:bshk2 .42s linear}
 .tg b{font:700 12px var(--f-num);color:var(--muted)}
 .tg[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .tg[aria-pressed="true"] b{color:var(--accent-ink)}
-.shell .bhead{gap:6px}.shell .bhead .tag{padding:4px 7px;font-size:12px}.shell .bhead h3{font-size:14px}.shell .bhead .lv{font-size:13px;white-space:nowrap}
+.shell .bhead{gap:6px}.shell .bhead .tag{padding:4px 7px;font-size:12px}.shell .bhead h3{font-size:13px}.shell .bhead .lv{font-size:13px;white-space:nowrap}
 .shell .cmd{max-height:54%}
 .shell .cmd .cmdmain{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .shell .cmd .cmdmain .btn{min-height:58px;font-size:18px;font-weight:900;letter-spacing:.04em;padding:6px}
@@ -5993,6 +6012,10 @@ function owThin(m,o){
     talk([['','湖じゅうの氷が、いっせいに鳴りひびいた……！'],['','氷の下から、光るものが浮かび上がってきた。'],['',Object.entries(tp.items).map(([it,n])=>`${ITEMS[it].n}×${n}`).join('と')+'を手に入れた！'],['','割れた氷は、またたく間に凍りなおした。']]);return true;}}
   return false;}
 /* 時間帯・天気のお知らせ帯(マップ上部、2秒)。天気は T1 が owWeatherNote / owWeatherChip を上書きして足す */
+const OWVIG={};
+/* 円形のくもりを毎フレーム作らず、W*2 x H*2 の画像に一度だけ描いて使いまわす(中心=画像の中央) */
+function owVigCache(col,r0,r1,a,W,H){const k=col+'|'+r0+'|'+r1+'|'+a+'|'+W+'|'+H;let v=OWVIG[k];if(v)return v;
+  v=document.createElement('canvas');v.width=W*2;v.height=H*2;const x=v.getContext('2d'),g=x.createRadialGradient(W,H,r0,W,H,r1);g.addColorStop(0,`rgba(${col},0)`);g.addColorStop(1,`rgba(${col},${a})`);x.fillStyle=g;x.fillRect(0,0,W*2,H*2);OWVIG[k]=v;return v;}
 const WX_NOTE={ame:'雨が降りだした',kiri:'霧が出てきた',yuki:'雪が降りだした',hai:'火山灰が降ってきた',hoshi:'星が降りはじめた',kumo:'空がくもってきた',hare:'空が晴れてきた'};
 function owWeatherNote(){
   const tw=state.town,cur=wxNow(tw),prev=wxOf(tw,-1);if(cur===prev)return '';
@@ -6025,7 +6048,7 @@ function owWxFx(c,m){
     for(let i=0;i<7;i++){const ph=((now/700+i*.37)%1);if(ph<.5)c.fillRect(Math.round((i*97+31)%W),Math.round(Hh*.35+((i*53)%(Hh*.6))),Math.round(2+ph*6),1);}
     return;}
   if(wx==='kiri'){
-    const col=nt?'26,32,48':'214,222,230',r1=state.time===0?72:84;c.save();const g=c.createRadialGradient(fx,fy,28,fx,fy,r1);g.addColorStop(0,`rgba(${col},0)`);g.addColorStop(1,`rgba(${col},.93)`);c.fillStyle=g;c.fillRect(0,0,W,Hh);
+    const col=nt?'26,32,48':'214,222,230',r1=state.time===0?72:84;c.save();c.drawImage(owVigCache(col,28,r1,.93,W,Hh),Math.round(fx-W),Math.round(fy-Hh));
     c.fillStyle=`rgba(${col},.16)`;for(let i=0;i<5;i++){const tt=now/4200+i;c.fillRect(((Math.sin(tt)*.5+.5)*W+i*37)%W-20,(i*31)%Hh,56,9);}c.restore();return;}
   if(wx==='yuki'){
     c.fillStyle='rgba(190,214,245,.1)';c.fillRect(0,0,W,Hh);
@@ -6406,7 +6429,7 @@ function renderOverworld(){
   return `<section class="ow" aria-label="${m.name}のマップ">
     <div class="ow-screen"><div class="ow-cv"><canvas id="owc" width="${OWC.vw*TS*OWSCALE}" height="${OWC.vh*TS*OWSCALE}" aria-label="${m.name}を見下ろしたマップ。主人公が立っている"></canvas>
       <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}${owWxOutdoor(m)?' ・ '+WX[owWxId()].n:''}</span><div class="ow-sub">${owSubHtml(m)}</div></div>${ui.stampCur?stampHtml(ui.stampCur):''}${ui.band?`<div class="ow-band" style="--tc:${ui.band.c}" role="status"><b>${esc(ui.band.text)}</b></div>`:''}${ui.heal?`<button class="ow-heal" data-act="owHeal">${esc(ui.heal)}</button>`:''}${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
-    <div class="ow-pad">
+    <div class="ow-pad${state.ow.map!==m.town?' has-back':''}">
       <div class="dpad">${['up','left','right','down'].map(d=>`<button class="dp dp-${d}" data-owdir="${d}" aria-label="${{up:'上',down:'下',left:'左',right:'右'}[d]}">${{up:'▲',down:'▼',left:'◀',right:'▶'}[d]}</button>`).join('')}<span class="dp-c"></span></div>
       ${state.ow.map!==m.town?`<button class="ow-back${ui.owBack?' on':''}" data-act="owBack" aria-label="町の駅へもどる">${ui.owBack?'もう一度で<br>もどる':'駅へ<br>もどる'}</button>`:''}
       <div class="abtn"><button class="ob ob-b" data-owb="1" aria-label="Bボタン(押しているあいだ走る)">B</button><button class="ob ob-a" data-act="owA" aria-label="Aボタン(調べる・話す)">A</button></div>
@@ -7289,6 +7312,13 @@ function lowest(list){return list.filter(alive).sort((x,y)=>x.hp/x.st.hp-y.hp/y.
 const WILDRW=[{makimono:2,tane:2},{kai:2,kettou:1},{saino:2},{tenpu:1,saino:2},{tenpu:2,kakusei:1}];
 const wildLv=(lv,n)=>Math.round(lv*(1+.1*n))+4*n;
 /* 色違いの登場: 画面が一度白く光る(0.5秒) */
+
+/* 新駅発見・覚醒の演出。kind: 'station' | 'awaken'。ジングルと同時に、フラッシュ→揺れ→帯が流れ込む */
+function signFx(kind,o){if(!document.body)return;jingle(kind);const old=document.getElementById('sgfx');if(old)old.remove();
+  const d=document.createElement('div');d.id='sgfx';d.className='sgfx';d.setAttribute('role','status');d.style.setProperty('--sc',o.c||'#62c46e');
+  d.innerHTML=`<i class="sg-fl"></i><i class="sg-ln" style="top:calc(36% - 12px);animation-delay:0s"></i><i class="sg-ln" style="top:calc(36% + 74px);animation-delay:.1s"></i><div class="sg-bar">${o.code?`<span class="sg-code">${esc(o.code)}</span>`:''}<div class="sg-t"><small>${esc(o.sub)}</small><b>${esc(o.title)}</b></div></div>`;
+  document.body.appendChild(d);if(!REDUCED){document.body.classList.add('sgshake');setTimeout(()=>document.body.classList.remove('sgshake'),400);}
+  setTimeout(()=>d.remove(),REDUCED?1500:2300);}
 function shinyFlash(){if(REDUCED||!document.body)return;const d=document.createElement('div');d.className='shflash';document.body.appendChild(d);setTimeout(()=>d.remove(),600);}
 function startBattle(foes,opt){
   const allies=state.party.filter(m=>m.hp>0).map(m=>comb(m,'ally'));
@@ -7763,7 +7793,7 @@ function explore(fid){
 const H={
   starter:d=>{const m=newMon(d.id,3,{talent:randTalent(8,12)});m.gen=0;state.party=[m];state.owned[d.id]=true;state.seen[d.id]=true;state.started=true;state.flags.intro=true;state.flags.v2=true;state.flags.gacha=true;state.stars=50;state.login={last:dayKey(),streak:1};ui.sel=m.uid;ui.toast=`${SP[d.id].name}が相棒になった！ まずは田んぼのあぜ道でなかまをスカウトしよう。`;save();render();talk(STORY.intro);},
   tab:d=>{ui.tab=d.v;ui.toast='';ui.confirmRel=false;ui.renaming=false;ui.detailOpen=false;sfx('sel');render();scrollTop0();},
-  town:d=>{const t=TOWN[d.id];if(!townOpen(t))return;state.town=d.id;if(MAPS[d.id]){const s=MAPS[d.id].station;state.ow={map:d.id,x:s.x,y:s.y,dir:s.dir};owFoot();ui.station=false;ui.inside=null;OWC.cars=null;}ui.toast=`ミチクサ線で${t.name}へ移動した。`;save();render();const fk='visit_'+d.id;if(STORY[fk]&&!state.flags[fk]){state.flags[fk]=true;save();talk(STORY[fk]);}},
+  town:d=>{const t=TOWN[d.id];if(!townOpen(t))return;state.town=d.id;if(MAPS[d.id]){const s=MAPS[d.id].station;state.ow={map:d.id,x:s.x,y:s.y,dir:s.dir};owFoot();ui.station=false;ui.inside=null;OWC.cars=null;}ui.toast=`ミチクサ線で${t.name}へ移動した。`;save();render();const fk='visit_'+d.id;if(d.id!=='komorebi'&&!state.flags['arr_'+d.id]&&!state.flags[fk]){state.flags['arr_'+d.id]=true;save();signFx('station',{c:TLC[d.id],code:t.code,sub:'新駅発見 NEW STATION',title:t.name});}if(STORY[fk]&&!state.flags[fk]){state.flags[fk]=true;save();talk(STORY[fk]);}},
   explore:d=>explore(d.f),
   ura:()=>{const t=TOWN[state.town];if(!t.ura||!state.boss[t.id])return;startBattle(t.ura.foes,{boss:true,ura:true,town:t.id,field:t.ura.title,scene:t.ura.scene});},
   sainoOpen:()=>{ui.sainoPick=ui.sainoPick===ui.sel?null:ui.sel;ui.tenpuAsk=null;render();},
@@ -7816,7 +7846,7 @@ const H={
   xchg:()=>{const t=dayKey();if(!state.xchg||state.xchg.d!==t)state.xchg={d:t,n:0};if(state.xchg.n>=5||state.yen<10000)return;state.yen-=10000;state.xchg.n++;addStars(1);sfx('sel');save();render();},
   awaken0:()=>{ui.awakeAsk=null;render();},
   awaken:()=>{const m=findMon(ui.sel);if(!m)return;const ev=SP[m.sp].evo;if(!ev||m.lv<80||!(state.items.kakusei>0))return;if(ui.awakeAsk!==m.uid){ui.awakeAsk=m.uid;render();return;}
-    const before=SP[m.sp].name;state.items.kakusei--;m.sp=ev;m.traits=m.traits.map(t=>t==='shishin'?'sousei':t);if(!m.traits.includes('sousei'))m.traits[0]='sousei';learn(m);const st=calc(m);m.hp=st.hp;m.mp=st.mp;state.owned[ev]=true;state.seen[ev]=true;if(m.shiny)state.shinySeen[ev]=true;ui.awakeAsk=null;sfx('shiny');save();render();
+    const before=SP[m.sp].name;state.items.kakusei--;m.sp=ev;m.traits=m.traits.map(t=>t==='shishin'?'sousei':t);if(!m.traits.includes('sousei'))m.traits[0]='sousei';learn(m);const st=calc(m);m.hp=st.hp;m.mp=st.mp;state.owned[ev]=true;state.seen[ev]=true;if(m.shiny)state.shinySeen[ev]=true;ui.awakeAsk=null;save();render();signFx('awaken',{c:'#f2b13c',sub:'覚醒 AWAKENING',title:SP[ev].name});
     talk([['',`${before}が、まばゆい光につつまれた……！`],['',`${SP[ev].name}に覚醒した！ 創世ランクになり、レベル上限が${capLv(m)}になった。`]]);},
   bclear:()=>{ui.bA=ui.bB=null;ui.bSlot='A';ui.inh=[];ui.trs=[];ui.cats=[];ui.btab='pick';render();},
   bset:d=>{ui.bA=+d.a;ui.bB=+d.b;ui.bSlot='B';ui.inh=[];ui.trs=[];ui.btab='set';render();scrollTop0();},
