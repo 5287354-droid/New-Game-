@@ -58,3 +58,5 @@ bgm_nirai,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を We
 bgm_yomi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
 bgm_orochi,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
 bgm_tokoyo,BGM,MML風の文字列(arrange/thicken で伴奏を自動生成)を Web Audio で合成。外部素材なし,ミチクサ鉄道の制作チーム(Claude),2026-11,自作・商用可
+bgm_mabo,BGM,オルゴールと発車ベル風の自作フレーズ(MML風の文字列)を Web Audio で合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
+sfx_fumikiri,SE,Web Audio API(OscillatorNode)で実行時に合成。外部素材なし,sound-lab(Claude),2026-11-18,自作・商用可
