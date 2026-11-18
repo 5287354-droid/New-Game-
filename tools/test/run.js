@@ -226,9 +226,9 @@ T('T2: 全マップで踏破100%が到達可能(歩ける区画が1つ以上、�
   eq(r.bad, [], '歩ける区画がないマップ'); console.log(`      ${r.n}マップ / 到達判定で外れたマスがあるマップ: ${r.skipped.length}件 ${r.skipped.slice(0, 8).join(' ')}`);
   eq(s.errors, []); await s.close();
 });
-T('T2: しかけスタンプ16種がすべて取れる(関数を呼ぶ + ソースにフックがある)', async () => {
+T('T2: しかけスタンプ18種がすべて取れる(関数を呼ぶ + ソースにフックがある)', async () => {
   const s = await open(); await startGame(s);
-  const ids = await s.ev(() => OW_STAMPS.map(d => d[0])); eq(ids.length, 16);
+  const ids = await s.ev(() => OW_STAMPS.map(d => d[0])); eq(ids.length, 18);
   for (const id of ids) ok(GAME_SRC.split(`owStamp('${id}')`).length > 2 || GAME_SRC.includes(`owStamp('${id}')`), id + ' のフックがない');
   const r = await s.ev(() => {
     const got = {}, mark = id => { got[id] = !!state.stamps[id]; };
@@ -240,11 +240,11 @@ T('T2: しかけスタンプ16種がすべて取れる(関数を呼ぶ + ソー�
     const fake = { cars: { lanes: [{ y: 7 }] }, floats: [], wind: true, aurora: true };
     const O = { x: 1, y: 7 }; const tide = owTideHigh; const pg = owPedGreen; window.owPedGreen = () => 'go'; owStampTiles(fake, O, 'a'); window.owPedGreen = pg; mark('g:signal'); mark('g:aurora');
     state.time = 1; owStampTiles(fake, O, 'U'); mark('g:tide'); state.stamps['g:gust'] || (owGust = () => 'gust'); owStampTiles(fake, O, 'H'); mark('g:gust');
-    for (const id of ['g:power', 'g:ride', 'g:geyser', 'g:float', 'g:ring', 'g:mirror']) { owStamp(id); mark(id); }
+    for (const id of ['g:power', 'g:ride', 'g:geyser', 'g:float', 'g:ring', 'g:mirror', 'g:ghost', 'g:fog']) { owStamp(id); mark(id); }
     return { got, n: OW_STAMPS.filter(d => state.stamps[d[0]]).length, mpt: state.mpt };
   });
   const miss = Object.entries(r.got).filter(([, v]) => !v).map(([k]) => k); eq(miss, [], '取れないスタンプ');
-  eq(r.n, 16); ok(r.mpt >= 80, 'しかけ16種で +5点ずつ'); eq(s.errors.filter(e => !/owPedGreen|assign to const/.test(e)), []); await s.close();
+  eq(r.n, 18); ok(r.mpt >= 80, 'しかけ18種で +5点ずつ'); eq(s.errors.filter(e => !/owPedGreen|assign to const/.test(e)), []); await s.close();
 });
 T('T2: 寄り道ボーナスの段(10区画ごとに1段、最大5段)・駅に戻ると0・戦闘に倍率', async () => {
   const s = await open(); await startGame(s);
@@ -284,7 +284,7 @@ T('T2: みちくさ帳の交換(点が足りないと不可・1日1回・累計1
   });
   eq(r.poor, false); eq([r.k, r.kai, r.s1, r.s2, r.st1, r.st2, r.t1, r.t2], [true, true, true, false, true, false, true, false]);
   eq(r.items, [1, 1, 1, 1]); eq(r.stars, 10); eq(r.mpt, 600 - 15 - 40 - 80 - 50 - 400);
-  eq(r.t0, ''); eq(r.t1x, 'みちくさ名人'); eq(r.inside, 'mchi'); eq(r.html, 5); eq(r.stamps, 16);
+  eq(r.t0, ''); eq(r.t1x, 'みちくさ名人'); eq(r.inside, 'mchi'); eq(r.html, 5); eq(r.stamps, 18);
   eq(s.errors, []); await s.close();
 });
 T('T2: 画面(みちくさ帳)は390pxでもはみ出さず、ボタンが44px以上', async () => {
@@ -392,10 +392,10 @@ T('T1: 星降りは夜だけ。天候限定の7体はその天気の時だけ出
       for (const w of WXK) for (let tm = 0; tm < 4; tm++) { const has = wxTable(f.table, tm, w).some(x => x.s === sp), want = w === wx && (sp === 'kumozumi' ? tm >= 2 : true); if (has !== want) bad.push(`${sp} ${w} t${tm} has=${has}`); if (has) hit.push(sp); } }
     let star = 0; state.time = 0; for (let i = 0; i < 500; i++) { state.wxN = i; if (wxOf('komorebi') === 'hoshi') star++; }
     let starN = 0; state.time = 3; for (let i = 0; i < 500; i++) { state.wxN = i; if (wxOf('komorebi') === 'hoshi') starN++; }
-    return { bad, n: new Set(hit).size, star, starN, spl: SPL.slice(-7).map(x => x.id) };
+    return { bad, n: new Set(hit).size, star, starN, spl: SPL.slice(-8, -1).map(x => x.id), last: SPL[SPL.length - 1].id };
   });
   eq(r.bad, [], '出現のずれ'); eq(r.n, 7); eq(r.star, 0, '昼に星降り'); ok(r.starN > 0, '夜に星降りが出ない');
-  eq(r.spl, ['amayadori', 'kirigarasu', 'nijimimizu', 'yukiwata', 'haikagura', 'kumozumi', 'hoshikuzume'], 'S() の末尾に追加されていない'); await s.close();
+  eq(r.spl, ['amayadori', 'kirigarasu', 'nijimimizu', 'yukiwata', 'haikagura', 'kumozumi', 'hoshikuzume'], 'S() の末尾に追加されていない'); eq(r.last, 'mabonokoshou', 'T8 の新種が末尾でない'); await s.close();
 });
 T('T1: 既存の n/d タグは時間だけで決まる(天気に左右されない)', async () => {
   const s = await open();
@@ -405,7 +405,7 @@ T('T1: 既存の n/d タグは時間だけで決まる(天気に左右されな�
 });
 T('T1: 全7体の絵が描け、目が入っている(例外なし・透明でない)', async () => {
   const s = await open();
-  const r = await s.ev(async () => { const out = []; for (const id of SPL.slice(-7).map(x => x.id)) { const u = sprite(id), im = new Image(); im.src = u; await im.decode(); const c = document.createElement('canvas'); c.width = c.height = 192; const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, 192, 192).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 200) n++; out.push([id, n]); } return out; });
+  const r = await s.ev(async () => { const out = []; for (const id of SPL.slice(-8, -1).map(x => x.id)) { const u = sprite(id), im = new Image(); im.src = u; await im.decode(); const c = document.createElement('canvas'); c.width = c.height = 192; const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, 192, 192).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 200) n++; out.push([id, n]); } return out; });
   for (const [id, n] of r) ok(n > 1500, id + ' が小さい/空: ' + n); await s.close();
 });
 T('T1: 屋外だけ画面効果、霧は5マスの見える範囲、雨は遭遇率1.15倍、音のフック', async () => {
@@ -480,11 +480,177 @@ T('T1: 駅のみちくさ便りが出て、予報どおり(3コマ)', async () =
   ok(r.has && r.cells === 3, 'みちくさ便りなし'); eq(s.errors, []); await s.close();
 });
 
+/* ---- T8 まぼろし駅 ---- */
+const T8_STAGE = s => s.ev(() => { H.starter({ id: 'ibote' }); ui.dlg = null; state.bgm = false; state.sound = false; state.boss = { komorebi: true, kasumi: true }; state.town = 'kasumi'; state.time = 3; window.wxNow = () => 'kiri'; ui.tab = 'map'; ui.station = false; ui.inside = null; ui.toast = ''; state.ow = null; owEnsureState(); render(); });
+const T8_ENTER = s => s.ev(() => { ui.station = true; render(); H.mabo(); ui.dlg = null; document.querySelectorAll('.mabo-fx').forEach(e => e.remove()); });
+const T8_CLOCK = s => s.ev(() => { window.__rd = Date.now.bind(Date); window.__fix = true; window.__T = 0; Date.now = () => window.__fix ? window.__T : window.__rd(); });
+T('T8: 入口は 霧×夜×霞ヶ丘撃破 のときだけ(路線図と駅に出る/ほかでは出ない)', async () => {
+  const s = await open(); await T8_STAGE(s);
+  const r = await s.ev(() => {
+    const bad = []; let n = 0;
+    for (const boss of [true, false]) for (const w of WXK) for (let tm = 0; tm < 4; tm++) {
+      state.boss = boss ? { komorebi: true, kasumi: true } : { komorebi: true }; state.time = tm; window.wxNow = () => w; ui.station = true; render();
+      const open = maboOpen(), want = boss && w === 'kiri' && tm === 3, rail = !!document.querySelector('.rail .station.mabo'), note = !!document.querySelector('.mabo-note');
+      if (open !== want || rail !== want || note !== want) bad.push(`${boss} ${w} t${tm}: open=${open} rail=${rail} note=${note}`); if (want) n++;
+    }
+    state.boss = { komorebi: true, kasumi: true }; state.time = 3; window.wxNow = () => 'kiri'; ui.station = true; render();
+    const rail = [...document.querySelectorAll('.rail .station')].map(e => e.className.split(' ').filter(c => ['cur', 'mabo', 'locked'].includes(c)).join('+'));
+    return { bad, n, rail, sw: document.documentElement.scrollWidth };
+  });
+  eq(r.bad, [], '出る/出ないがずれた'); eq(r.n, 1); eq(r.rail[1], 'cur'); eq(r.rail[2], 'mabo', '現在の駅の次に ？？ が出ない'); ok(r.sw <= 390, '横にはみ出す');
+  eq(s.errors, []); await s.close();
+});
+T('T8: 乗ると着く(flags.mabo・ジングル・演出)。保存→再読み込みでも、歩いて駅へ戻れる', async () => {
+  const s = await open(); await T8_STAGE(s);
+  const r = await s.ev(() => {
+    const o = {}; const jn = []; const j0 = window.jingle; window.jingle = n => { jn.push(n); }; o.before = state.flags.mabo; ui.station = true; render(); H.mabo(); window.jingle = j0;
+    o.after = state.flags.mabo; o.jingle = jn; o.map = state.ow.map; o.town = state.town; o.fx = !!document.querySelector('.mabo-fx'); o.fxFirst = !!document.querySelector('.mabo-fx.first'); o.owActive = owActive(); o.walk = !!document.getElementById('owc');
+    o.stateTown = TOWNS.some(t => t.id === state.town); return o;
+  });
+  eq(r.before, undefined); eq(r.after, true); eq(r.jingle, ['station']); eq(r.map, 'maboroshi'); eq(r.town, 'kasumi'); ok(r.fx && r.fxFirst, '到着演出がない'); ok(r.owActive && r.walk, '歩けない'); ok(r.stateTown);
+  await wait(300); await s.ev(() => { state.time = 3; save(); }); await s.page.reload(); await s.page.waitForFunction(() => typeof state !== 'undefined' && state); await wait(600);
+  const r2 = await s.ev(() => { window.wxNow = () => 'hare'; state.time = 1; owEnsureState(); const o = { map: state.ow.map, town: state.town, flag: state.flags.mabo, open: maboOpen() };
+    ui.tab = 'map'; ui.station = false; render(); o.active = owActive();
+    owBackToTown(); o.ask = ui.owBack; owBackToTown(); o.back = state.ow.map; o.sameStation = state.ow.x === MAPS.kasumi.station.x && state.ow.y === MAPS.kasumi.station.y; return o; });
+  eq(r2.map, 'maboroshi', '再読み込みで中にいる'); eq(r2.town, 'kasumi'); eq(r2.flag, true); eq(r2.open, false, '天気が変わっても戻りは使える(入口は閉じてよい)'); ok(r2.active); eq(r2.ask, true); eq(r2.back, 'kasumi'); ok(r2.sameStation);
+  eq(s.errors, []); await s.close();
+});
+T('T8: ホームの端・終点の鐘からも駅へ戻れ、中で負けても町の銭湯側へ戻る(閉じ込めない)', async () => {
+  const s = await open(); await T8_STAGE(s); await T8_ENTER(s);
+  const r = await s.ev(() => {
+    const o = {};
+    for (const k of Object.keys(MAPS.maboroshi.warps)) { const [x, y] = k.split(',').map(Number); state.ow = { map: 'maboroshi', x, y, dir: 'right' }; OWC.mv = null; owArrive(); o[k] = [state.ow.map, state.ow.x === MAPS.kasumi.station.x]; ui.dlg = null; ui.station = false; }
+    state.ow = { map: 'maboroshi', x: 30, y: 30, dir: 'down' }; ui.station = false; render();
+    startBattle([['dokudamin', 5]], { field: 'まぼろし駅・夢の野原', scene: 'subway' }); lose(); o.lose = state.ow.map; o.loseTown = state.town; B = null; ui.result = null; return o;
+  });
+  eq(r['1,44'], ['kasumi', true]); eq(r['56,5'], ['kasumi', true]); eq(r.lose, 'kasumi'); eq(r.loseTown, 'kasumi'); eq(s.errors, []); await s.close();
+});
+T('T8: 60x50。入口から全ての重要地点(落とし物5つ・出口・終点・新種のT)へ行け、改札はレバーの先・どの足場も岸が近く・いつでも戻れる(BFS)', async () => {
+  const s = await open();
+  const D = await s.ev(() => { const m = MAPS.maboroshi; return { rows: m.rows, objs: m.objs, items: m.items, npcs: m.npcs, warps: m.warps, spawn: m.spawn, goal: m.goal, solid: OW_SOLID }; });
+  const W = D.rows[0].length, H = D.rows.length; eq([W, H], [60, 50]); ok(D.rows.every(r => r.length === 60), '行の長さがそろっていない');
+  const tile = (x, y) => (D.rows[y] || '')[x]; const solidObj = new Set(); const lever = D.objs.find(o => o[0] === 'lever'), shutters = D.objs.filter(o => o[0] === 'shutter');
+  for (const [k, x, y, w = 1, h = 1] of D.objs) { if (k === 'shutter') continue; for (let a = 0; a < w; a++) for (let b = 0; b < h; b++) solidObj.add((x + a) + ',' + (y + b)); }
+  for (const k in D.items) solidObj.add(k); D.npcs.forEach(n => solidObj.add(n.x + ',' + n.y));
+  const walk = (x, y, gate, fog) => { const c = tile(x, y); if (c === undefined || x < 0 || y < 0) return false; if (D.solid.includes(c)) return false; if (c === 'f' && fog) return false; if (solidObj.has(x + ',' + y)) return false; if (!gate && shutters.some(o => o[1] === x && o[2] === y)) return false; return true; };
+  const D4 = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  const bfs = (gate, fog, from) => { const seen = new Set([from.join(',')]), q = [from]; while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of D4) { const nx = x + dx, ny = y + dy, k = nx + ',' + ny; if (!seen.has(k) && walk(nx, ny, gate, fog)) { seen.add(k); q.push([nx, ny]); } } } return seen; };
+  const near = (set, x, y) => D4.some(([dx, dy]) => set.has((x + dx) + ',' + (y + dy)));
+  const sp = [D.spawn.x, D.spawn.y], closed = bfs(false, false, sp), reach = bfs(true, false, sp);
+  ok(closed.has(sp.join(',')));
+  ok(near(closed, lever[1], lever[2]), 'レバーに行けない(改札があかない)');
+  ok(shutters.every(o => !closed.has(o[1] + ',' + o[2])), '改札が最初から通れる'); ok(reach.has(D.goal.x + ',' + D.goal.y), '改札をあけても終点に行けない'); ok(!closed.has(D.goal.x + ',' + D.goal.y), 'レバーなしで終点に行ける');
+  for (const k in D.items) { const [x, y] = k.split(',').map(Number); ok(near(reach, x, y), `落とし物 ${D.items[k]} (${k}) に行けない`); }
+  eq(Object.keys(D.items).length, 5); ok(['saino', 'tenpu'].every(i => Object.values(D.items).includes(i)), '才能のかけら・天賦の宝珠');
+  for (const k in D.warps) ok(reach.has(k), `出口 ${k} に行けない`);
+  for (const n of D.npcs) ok(near(reach, n.x, n.y), n.id + ' に話しかけられない');
+  let T = 0, Tin = 0; for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (tile(x, y) === 'T') { T++; if (reach.has(x + ',' + y)) Tin++; } ok(Tin >= 450 && Tin === T, `遭遇するT(新種の出現場所)に行けない: ${Tin}/${T}`);
+  const back = bfs(true, false, [1, 44]); eq([...reach].filter(k => !back.has(k)), [], '出口に戻れないマスがある');
+  for (const fog of [true, false]) { const f = bfs(true, fog, sp); ok(f.has('1,44') && f.has(sp.join(',')), '霧のときに入口ホームが閉じる'); }
+  const foggy = bfs(true, true, sp); ok(![...foggy].some(k => tile(...k.split(',').map(Number)) === 'f'), '霧のときに足場に立てる');
+  const fs_ = []; for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (tile(x, y) === 'f') fs_.push([x, y]); ok(fs_.length >= 20, '足場が少ない');
+  const isLand = (x, y) => walk(x, y, true, true); let worstExit = 0, worstCross = 0;
+  for (const [fx, fy] of fs_) { const d = new Map([[fx + ',' + fy, 0]]), q = [[fx, fy]]; let ex = null; while (q.length) { const [x, y] = q.shift(); const dd = d.get(x + ',' + y); for (const [dx, dy] of D4) { const nx = x + dx, ny = y + dy, k = nx + ',' + ny; if (d.has(k)) continue; if (isLand(nx, ny)) { if (ex === null) ex = dd + 1; continue; } if (tile(nx, ny) === 'f') { d.set(k, dd + 1); q.push([nx, ny]); } } } ok(ex !== null, `足場 ${fx},${fy} から岸に出られない`); worstExit = Math.max(worstExit, ex); }
+  const comps = []; { const seen = new Set(); for (const [fx, fy] of fs_) { if (seen.has(fx + ',' + fy)) continue; const c = [[fx, fy]], q = [[fx, fy]]; seen.add(fx + ',' + fy); while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of D4) { const k = (x + dx) + ',' + (y + dy); if (!seen.has(k) && tile(x + dx, y + dy) === 'f') { seen.add(k); c.push([x + dx, y + dy]); q.push([x + dx, y + dy]); } } } comps.push(c); } }
+  for (const c of comps) { const lands = new Map(); for (const [x, y] of c) for (const [dx, dy] of D4) if (isLand(x + dx, y + dy)) lands.set((x + dx) + ',' + (y + dy), [x, y]); const ks = [...lands.keys()]; ok(ks.length >= 2, '行きどまりだけの足場の群れ');
+    for (const a of ks) { const st = lands.get(a), d = new Map([[st.join(','), 1]]), q = [st]; while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of D4) { const k = (x + dx) + ',' + (y + dy); if (!d.has(k) && tile(x + dx, y + dy) === 'f') { d.set(k, d.get(x + ',' + y) + 1); q.push([x + dx, y + dy]); } } }
+      for (const b of ks) if (b !== a) { const [bx, by] = lands.get(b); const dd = d.get(bx + ',' + by); if (dd) worstCross = Math.max(worstCross, dd + 1); } } }
+  console.log(`      足場 ${fs_.length}マス / ${comps.length}群 / 岸までの最大 ${worstExit}歩 / 岸から岸の最大 ${worstCross}歩 / 到達できる遭遇マス ${Tin} / 歩けるマス ${reach.size}`);
+  ok(worstExit <= 6, '岸まで遠い足場'); ok(worstCross <= 12, '1回の晴れ間で渡りきれない足場');
+  eq(s.errors, []); await s.close();
+});
+T('T8: 幽霊列車 — 踏切の行だけが危険・島は安全・走らない時間がある・はねられると岸へ戻る', async () => {
+  const s = await open();
+  const D = await s.ev(() => { const m = MAPS.maboroshi; return { rows: m.rows, g: m.ghost, solid: OW_SOLID }; });
+  const rowsY = [...new Set(D.g.lines.map(l => l.y))]; ok(!rowsY.includes(23), '島の行を列車が走る');
+  for (const y of rowsY) { const walkX = []; for (let x = 0; x < 60; x++) if (!D.solid.includes(D.rows[y][x])) walkX.push(x); eq(walkX, D.g.cross, `行${y}で、踏切以外に歩けるマスがある`); }
+  for (const cx of D.g.cross) for (let y = 21; y <= 25; y++) ok(!D.solid.includes(D.rows[y][cx]), `踏切 ${cx},${y} が通れない`);
+  ok(D.rows[23].slice(D.g.cross[0] - 2, D.g.cross[0] + 3).split('').every(c => !D.solid.includes(c)), '島がない');
+  const sim = await s.ev(() => { const m = MAPS.maboroshi, G = m.ghost, out = { calm: 0, best: 0, run: 0 }; let cur = 0;
+    for (let t = 0; t < 1200000; t += 100) { const busy = G.lines.some(L => owGhostState(G, L, t, 60).st === 'run'); if (busy) { cur = 0; out.run++; } else { cur += 100; out.calm++; out.best = Math.max(out.best, cur); } }
+    out.share = out.calm / (out.calm + out.run); return out; });
+  ok(sim.best >= 1500, `わたれる時間が短い: ${sim.best}ms`); ok(sim.share > .3 && sim.share < .95, `列車の混み具合: ${sim.share}`); console.log(`      列車が走っていない時間 ${(sim.share * 100).toFixed(0)}% / 最長 ${(sim.best / 1000).toFixed(1)}秒`);
+  await T8_STAGE(s); await T8_ENTER(s); await T8_CLOCK(s);
+  const r = await s.ev(() => { const o = {}; const m = MAPS.maboroshi, G = m.ghost;
+    const find = (row, x) => { for (let t = 0; t < 60000; t += 20) { const run = G.lines.map(l => owGhostState(G, l, t, 60)); if (G.lines.some((l, i) => l.y === row && owGhostOver(G, run[i], x)) && !G.lines.some((l, i) => l.y !== row && run[i].st === 'run')) return t; } return -1; };
+    const t22 = find(22, 14), t24 = find(24, 14); o.t = [t22 >= 0, t24 >= 0];
+    for (const [row, T] of [[22, t22], [24, t24]]) { window.__T = T; state.ow = { map: 'maboroshi', x: 14, y: row, dir: 'up' }; OWC.mv = null; OWC.lastSafe = { map: 'maboroshi', x: 14, y: row === 22 ? 21 : 25 }; OWC.ghostT = 0; ui.dlg = null; const mx = calc(state.party[0]).hp; state.party[0].hp = mx;
+      const hit = owMaboStep(m); o['hit' + row] = [hit, state.ow.x, state.ow.y, state.party[0].hp < mx]; ui.dlg = null; }
+    window.__T = t22; state.ow = { map: 'maboroshi', x: 14, y: 23, dir: 'up' }; OWC.mv = null; OWC.ghostT = 0; o.island = owMaboStep(m); o.islandPos = [state.ow.x, state.ow.y]; o.stamp = !!state.stamps['g:ghost']; return o; });
+  eq(r.t, [true, true], '走る時刻が見つからない'); eq(r.hit22.slice(0, 3), [true, 14, 21]); eq(r.hit24.slice(0, 3), [true, 14, 25]); ok(r.hit22[3] && r.hit24[3], 'HP が減らない'); eq(r.island, false); eq(r.islandPos, [14, 23]); ok(r.stamp, '島で待つスタンプ');
+  eq(s.errors, []); await s.close();
+});
+T('T8: 霧の足場 — 晴れ間だけ立てる・足場の上で霧が戻ると岸へ戻される(どの足場でも)・渡るとスタンプ', async () => {
+  const s = await open(); await T8_STAGE(s); await T8_ENTER(s); await T8_CLOCK(s);
+  const r = await s.ev(() => { const o = { phases: [], stuck: [] }; const m = MAPS.maboroshi;
+    for (const t of [0, 6999, 7000, 8499, 8500, 12499, 12500, 13999, 14000, 14999, 15000]) { window.__T = t; o.phases.push([t, owMiPhase(m), owMiWalk(), owSolid(m, 28, 40)]); }
+    const fts = []; for (let y = 0; y < 50; y++) for (let x = 0; x < 60; x++) if (m.rows[y][x] === 'f') fts.push([x, y]);
+    const land = (x, y) => { const c = m.rows[y][x]; return !OW_SOLID.includes(c) && c !== 'f' && c !== 'H'; };
+    const real = Math.random; Math.random = () => .999; let moved = 0; const sx = m.spawn.x, sy = m.spawn.y;
+    for (const [fx, fy] of fts) {
+      window.__T = 10000; const q = [[sx, sy]], pr = new Map([[sx + ',' + sy, null]]); let found = false;
+      while (q.length && !found) { const [x, y] = q.shift(); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy, k = nx + ',' + ny; if (pr.has(k) || owSolid(m, nx, ny)) continue; pr.set(k, [x, y]); if (nx === fx && ny === fy) { found = true; break; } q.push([nx, ny]); } }
+      if (!found) { o.stuck.push(['unreach', fx, fy]); continue; }
+      const path = []; for (let c = [fx, fy]; c; c = pr.get(c[0] + ',' + c[1])) path.unshift(c);
+      state.ow = { map: 'maboroshi', x: sx, y: sy, dir: 'right' }; OWC.lastSafe = null; for (const [x, y] of path) { state.ow.x = x; state.ow.y = y; OWC.mv = null; state.owSteps = 0; owArrive(); ui.dlg = null; B = null; }
+      if (state.ow.x !== fx || state.ow.y !== fy) { o.stuck.push(['warped', fx, fy]); continue; }
+      window.__T = 3000; OWC.mv = null; const fell = owMaboStep(m); ui.dlg = null; const p = state.ow; const ok2 = fell && land(p.x, p.y) && !owSolid(m, p.x, p.y); if (!ok2) o.stuck.push(['no-return', fx, fy, p.x, p.y]); else moved++;
+    }
+    Math.random = real; o.n = fts.length; o.moved = moved; o.stamp = !!state.stamps['g:fog']; return o; });
+  eq(r.phases.map(p => p[1]), ['fog', 'fog', 'dawn', 'dawn', 'clear', 'clear', 'dusk', 'dusk', 'fog', 'fog', 'fog']); eq(r.phases.map(p => p[2]), [false, false, false, false, true, true, true, true, false, false, false]);
+  eq(r.phases[0][3], false, '岸は霧でも通れる'); eq(r.stuck, [], '足場から戻れない/たどりつけない'); eq(r.moved, r.n); ok(r.stamp, '霧の足場スタンプ'); eq(s.errors, []); await s.close();
+});
+T('T8: 改札のレバー→シャッターが開く・終点で流星石★20(1回だけ)・落とし物5つが取れる', async () => {
+  const s = await open(); await T8_STAGE(s); await T8_ENTER(s);
+  const r = await s.ev(() => { const o = {}; const m = MAPS.maboroshi; const sh = m.objs.find(q => q[0] === 'shutter'), lv = m.objs.find(q => q[0] === 'lever');
+    o.closed = owSolid(m, sh[1], sh[2]); state.ow = { map: 'maboroshi', x: lv[1], y: lv[2] + 1, dir: 'up' }; OWC.mv = null; owA(); ui.dlg = null; o.opened = !owSolid(m, sh[1], sh[2]); o.flag = owFlag('mabo_k');
+    const s0 = state.stars; state.ow = { map: 'maboroshi', x: m.goal.x, y: m.goal.y, dir: 'right' }; OWC.mv = null; owArrive(); ui.dlg = null; const s1 = state.stars; owArrive(); ui.dlg = null; o.stars = [s1 - s0, state.stars - s1];
+    const got = {}; for (const k in m.items) { const [x, y] = k.split(',').map(Number); const it = m.items[k]; const before = state.items[it] || 0;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (!owSolid(m, x + dx, y + dy)) { state.ow = { map: 'maboroshi', x: x + dx, y: y + dy, dir: { '1,0': 'left', '-1,0': 'right', '0,1': 'up', '0,-1': 'down' }[dx + ',' + dy] }; break; }
+      OWC.mv = null; owA(); ui.dlg = null; got[it] = (state.items[it] || 0) - before; }
+    o.got = got; return o; });
+  eq(r.closed, true); eq(r.opened, true); eq(r.flag, true); eq(r.stars, [20, 0]); eq(r.got, { kai: 1, saino: 1, tenpu: 1, kirakira: 1, makimono: 1 }); eq(s.errors, []); await s.close();
+});
+T('T8: 敵Lv=撃破したぬしの最大Lv+3・出るのは天候限定7体+新種(全員)・新種は末尾で目がある・図鑑の最後の地域とコンプ報酬', async () => {
+  const s = await open(); await T8_STAGE(s);
+  const r = await s.ev(async () => { const o = {}; const f = TOWN.mabo.fields[0];
+    o.lv1 = [maboLv(), Math.max(...TOWN.komorebi.boss.foes.map(x => x[1]), ...TOWN.kasumi.boss.foes.map(x => x[1])) + 3]; state.boss = { komorebi: true, kasumi: true, shiomi: true }; o.lv2 = [maboLv(), Math.max(...TOWN.shiomi.boss.foes.map(x => x[1])) + 3]; state.boss = { komorebi: true, kasumi: true };
+    ui.station = true; render(); H.mabo(); ui.dlg = null; document.querySelectorAll('.mabo-fx').forEach(e => e.remove());
+    owEncounter('mabo'); o.field = B && B.field; o.lvs = B ? B.enemies.map(c => c.mon.lv) : []; B = null; ui.result = null;
+    const tb = wxTable(f.table, 3, 'kiri'); const got = new Set(); for (let i = 0; i < 3000; i++) got.add(wpick(tb).s); o.got = [...got].sort();
+    o.sp = { fam: SP.mabonokoshou.fam, last: SPL[SPL.length - 1].id, no: SPL.indexOf(SP.mabonokoshou) + 1, n: SPL.length };
+    const u = sprite('mabonokoshou'), im = new Image(); im.src = u; await im.decode(); const c = document.createElement('canvas'); c.width = c.height = 192; const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, 192, 192).data; let n = 0, iris = 0; for (let i = 0; i < d.length; i += 4) { if (d[i + 3] > 200) n++; if (d[i] > 200 && d[i + 1] > 150 && d[i + 2] < 120 && d[i + 3] > 200) iris++; } o.px = n; o.iris = iris;
+    o.reg = regList('mabo').map(q => q.s).sort(); return o; });
+  eq(r.lv1[0], r.lv1[1]); eq(r.lv2[0], r.lv2[1]); ok(r.lv2[0] > r.lv1[0]); ok(r.field && r.field.includes('まぼろし駅'), String(r.field)); ok(r.lvs.length >= 1 && r.lvs.every(l => l === r.lv1[0]), '敵Lvがずれた: ' + r.lvs + ' / ' + r.lv1[0]);
+  eq(r.got, ['amayadori', 'haikagura', 'hoshikuzume', 'kirigarasu', 'kumozumi', 'mabonokoshou', 'nijimimizu', 'yukiwata']); eq(r.reg, r.got); eq(r.sp.fam, 'myst'); eq(r.sp.last, 'mabonokoshou'); eq(r.sp.no, r.sp.n); ok(r.px > 1500, '絵が小さい'); ok(r.iris > 8, '目の虹彩が入っていない: ' + r.iris);
+  ok(GAME_SRC.includes('ART(T8)'), 'ART(T8) の印がない');
+  const r2 = await s.ev(() => { const o = {}; state.flags.mabo = true; ui.station = false; ui.tab = 'dex'; ui.dexMode = 'reg'; render(); const g = [...document.querySelectorAll('.dexgroup.reg')]; o.groups = g.length; o.lastHead = g[g.length - 1].querySelector('h4').textContent;
+    o.before = regClaim('mabo'); regList('mabo').forEach(x => { state.owned[x.s] = true; state.seen[x.s] = true; }); const s0 = state.stars, t0 = state.items.tenpu || 0; o.a = regClaim('mabo'); o.b = regClaim('mabo'); o.stars = state.stars - s0; o.tenpu = (state.items.tenpu || 0) - t0; o.stamp = state.stamps['reg:mabo']; return o; });
+  eq(r2.groups, 10); ok(r2.lastHead.includes('まぼろし駅')); eq([r2.before, r2.a, r2.b], [false, true, false]); eq(r2.stars, 10); eq(r2.tenpu, 1); eq(r2.stamp, 2); eq(s.errors, []); await s.close();
+});
+T('T8: 旧セーブは読めて、中で保存した状態も 引き継ぎコードで往復できる。state.v は1のまま', async () => {
+  const s = await open(); await makeOldSave(s, 2);
+  await s.page.reload(); await s.page.waitForFunction(() => typeof state !== 'undefined' && state); await wait(600);
+  const r = await s.ev(() => { const o = { v: state.v, flag: state.flags.mabo }; window.wxNow = () => 'kiri'; state.time = 3; ui.station = true; render(); H.mabo(); ui.dlg = null; document.querySelectorAll('.mabo-fx').forEach(e => e.remove()); save(); const code = saveCode(); const b = readCode(code);
+    o.inside = [state.ow.map, b.ow.map, b.flags.mabo, b.town]; o.same = JSON.stringify(b) === JSON.stringify(state); const a = JSON.stringify(state); migrate(); migrate(); o.idem = a === JSON.stringify(state);
+    state = load(); owEnsureState(); o.reload = state.ow.map; o.song = bgmWanted(); return o; });
+  eq(r.v, 1); eq(r.flag, undefined); ok(r.same, '引き継ぎコードの往復'); ok(r.idem, 'migrate が冪等でない'); eq(r.inside, ['maboroshi', 'maboroshi', true, 'shiomi']); eq(r.reload, 'maboroshi'); eq(r.song, 'mabo');
+  eq(s.errors, []); await s.close();
+});
+T('T8: 足場・列車・夜の霧が、各地点でエラーなく描け、1フレームが軽い', async () => {
+  const s = await open(); await T8_STAGE(s); await T8_ENTER(s); await T8_CLOCK(s);
+  const r = await s.ev(() => { const o = {}; const out = [];
+    for (const [x, y, T] of [[14, 25, 3000], [36, 40, 10000], [36, 40, 3000], [29, 13, 0], [50, 5, 0], [12, 44, 0]]) { state.ow = { map: 'maboroshi', x, y, dir: 'up' }; window.__T = T; OWC.mv = null; const t0 = performance.now(); for (let i = 0; i < 20; i++) owDraw(); out.push((performance.now() - t0) / 20); } o.ms = out.map(v => +v.toFixed(2)); return o; });
+  console.log('      owDraw(ms) ' + JSON.stringify(r.ms)); ok(Math.max(...r.ms) < 30, '重い: ' + r.ms);
+  eq(s.errors, []); await s.close();
+});
+
 (async () => {
   await new Promise(r => server.listen(0, r)); port = server.address().port;
   browser = await chromium.launch();
   let pass = 0, fail = 0; const t0 = Date.now();
   for (const [name, fn] of tests) {
+    if (process.env.ONLY && !new RegExp(process.env.ONLY).test(name)) continue;   /* 例: ONLY='T8' node tools/test/run.js */
     try { await fn(); pass++; console.log('  PASS ' + name); }
     catch (e) { fail++; console.log('  FAIL ' + name + '\n       ' + String(e.message).split('\n')[0]); }
   }

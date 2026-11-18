@@ -177,8 +177,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     await ev(() => { if (B) { B.lockUntil = 0; render(); } }); await shot('73_shiny_battle', 900);
     await ev(() => { B = null; ui.dlg = null; ui.toast = ''; render(); });
     // 天候限定7体の図鑑
-    await ev(() => { SPL.slice(-7).forEach(s => { state.seen[s.id] = true; state.owned[s.id] = true; }); ui.tab = 'dex'; ui.dexSel = 'hoshikuzume'; render(); }); await shot('74_dex_weather7', 400);
-    await ev(() => { const d = document.createElement('div'); d.id = 'sheet'; d.style.cssText = 'position:fixed;inset:0;z-index:999;background:#000;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px;overflow:auto'; d.innerHTML = SPL.slice(-7).map(s => `<div style="color:#fff;text-align:center;font:12px sans-serif"><img src="${sprite(s.id)}" style="width:170px;height:170px;image-rendering:auto"><br>${s.name}</div>`).join(''); document.body.appendChild(d); });
+    await ev(() => { SPL.slice(-8, -1).forEach(s => { state.seen[s.id] = true; state.owned[s.id] = true; }); ui.tab = 'dex'; ui.dexSel = 'hoshikuzume'; render(); }); await shot('74_dex_weather7', 400);
+    await ev(() => { const d = document.createElement('div'); d.id = 'sheet'; d.style.cssText = 'position:fixed;inset:0;z-index:999;background:#000;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:10px;overflow:auto'; d.innerHTML = SPL.slice(-8, -1).map(s => `<div style="color:#fff;text-align:center;font:12px sans-serif"><img src="${sprite(s.id)}" style="width:170px;height:170px;image-rendering:auto"><br>${s.name}</div>`).join(''); document.body.appendChild(d); });
     await shot('75_weather7_sheet', 400);
     await ev(() => { document.getElementById('sheet').remove(); if (window.__wxNow) window.wxNow = window.__wxNow; render(); });
   });
