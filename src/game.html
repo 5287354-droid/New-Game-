@@ -1040,7 +1040,7 @@ function artRender(id,shiny,stg){
     ax.setTransform(1,0,0,1,0,0);artFatten(ax,fat);};
   const box=()=>{const d=ax.getImageData(0,0,N,N).data;let x0=N,y0=N,x1=0,y1=0;for(let i=0;i<N*N;i++)if(d[i*4+3]>8){const X=i%N,Y=i/N|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}
     return x1<x0?[0,0,N-1,N-1]:[x0,y0,x1,y1];};
-  const fat=FATX[id]||ART_FAT,M=ASAFE+st.line+fat+1,BOT=AFOOT-st.line-1;
+  const fat=FATX[id]??ART_FAT,M=ASAFE+st.line+fat+1,BOT=AFOOT-st.line-1;
   /* 1 回目: 半分の大きさで描き、はみ出しても外形を測る。細長い種は縦(横)にふくらませて枠をうめる */
   draw(.5,N/4,N/4,1,1);let [x0,y0,x1,y1]=box();
   const asp=(x1-x0+1)/(y1-y0+1),kh=asp<1/1.25?Math.min(ART_STRETCH,1/asp/1.25):1,kv=asp>1.25?Math.min(ART_STRETCH,asp/1.25):1;
@@ -2389,14 +2389,14 @@ const EXTRA={
   harigane:{back:g=>{g.path([[6,40],[14,30],[10,20],[20,12],[30,18],[26,30],[36,36],[44,26]],'#a8b0bc',6.5);g.e(44,25,4,3.5,'#c8d0dc');}},
   ibote:g=>{g.h(40,43,6.5,5.5,'#d8342c');g.r(36.5,43,7,5,'#f4efe3');g.e(38,39.5,1.2,1,'#fbf6ea');g.e(42,41,1,.8,'#fbf6ea');},
   chunta:g=>{g.p([[10,14],[12,5],[16,13]],'#8a5a32');g.p([[14,13],[19,4],[20,14]],'#6e4a2a');g.p([[17,14],[24,8],[23,17]],'#8a5a32');},
-  gorodango:g=>{[15,20,25,30,35].forEach(a=>{const t=39-14*Math.sqrt(1-((a-25)/17)**2);g.p([[a-2.2,t+2],[a,t-7],[a+2.2,t+2]],'#8a92a2');});},
-  fukuredoku:g=>{g.p([[16,15],[23,2],[32,13]],'#c9b88a');g.p([[20,14],[25,6],[29,13]],'#e6d6a8');},
+  gorodango:g=>{[15,20,25,30,35].forEach(a=>{const t=39-14*Math.sqrt(1-((a-25)/17)**2);g.p([[a-2.2,t+2],[a,t-4.5],[a+2.2,t+2]],'#8a92a2');});},
+  fukuredoku:g=>{g.p([[16,15],[22,5],[31,13]],'#c9b88a');},
   happoudako:g=>{g.p([[20,13],[25,1],[30,12]],'#e88a6a');g.e(25,3,2,2,'#f6e8c8');},
   shikouchou:g=>{g.p([[12,41],[7,50],[17,44]],'#3a1a64');g.p([[36,41],[41,50],[31,44]],'#3a1a64');},
   umibouzu:g=>{g.p([[8,38],[-1,27],[3,24],[12,33]],'#6a5a7a');g.p([[40,38],[49,27],[45,24],[36,33]],'#6a5a7a');},
   hasunoha:g=>{g.e(7,41,7,3,'#3aa860');g.e(42,39,6,3,'#3aa860');g.e(7,40,3,1,'#6ad07a');},
   tagamen:g=>{g.p([[38,36],[48,40],[45,47],[35,43]],'#5a4630');},
-  namazun:g=>{g.p([[22,21],[28,6],[36,21]],'#5a6a70');g.l(28,7,26,14,'#8a9aa0',1);},
+  namazun:g=>{g.p([[21,21],[25,11],[34,21]],'#5a6a70');g.path([[6,32],[0,38],[1,44]],'#3a4448',1.6);},
   gamelyu:g=>{g.p([[26,23],[28,11],[32,23]],'#e2c48a');g.p([[34,23],[38,13],[40,25]],'#e2c48a');},
   kintoki:g=>{g.p([[22,19],[30,5],[38,14],[36,23]],'#ff5a3a');g.p([[20,40],[13,49],[27,44]],'#ff8a2a');},
   yougankari:g=>{g.p([[30,16],[34,3],[38,14]],'#ff8a2a');g.p([[37,14],[43,4],[44,16]],'#ffb02a');},
@@ -2408,7 +2408,7 @@ const EXTRA={
   hirugi:g=>{g.path([[8,38],[1,45]],'#5a4030',2.4);g.path([[41,38],[47,45]],'#5a4030',2.4);},
 };
 /* 細い種は、ふくらませを強くして外形をぽってりさせる(不透明率の規格のため) */
-const FATX={};
+const FATX={mukadeou:0};   /* 細かい脚が多い種は、ふくらませると脚がつぶれるので 0 */
 /* 色違いの配色の型(tools/art_assign.js が系統ごとに3種をめぐらせて割り当てた) */
 Object.assign(SHREC,{
   dokudamin:'momiji',ibote:'fuji',tsubokurau:'momiji',yadoridake:'fuji',dobuchu:'tsukishiro',happadanuki:'kokuyou',
