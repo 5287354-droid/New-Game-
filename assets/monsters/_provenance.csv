@@ -158,3 +158,10 @@ kawaso,カワソ,procedural-canvas,none,src/game.html DRAW.kawaso + flatPainter/
 akanetoki,アカネトキ,procedural-canvas,none,src/game.html DRAW.akanetoki + flatPainter/sprite(),,2026-11-18,yes
 yomotsuorochi,ヨモツオロチ,procedural-canvas,none,src/game.html DRAW.yomotsuorochi + flatPainter/sprite(),,2026-11-18,yes
 tokoyo,トコヨ,procedural-canvas,none,src/game.html DRAW.tokoyo + flatPainter/sprite(),,2026-11-18,yes
+amayadori,アマヤドリ,procedural-canvas,none,src/game.html DRAW96.amayadori + flatPainter/sprite(),,2026-11-18,yes
+kirigarasu,キリガラス,procedural-canvas,none,src/game.html DRAW96.kirigarasu + flatPainter/sprite(),,2026-11-18,yes
+nijimimizu,ニジミミズ,procedural-canvas,none,src/game.html DRAW96.nijimimizu + flatPainter/sprite(),,2026-11-18,yes
+yukiwata,ユキワタボウシ,procedural-canvas,none,src/game.html DRAW96.yukiwata + flatPainter/sprite(),,2026-11-18,yes
+haikagura,ハイカグラ,procedural-canvas,none,src/game.html DRAW96.haikagura + flatPainter/sprite(),,2026-11-18,yes
+kumozumi,クモリスミ,procedural-canvas,none,src/game.html DRAW96.kumozumi + flatPainter/sprite(),,2026-11-18,yes
+hoshikuzume,ホシクズメ,procedural-canvas,none,src/game.html DRAW96.hoshikuzume + flatPainter/sprite(),,2026-11-18,yes
