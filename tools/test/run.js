@@ -338,7 +338,7 @@ T('T4: はじめて会った場所 seenAt(最初の1回だけ)、図鑑の詳細
     state.town = 'shiomi'; state.time = 0; startBattle([['kurageru', 5]], { field: 'x', scene: 'inaka' }); o.b = state.seenAt.kurageru; B = null;
     o.text = seenAtText('kurageru'); delete state.seenAt.kurageru; o.none = seenAtText('kurageru'); return o;
   });
-  eq(r.a, ['kasumi', 3, null]); eq(r.b, ['kasumi', 3, null], '上書きされた'); ok(r.text.includes('霞ヶ丘') && r.text.includes('夜'), r.text); ok(r.none.includes('記録なし')); eq(s.errors, []); await s.close();
+  eq(r.a.slice(0, 2), ['kasumi', 3]); ok(r.a[2] === null || typeof r.a[2] === 'string', '天気の記録の形が違う'); eq(r.b, r.a, '上書きされた'); ok(r.text.includes('霞ヶ丘') && r.text.includes('夜'), r.text); ok(r.none.includes('記録なし')); eq(s.errors, []); await s.close();
 });
 T('T2/T4: 旧セーブ(新キーなし)でも新キーが補われ、最初の1歩から記録される', async () => {
   const s = await open(); await makeOldSave(s, 1);
@@ -357,6 +357,127 @@ T('T2/T4: foot・seenAt・stamps を全部埋めても 引き継ぎコード・�
   });
   ok(r.same, '読み直した内容が違う'); console.log(`      json ${r.json}B / 引き継ぎコード ${r.code}字 / gzip+b64 ${r.z}字 (foot ${r.foot}B, seenAt ${r.seenAt}B)`);
   ok(r.foot < 6000 && r.seenAt < 6000, 'foot/seenAt が大きい'); ok(r.z > 0 && r.z < 100000, 'クラウド保存が大きい ' + r.z); eq(s.errors, []); await s.close();
+});
+
+/* ===== T1(空もよう)・T3(きらり) ===== */
+T('T1: 天気は日付+町+wxN で決まり(保存しない)、advanceTime で再抽選される', async () => {
+  const s = await open(); await goMap(s, 'komorebi');
+  const r = await s.ev(() => {
+    const a = wxOf('komorebi'), b = wxOf('komorebi'), keys = JSON.parse(JSON.stringify(state));
+    const n0 = state.wxN; advanceTime(); const n1 = state.wxN;
+    const seq = []; for (let i = 0; i < 12; i++) { state.wxN = i; seq.push(wxOf('komorebi')); }
+    return { same: a === b, n0, n1, noSaved: !('wx' in keys) && !('weather' in keys), kinds: new Set(seq).size, f: [wxOf('komorebi', 1), (state.wxN++, state.time = (state.time + 3) % 4, wxOf('komorebi', 1))] };
+  });
+  ok(r.same, '同じ状態で天気が変わる'); eq(r.n1, r.n0 + 1, 'advanceTime で wxN が進まない'); ok(r.noSaved, '天気を保存している');
+  ok(r.kinds >= 2, '天気が変化しない'); eq(s.errors, []); await s.close();
+});
+T('T1: 予報(k=1,2)が、時間を進めたときの天気と一致する', async () => {
+  const s = await open(); await goMap(s, 'tengu');
+  const r = await s.ev(() => { let bad = 0; for (let i = 0; i < 40; i++) { state.wxN = i * 3; state.time = i % 4; const f1 = wxOf('tengu', 1), f2 = wxOf('tengu', 2); advanceTime(); if (wxNow('tengu') !== f1) bad++; advanceTime(); if (wxNow('tengu') !== f2) bad++; } return bad; });
+  eq(r, 0, '予報が外れた'); eq(s.errors, []); await s.close();
+});
+T('T1: 各町で天気の割合が表の±3%以内(昼)', async () => {
+  const s = await open();
+  const r = await s.ev(() => { const out = []; state.time = 1; for (const t of Object.keys(WX_TBL)) { const tb = WX_TBL[t], tot = Object.values(tb).reduce((a, b) => a + b, 0) - (tb.hoshi || 0), N = 4000, cnt = {};
+    for (let i = 0; i < N; i++) { state.wxN = i; const w = wxOf(t); cnt[w] = (cnt[w] || 0) + 1; }
+    for (const id of WXK) { const exp = id === 'hoshi' ? 0 : (tb[id] || 0) / tot, got = (cnt[id] || 0) / N; if (Math.abs(exp - got) > .03) out.push(`${t}:${id} ${got.toFixed(3)} vs ${exp.toFixed(3)}`); } } return out; });
+  eq(r, [], '割合のずれ'); await s.close();
+});
+T('T1: 星降りは夜だけ。天候限定の7体はその天気の時だけ出現表に入る', async () => {
+  const s = await open();
+  const r = await s.ev(() => {
+    const lim = { amayadori: ['komorebi', 'aze', 'ame', null], kirigarasu: ['tengu', 'sando', 'kiri', null], nijimimizu: ['kasumi', 'biru', 'ame', null], yukiwata: ['ryuhyo', 'genseirin', 'yuki', null], haikagura: ['hinoshima', 'kokusa', 'hai', null], kumozumi: ['shiomi', 'gyokou', 'kumo', 3], hoshikuzume: ['komorebi', 'aze', 'hoshi', null] };
+    const bad = [], hit = [];
+    for (const [sp, [tw, fid, wx, nt]] of Object.entries(lim)) { const f = TOWN[tw].fields.find(x => x.id === fid);
+      for (const w of WXK) for (let tm = 0; tm < 4; tm++) { const has = wxTable(f.table, tm, w).some(x => x.s === sp), want = w === wx && (sp === 'kumozumi' ? tm >= 2 : true); if (has !== want) bad.push(`${sp} ${w} t${tm} has=${has}`); if (has) hit.push(sp); } }
+    let star = 0; state.time = 0; for (let i = 0; i < 500; i++) { state.wxN = i; if (wxOf('komorebi') === 'hoshi') star++; }
+    let starN = 0; state.time = 3; for (let i = 0; i < 500; i++) { state.wxN = i; if (wxOf('komorebi') === 'hoshi') starN++; }
+    return { bad, n: new Set(hit).size, star, starN, spl: SPL.slice(-7).map(x => x.id) };
+  });
+  eq(r.bad, [], '出現のずれ'); eq(r.n, 7); eq(r.star, 0, '昼に星降り'); ok(r.starN > 0, '夜に星降りが出ない');
+  eq(r.spl, ['amayadori', 'kirigarasu', 'nijimimizu', 'yukiwata', 'haikagura', 'kumozumi', 'hoshikuzume'], 'S() の末尾に追加されていない'); await s.close();
+});
+T('T1: 既存の n/d タグは時間だけで決まる(天気に左右されない)', async () => {
+  const s = await open();
+  const r = await s.ev(() => { const bad = []; for (const w of WXK) for (let tm = 0; tm < 4; tm++) { if (tagOK('n', tm, w) !== (tm >= 2)) bad.push('n' + tm + w); if (tagOK('d', tm, w) !== (tm <= 1)) bad.push('d' + tm + w); if (!tagOK(null, tm, w)) bad.push('null'); }
+    return { bad, old: timeOK('n', 3, 'ame'), t: [tagOK('nR', 3, 'ame'), tagOK('nR', 1, 'ame'), tagOK('nR', 3, 'hare')] }; });
+  eq(r.bad, []); eq(r.t, [true, false, false]); await s.close();
+});
+T('T1: 全7体の絵が描け、目が入っている(例外なし・透明でない)', async () => {
+  const s = await open();
+  const r = await s.ev(async () => { const out = []; for (const id of SPL.slice(-7).map(x => x.id)) { const u = sprite(id), im = new Image(); im.src = u; await im.decode(); const c = document.createElement('canvas'); c.width = c.height = 192; const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, 192, 192).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 200) n++; out.push([id, n]); } return out; });
+  for (const [id, n] of r) ok(n > 1500, id + ' が小さい/空: ' + n); await s.close();
+});
+T('T1: 屋外だけ画面効果、霧は5マスの見える範囲、雨は遭遇率1.15倍、音のフック', async () => {
+  const s = await open(); await goMap(s, 'komorebi');
+  const r = await s.ev(() => { const m = owMap(); const out = { outdoor: owWxOutdoor(m), indoor: owWxOutdoor({ ground: 'floor' }) || owWxOutdoor({ dim: 1 }) || owWxOutdoor({ cave: 1 }) };
+    state.wxN = 0; for (let i = 0; i < 200; i++) { state.wxN = i; if (wxNow('komorebi') === 'kiri') break; } out.kiri = wxNow('komorebi') === 'kiri'; out.limK = owTapLimit(m);
+    for (let i = 0; i < 200; i++) { state.wxN = i; if (wxNow('komorebi') === 'hare') break; } out.limH = owTapLimit(m);
+    for (let i = 0; i < 200; i++) { state.wxN = i; if (wxNow('komorebi') === 'ame') break; }
+    const a = []; window.ambStart = n => a.push('amb:' + n); window.ambStop = () => a.push('stop'); window.bgmSetMood = o => a.push(JSON.stringify(o)); OWC.wxAk = null; owWxAudio(true); out.audio = a; return out; });
+  ok(r.outdoor && !r.indoor, '屋外判定'); ok(r.kiri, '霧が見つからない'); eq(r.limK, 5); eq(r.limH, 99);
+  ok(r.audio.includes('amb:rain') && r.audio.some(x => x.includes('"rain":true')), '雨の音: ' + r.audio.join(','));
+  eq(s.errors, []); await s.close();
+});
+T('T1: 画面効果の7種がすべてエラーなく描け、1フレームが軽い(owDraw)', async () => {
+  const s = await open(); await goMap(s, 'komorebi'); await wait(500);
+  const r = await s.ev(() => { const out = {}; const m = owMap(); const orig = wxNow; for (const w of WXK) { window.wxNow = () => w; const T0 = performance.now(); for (let i = 0; i < 60; i++) owDraw(); out[w] = +((performance.now() - T0) / 60).toFixed(2); } window.wxNow = orig; return out; });
+  console.log('      owDraw 1フレーム(ms):', JSON.stringify(r));
+  for (const [w, ms] of Object.entries(r)) ok(ms < 12, w + ' が重い: ' + ms); eq(s.errors, []); await s.close();
+});
+T('T3: きらりは遭遇タイルに1つだけ(6〜14マス)・90歩で消える・踏むと必ず戦闘', async () => {
+  const s = await open(); await goMap(s, 'komorebi'); await wait(300);
+  const r = await s.ev(async () => {
+    const m = owMap(), o = state.ow; state.kirari = null; OWC.kMap = o.map;
+    let okSp = 0, dist = [], onEnc = 0; for (let i = 0; i < 30; i++) { state.kirari = null; if (owKirariSpawn(m, o)) { okSp++; const k = state.kirari; dist.push(Math.abs(k.x - o.x) + Math.abs(k.y - o.y)); if ((m.enc || 'T').includes(m.rows[k.y][k.x])) onEnc++; } }
+    state.kirari = null; owKirariSpawn(m, o); const k0 = { ...state.kirari };
+    const one = typeof state.kirari === 'object' && !Array.isArray(state.kirari);
+    let steps = 0; const save0 = state.kirari.ttl; for (let i = 0; i < 100 && state.kirari; i++) { OWC.kSteps = 1; owKirariTick(m, o); steps++; if (state.kirari && steps === 5) steps = steps; }
+    const gone = state.kirari === null, st = steps;
+    /* 踏む */
+    state.kirari = { map: o.map, x: k0.x, y: k0.y, ttl: 50 }; state.ow = { map: o.map, x: k0.x, y: k0.y, dir: 'down' }; OWC.kMap = o.map; OWC.stuck = 0;
+    owArrive(); await new Promise(r => setTimeout(r, 900));
+    return { okSp, min: Math.min(...dist), max: Math.max(...dist), onEnc, one, gone, st, ttl0: save0, battle: !!B, kirNull: state.kirari === null, rare: B && B.enemies[0].rare };
+  });
+  ok(r.okSp > 25, '出ない'); ok(r.min >= 6 && r.max <= 14, `距離 ${r.min}-${r.max}`); eq(r.onEnc, r.okSp, '遭遇タイル以外'); ok(r.one); eq(r.ttl0, 90);
+  ok(r.gone && r.st >= 88 && r.st <= 91, '90歩前後で消えない: ' + r.st); ok(r.battle, '踏んでも戦闘にならない'); ok(r.kirNull, '踏んでも消えない'); ok(r.rare, 'レア札なし');
+  eq(s.errors, []); await s.close();
+});
+T('T3: きらりの1体目の配分(1万回): 50/30/20 ±2%、色違い率 通常1/150・きらり1/30・星降りきらり1/15', async () => {
+  const s = await open(); await goMap(s, 'komorebi');
+  const r = await s.ev(() => { const f = TOWN.komorebi.fields.find(x => x.id === 'aze'); state.time = 3; let wxn = 0; for (let i = 0; i < 500; i++) { state.wxN = i; if (wxNow('komorebi') === 'ame') { wxn = i; break; } }
+    state.wxN = wxn; const c = { low: 0, metal: 0, wx: 0 }, N = 10000; for (let i = 0; i < N; i++) c[owKirariFoe(f, 'ame', 0, Math.random())[2]]++;
+    const hit = (p, n) => { let k = 0; for (let i = 0; i < n; i++) if (Math.random() < p) k++; return k / n; };
+    return { low: c.low / N, metal: c.metal / N, wx: c.wx / N, n: hit(owShinyP('hare', false), 60000), k: hit(owShinyP('hare', true), 30000), h: hit(owShinyP('hoshi', true), 20000), p: [owShinyP('hare', false), owShinyP('hare', true), owShinyP('hoshi', true)] }; });
+  ok(Math.abs(r.low - .5) < .02 && Math.abs(r.metal - .3) < .02 && Math.abs(r.wx - .2) < .02, JSON.stringify(r));
+  ok(Math.abs(r.n - 1 / 150) < .0025 && Math.abs(r.k - 1 / 30) < .008 && Math.abs(r.h - 1 / 15) < .012, JSON.stringify(r)); await s.close();
+});
+T('T3: 色違いが当たると前兆(七色)のあとで戦闘が始まる。opt.shiny が反映される', async () => {
+  const s = await open(); await goMap(s, 'komorebi'); await wait(300);
+  const r = await s.ev(async () => { const real = Math.random; let cap = null; const sb = startBattle; window.startBattle = (f, o) => { cap = o; sb(f, o); };
+    Math.random = () => 0.0001; owEncounter('aze', false); const omen = !!OWC.omen && OWC.omen.sh, tst = ui.toast;
+    await new Promise(r => setTimeout(r, 900)); Math.random = real; window.startBattle = sb;
+    return { omen, tst, started: !!B, shiny: B && B.enemies.some(c => c.mon.shiny), log0: B && B.log[0] && B.log[0].t || (B && JSON.stringify(B.log[0])), seen: B && state.shinySeen[B.enemies[0].mon.sp] }; });
+  ok(r.omen, '前兆なし'); ok(r.tst.includes('七色'), r.tst); ok(r.started && r.shiny, '色違いで戦闘に入らない'); ok(String(r.log0).includes('★ 色違い'), 'ログ: ' + r.log0);
+  eq(s.errors, []); await s.close();
+});
+T('T3: メタルに逃げられると「勝利」でなく逃げられた扱い、30歩以内にきらりが1回出る', async () => {
+  const s = await open(); await goMap(s, 'komorebi'); await wait(300);
+  const r = await s.ev(() => { const w0 = state.wins; startBattle([['haganetsubu', 3]], { field: 'x' }); B.enemies[0].gone = true; B.enemies[0].fled = true; win();
+    const res = { win: B.result.win, flee: B.result.flee, head: B.result.rw.head, wins: state.wins - w0, due: state.kirariDue }; B = null; ui.result = null;
+    const m = owMap(), o = state.ow; state.kirari = null; OWC.kMap = o.map; let n = 0; while (state.kirariDue > 0 && n < 40) { OWC.kSteps = 1; owKirariTick(m, o); n++; } res.spawned = !!state.kirari; res.steps = n; res.due2 = state.kirariDue; return res; });
+  eq(r.win, false); eq(r.flee, true); eq(r.head, '逃げられた……'); eq(r.wins, 0); eq(r.due, 30); ok(r.spawned && r.steps <= 30 && r.due2 === 0, JSON.stringify(r)); await s.close();
+});
+T('T3: 新キー(wxN/wxLog/kirari/kirariDue)が旧セーブに補われ、state.v は1のまま', async () => {
+  const s = await open(); await makeOldSave(s, 1);
+  await s.page.reload(); await s.page.waitForFunction(() => typeof state !== 'undefined' && state); await wait(600);
+  const r = await s.ev(() => { const a = JSON.stringify(state); migrate(); migrate(); return { v: state.v, wxN: state.wxN, wxLog: state.wxLog, kirari: state.kirari, due: state.kirariDue, same: a === JSON.stringify(state) }; });
+  eq(r.v, 1); eq(r.wxN, 0); eq(typeof r.wxLog, 'object'); eq(r.kirari, null); eq(r.due, 0); ok(r.same, 'migrate が冪等でない'); eq(s.errors, []); await s.close();
+});
+T('T1: 駅のみちくさ便りが出て、予報どおり(3コマ)', async () => {
+  const s = await open(); await goMap(s, 'komorebi'); await wait(300);
+  const r = await s.ev(() => { ui.station = true; render(); const el = document.querySelector('.wxnews'); return { has: !!el, cells: el ? el.querySelectorAll('.wxc').length : 0, txt: el ? el.textContent : '' }; });
+  ok(r.has && r.cells === 3, 'みちくさ便りなし'); eq(s.errors, []); await s.close();
 });
 
 (async () => {

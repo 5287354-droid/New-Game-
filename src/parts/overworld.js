@@ -2332,7 +2332,9 @@ function owDraw(){
   else if(here==='T'&&!mv){const X=o.x*TS-cx,Y=o.y*TS-cy;c.fillStyle=P.tall;c.fillRect(X+2,Y+12,12,4);c.fillStyle=P.tall2;for(let k=0;k<4;k++)c.fillRect(X+3+k*3,Y+11,1,4);}
   if(here==='Q'&&!mv){c.strokeStyle='rgba(232,238,246,.85)';c.lineWidth=.6;const X=o.x*TS-cx,Y=o.y*TS-cy;c.beginPath();c.moveTo(X+1,Y+4);c.lineTo(X+15,Y+12);c.moveTo(X+15,Y+3);c.lineTo(X+1,Y+13);c.stroke();}
   if(state.time===3&&m.ground==='grass'){for(let i=0;i<10;i++){const t=(Date.now()/900+i*1.7);const fx=((i*53)%(m.rows[0].length*TS))-cx+Math.sin(t)*4,fy=((i*97)%(m.rows.length*TS))-cy+Math.cos(t*1.3)*3;const rw=m.rows[Math.floor((fy+cy)/TS)];if(rw&&'RTW'.includes(rw[Math.floor((fx+cx)/TS)])){c.fillStyle=(i+Math.floor(t))%3?'#e8ff8a':'rgba(232,255,138,.4)';c.fillRect(Math.round(fx),Math.round(fy),1,1);}}}
+  owKirariDraw(c,m,cx,cy);
   if(m.ground==='snow')owSnowFx(c,m,px-cx+8,py-cy+8);
+  owWxFx(c,m);
   if(m.squall){const bz=owBliz();if(bz!=='calm'){c.fillStyle=bz==='storm'?'rgba(40,60,90,.28)':'rgba(40,60,90,.12)';c.fillRect(0,0,OWC.vw*TS,VH*TS);c.fillStyle='rgba(210,230,255,.75)';const n=bz==='storm'?60:22;for(let i=0;i<n;i++){const t=Date.now()/3+i*97;const rx=(OWC.vw*TS+30)-((t*1.3+i*41)%(OWC.vw*TS+30)),ry=(t*2.2+i*53)%(VH*TS);c.fillRect(Math.round(rx),Math.round(ry),1,3);c.fillRect(Math.round(rx)-1,Math.round(ry)+3,1,2);}}}
   if(m.ground==='yomi'){c.fillStyle='rgba(90,30,60,.10)';c.fillRect(0,0,OWC.vw*TS,VH*TS);for(let i=0;i<12;i++){const t=Date.now()/50+i*83;const fx=(i*61+Math.sin(t/37+i)*10+t*.15)%(OWC.vw*TS),fy=(t*.35+i*47)%(VH*TS);c.fillStyle=i%3?'#e8283c':'#ff8a9a';c.fillRect(Math.round(fx),Math.round(fy),2,1);}}
   if(m.ground==='coral'){c.fillStyle='rgba(20,90,150,.2)';c.fillRect(0,0,OWC.vw*TS,VH*TS);c.save();c.globalCompositeOperation='lighter';for(let i=0;i<4;i++){const rx=((i*67+Date.now()/90)%(OWC.vw*TS+60))-30;c.fillStyle='rgba(180,240,255,.06)';c.beginPath();c.moveTo(rx,0);c.lineTo(rx+14,0);c.lineTo(rx-26,VH*TS);c.lineTo(rx-46,VH*TS);c.fill();}c.restore();c.fillStyle='rgba(230,250,255,.7)';for(let i=0;i<10;i++){const t=(Date.now()/2600+i*.37)%1;c.fillRect(Math.round((i*47+Math.sin(t*9+i)*5)%(OWC.vw*TS)),Math.round((1-t)*VH*TS),1+(i%2),1+(i%2));}}
@@ -2348,6 +2350,16 @@ function owDraw(){
   if(m.light){const lv=Math.min(1,(state.owCold||0)/m.cold),r0=44-lv*30,r1=150-lv*100;c.save();const g=c.createRadialGradient(px-cx+8,py-cy+8,r0,px-cx+8,py-cy+8,r1);g.addColorStop(0,'rgba(10,4,16,0)');g.addColorStop(1,'rgba(10,4,16,.93)');c.fillStyle=g;c.fillRect(0,0,OWC.vw*TS,VH*TS);c.restore();}
   if(m.cave){c.save();const g=c.createRadialGradient(px-cx+8,py-cy+8,36,px-cx+8,py-cy+8,120);const vc=m.ground==='snow'?'6,14,30':'8,4,4';g.addColorStop(0,`rgba(${vc},0)`);g.addColorStop(1,`rgba(${vc},.8)`);c.fillStyle=g;c.fillRect(0,0,OWC.vw*TS,VH*TS);c.restore();}
   if(m.cold)owColdBar(c,m);
+  if(OWC.omen){const k=(performance.now()-OWC.omen.t)/600,a=Math.sin(Math.min(1,Math.max(0,k))*Math.PI)*.4,cl=['#ff5a6a','#ffa14a','#ffe04a','#6ad86a','#4ac8e8','#8a7aff','#d07aff'];if(OWC.omen.sh)cl.forEach((q,i)=>{c.fillStyle=q;c.globalAlpha=a;const hh=Math.ceil(VH*TS/7);c.fillRect(0,i*hh,OWC.vw*TS,hh);});else{c.fillStyle='#fff';c.globalAlpha=a*.7;c.fillRect(0,0,OWC.vw*TS,VH*TS);}c.globalAlpha=1;}
+}
+/* きらりの光(4コマの十字)と、画面の外にあるときの方向の目印 */
+function owKirariDraw(c,m,cx,cy){
+  const k=state.kirari;if(!k||k.map!==state.ow.map)return;
+  const W=OWC.vw*TS,Hh=OWC.vh*TS,fr=Math.floor(Date.now()/140)%4,L=[2,4,6,4][fr],col=fr%2?'#ffffff':'#ffe27a';
+  let X=k.x*TS-cx+8,Y=k.y*TS-cy+8;const out=X<0||Y<0||X>W||Y>Hh;
+  if(out){X=Math.max(5,Math.min(W-5,X));Y=Math.max(5,Math.min(Hh-5,Y));if(fr%2)return;}
+  c.fillStyle=col;c.fillRect(X-L,Y,2*L+1,1);c.fillRect(X,Y-L,1,2*L+1);
+  if(fr===2){c.fillRect(X-3,Y-3,1,1);c.fillRect(X+3,Y-3,1,1);c.fillRect(X-3,Y+3,1,1);c.fillRect(X+3,Y+3,1,1);}
 }
 /* ===== 火ノ島のしかけ =====
    %溶岩(通れない) &$溶岩流(ふだんは冷えた岩。&と$で流れる時間がずれる) ^間欠泉(噴き上がると飛ばされる)
@@ -2620,6 +2632,7 @@ function owArrive(){
   state.owSteps=(state.owSteps||0)+1;dailyInc('walk');if(state.owSteps>=120){state.owSteps=0;owTimePass();return;}
   if(w&&(!w.need||owFlag(w.need))){state.ow={map:w.to,x:w.x,y:w.y,dir:w.dir};owFoot();OWC.mv=null;OWC.held=null;OWC.cars=null;OWC.rk=null;OWC.fish=null;OWC.lseq=[];OWC.slide=null;OWC.crack=null;if(OWC.chase&&OWC.chase.map===o.map&&m.chase)owSetFlag(m.chase.done);owVolcReset();owTorchOut();if(w.setFlag)owSetFlag(w.setFlag);if(!MAPS[w.to].cold)state.owCold=0;owCancelPath();ui.toast=w.msg||MAPS[w.to].name;save();render();return;}
   owFoot();owStampTiles(m,o,here);
+  owKirariTick(m,o);
   if(!'&$?!^~uWav'.includes(here)&&!owHole(o.x,o.y)){OWC.lastSafe={map:o.map,x:o.x,y:o.y};if(m.rest&&m.rest.includes(here))OWC.lastRest={map:o.map,x:o.x,y:o.y};}
   if(here==='?'){OWC.crumb=OWC.crumb||{};const ck=o.x+','+o.y,b=OWC.crumb[ck];if(!b||performance.now()-b>=9000)OWC.crumb[ck]=performance.now();}
   if(state.owTorch>0){state.owTorch--;if(!state.owTorch){ui.toast='火種が燃えつきてしまった……';render();}}
@@ -2631,7 +2644,8 @@ function owArrive(){
   if(here==='Q'){OWC.stuck=performance.now()+650;OWC.held=null;owCancelPath();ui.toast='クモの糸にからまった！';render();}
   const enc=m.enc||'T';
   if(enc.includes(here)&&state.party.some(x=>x.hp>0)&&!(OWC.chase&&OWC.chase.map===o.map)){
-    const rate=(m.rate||.11)*(state.lure>0?1.8:1);if(!enc.includes(here))return;
+    const k=state.kirari;if(k&&k.map===o.map&&k.x===o.x&&k.y===o.y){owKirariHit(m);return;}
+    const rate=(m.rate||.11)*(state.lure>0?1.8:1)*(owWxOutdoor(m)&&owWxId()==='ame'?1.15:1);if(!enc.includes(here))return;
     if(Math.random()<rate){OWC.held=null;OWC.mv=null;owCancelPath();save();owEncounter(m.field);return;}
   }
   if(state.owSteps%10===0)save();
@@ -2668,8 +2682,54 @@ function owThin(m,o){
     talk([['','湖じゅうの氷が、いっせいに鳴りひびいた……！'],['','氷の下から、光るものが浮かび上がってきた。'],['',Object.entries(tp.items).map(([it,n])=>`${ITEMS[it].n}×${n}`).join('と')+'を手に入れた！'],['','割れた氷は、またたく間に凍りなおした。']]);return true;}}
   return false;}
 /* 時間帯・天気のお知らせ帯(マップ上部、2秒)。天気は T1 が owWeatherNote / owWeatherChip を上書きして足す */
-function owWeatherNote(){return '';}
-function owWeatherChip(){return '';}
+const WX_NOTE={ame:'雨が降りだした',kiri:'霧が出てきた',yuki:'雪が降りだした',hai:'火山灰が降ってきた',hoshi:'星が降りはじめた',kumo:'空がくもってきた',hare:'空が晴れてきた'};
+function owWeatherNote(){
+  const tw=state.town,cur=wxNow(tw),prev=wxOf(tw,-1);if(cur===prev)return '';
+  if(cur==='hoshi')sfx('kirari');
+  return WX_NOTE[cur]||'';
+}
+function owWeatherChip(){const w=WX[wxNow()];return w?`<span class="tchip wx" style="--tc:${w.c}" title="空もよう: ${w.n}"><i></i>${w.s}</span>`:'';}
+/* 天気の画面効果は屋外のマップだけ(洞窟・屋内・まっ暗な所は出さない) */
+const owWxOutdoor=m=>!!m&&!m.dim&&!m.dark&&!m.cave&&!m.light&&!m.air&&m.ground!=='floor'&&m.ground!=='cave';
+const owWxId=()=>wxNow(owMap()?owMap().town:state.town);
+/* 天気の音: 雨=雨音+BGMこもり、霧=BGMこもり、雪=風の音 */
+function owWxAudio(on){
+  const m=owMap(),wx=on&&owWxOutdoor(m)?owWxId():'';if(OWC.wxAk===wx)return;OWC.wxAk=wx;
+  try{
+    if(wx==='ame'){ambStart('rain');}else if(wx==='yuki'){ambStart('wind');}else if(OWC.wxAmb){ambStop();}
+    OWC.wxAmb=wx==='ame'||wx==='yuki';
+    bgmSetMood({rain:wx==='ame',fog:wx==='kiri'});
+  }catch(e){}
+}
+/* 天気の画面効果(Canvasで軽く: 線と点だけ。にじみ・ぼかしは使わない) */
+function owWxFx(c,m){
+  if(!owWxOutdoor(m))return;const wx=owWxId();if(wx==='hare')return;
+  const W=OWC.vw*TS,Hh=OWC.vh*TS,now=Date.now(),fx=OWC.ppx,fy=OWC.ppy,nt=state.time===3;
+  if(wx==='kumo'){c.fillStyle='rgba(22,30,48,.14)';c.fillRect(0,0,W,Hh);return;}
+  if(wx==='ame'){
+    c.fillStyle=nt?'rgba(6,10,30,.2)':'rgba(12,24,52,.2)';c.fillRect(0,0,W,Hh);
+    c.strokeStyle='rgba(158,195,255,.34)';c.lineWidth=.7;c.beginPath();
+    for(let i=0;i<36;i++){const ph=((now/420+(i*.618)%1)%1),y=ph*(Hh+12)-6,x=((i*61)%(W+20))-y*.22;c.moveTo(x,y);c.lineTo(x-2.2,y+7);}
+    c.stroke();c.fillStyle='rgba(190,220,255,.55)';
+    for(let i=0;i<7;i++){const ph=((now/700+i*.37)%1);if(ph<.5)c.fillRect(Math.round((i*97+31)%W),Math.round(Hh*.35+((i*53)%(Hh*.6))),Math.round(2+ph*6),1);}
+    return;}
+  if(wx==='kiri'){
+    const col=nt?'26,32,48':'214,222,230',r1=state.time===0?72:84;c.save();const g=c.createRadialGradient(fx,fy,28,fx,fy,r1);g.addColorStop(0,`rgba(${col},0)`);g.addColorStop(1,`rgba(${col},.93)`);c.fillStyle=g;c.fillRect(0,0,W,Hh);
+    c.fillStyle=`rgba(${col},.16)`;for(let i=0;i<5;i++){const tt=now/4200+i;c.fillRect(((Math.sin(tt)*.5+.5)*W+i*37)%W-20,(i*31)%Hh,56,9);}c.restore();return;}
+  if(wx==='yuki'){
+    c.fillStyle='rgba(190,214,245,.1)';c.fillRect(0,0,W,Hh);
+    if(m.ground!=='snow'){c.fillStyle='rgba(255,255,255,.85)';for(let i=0;i<30;i++){const tt=now/55+i*137,x=(((i*53+Math.sin(tt/40+i)*6)%W)+W)%W,y=(tt*.5+i*41)%Hh;c.fillRect(Math.round(x),Math.round(y),i%3?1:2,i%3?1:2);}}
+    return;}
+  if(wx==='hai'){
+    c.fillStyle='rgba(90,40,28,.17)';c.fillRect(0,0,W,Hh);
+    for(let i=0;i<34;i++){const tt=now/70+i*113,x=(((i*47+tt*.35)%W)+W)%W,y=(tt*.45+i*37)%Hh;c.fillStyle=i%6===0?'#ff9a5a':'#b9b0ac';c.fillRect(Math.round(x),Math.round(y),i%4?1:2,1);}
+    return;}
+  if(wx==='hoshi'){
+    c.fillStyle='rgba(10,14,56,.12)';c.fillRect(0,0,W,Hh);
+    for(let i=0;i<9;i++){const on=Math.floor(now/380+i*1.7)%3===0,x=Math.round((i*73+19)%W),y=Math.round((i*41+11)%Hh);if(on){c.fillStyle='#fff6c0';c.fillRect(x,y,1,1);c.fillRect(x-1,y,3,1);c.fillRect(x,y-1,1,3);}}
+    const ph=(now%5200)/5200;if(ph<.22){const q=ph/.22,x0=W*.85-q*W*.7,y0=q*Hh*.5;c.strokeStyle=`rgba(255,244,190,${1-q*.7})`;c.lineWidth=.9;c.beginPath();c.moveTo(x0,y0);c.lineTo(x0+16,y0-8);c.stroke();c.fillStyle='#fff';c.fillRect(Math.round(x0),Math.round(y0),2,2);}
+  }
+}
 function owBand(text){ui.band={text,c:TIMES[state.time].c,t:Date.now()};}
 /* ===== T2 みちくさ踏破(足あと・スタンプ・みちくさ点・寄り道ボーナス) ===== */
 /* しかけスタンプ16種。id は 'g:' + 名前。取ると +5点 */
@@ -2817,7 +2877,7 @@ function owFishStep(){
 function owFishPull(){
   const f=OWC.fish;OWC.fish=null;
   if(f.phase!=='bite'){ui.toast='早すぎた！ 魚に気づかれた。';render();return;}
-  const m=owMap(),t=TOWN[m.town],fs=m.fish,tb=fs.table.filter(([,,tm])=>timeOK(tm,state.time)).map(([s,w])=>({w,s}));
+  const m=owMap(),t=TOWN[m.town],fs=m.fish,tb=wxTable(fs.table,state.time,wxNow(m.town));
   const n=Math.random()<.25?2:1,foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(OW_LV(fs.lv[0],1.25),OW_LV(fs.lv[1],1.25))]);
   ui.toast='';owStamp('g:fish');save();startBattle(foes,{field:`${t.name}・釣り`,scene:'port'});
 }
@@ -2827,15 +2887,59 @@ function owEarly(foes){
   const lead=state.party.find(m=>m.hp>0)||state.party[0];if(!lead)return foes;
   foes.length=1;foes[0][1]=Math.max(1,Math.min(foes[0][1],lead.lv-1));return foes;
 }
-function owEncounter(fid){
+/* 色違いの率: 通常 1/150、きらり 1/30。星降りは通常 1/75、きらり 1/15 */
+const owShinyP=(wx,kir)=>kir?(wx==='hoshi'?1/15:1/30):(wx==='hoshi'?1/75:1/150);
+/* きらりを踏んだときの1体目: 50% その場でいちばん出にくい子 / 30% メタル系 / 20% 天候限定(なければ前者) */
+function owKirariFoe(f,wx,up,r){
+  const rows=f.table.filter(([,,tm])=>tagOK(tm,state.time,wx)),lv=()=>ri(f.lv[0],f.lv[1])+up,low=()=>{const mn=Math.min(...rows.map(x=>x[1]));return [pick(rows.filter(x=>x[1]===mn))[0],lv(),'low'];};
+  if(r<.5)return low();
+  if(r<.8)return [pick(TOWNS.indexOf(TOWN[state.town])>=2?['haganetsubu','gintachi']:['haganetsubu','koganetsubu','koganetsubu']),ri(f.lv[0],f.lv[1]),'metal'];
+  const wr=rows.filter(([,,tm])=>tm&&[...tm].some(ch=>WXT[ch]===wx));
+  return wr.length?[wpick(wr.map(x=>({w:x[1],s:x[0]}))).s,lv(),'wx']:low();
+}
+function owEncounter(fid,kir){
   const t=TOWN[state.town],f=t.fields.find(x=>x.id===fid);if(!f)return;
-  const n=Math.min(f.max,wpick([{w:6,v:1},{w:3,v:2},{w:1,v:3}]).v);
-  const tb=f.table.filter(([,,tm])=>timeOK(tm,state.time)).map(([s,w])=>({w,s}));
+  const wx=wxNow(state.town),n=Math.min(f.max,wpick([{w:6,v:1},{w:3,v:2},{w:1,v:3}]).v);
+  const tb=wxTable(f.table,state.time,wx);
   const up=(owMap()&&owMap().lvUp)||0,foes=[];for(let i=0;i<n;i++)foes.push([wpick(tb).s,ri(f.lv[0],f.lv[1])+up]);
   const mrate=.035*((state.lure||0)>0?4:1);if(state.lure>0)state.lure--;
   if(Math.random()<mrate)foes[0]=[pick(TOWNS.indexOf(t)>=2?['haganetsubu','gintachi']:['haganetsubu','koganetsubu','koganetsubu']),ri(f.lv[0],f.lv[1])];
-  owEarly(foes);ui.toast='';startBattle(foes,{field:`${t.name}・${f.name}`,scene:f.scene});
+  if(kir){const k=owKirariFoe(f,wx,up,Math.random());foes[0]=[k[0],k[1]];}
+  owEarly(foes);
+  const shiny=foes.map((_,i)=>Math.random()<owShinyP(wx,!!kir&&i===0));
+  ui.toast='';owBattleGo(foes,{field:`${t.name}・${f.name}`,scene:f.scene,shiny,rare:kir?[0]:null});
 }
+/* 戦闘の前: 色違いなら草むらが七色にゆれる(0.6秒)。きらりなら光のジングル */
+function owBattleGo(foes,opt){
+  const sh=(opt.shiny||[]).some(Boolean);
+  if(!sh&&!opt.rare){startBattle(foes,opt);return;}
+  OWC.held=null;OWC.mv=null;owCancelPath();OWC.stuck=performance.now()+800;OWC.omen={t:performance.now(),sh};
+  if(sh){sfx('shiny');ui.toast=opt.rare?'光が七色にゆれた！':'草むらが七色にゆれた！';}else{jingle('rare');ui.toast='きらりの光に、何かがひそんでいる！';}
+  render();
+  setTimeout(()=>{OWC.omen=null;if(!B)startBattle(foes,opt);},sh?600:450);
+}
+/* ===== T3: きらり(マップの光。踏むとレア確定・色違い率アップ。同時に1つまで) ===== */
+const owKirariProb=()=>Math.min(.8,.2*(1+.1*(state.detour||0))*(owWxId()==='hoshi'?3:1));
+function owKirariSpawn(m,o){
+  const enc=m.enc||'T',seen=new Set([o.x+','+o.y]),q=[[o.x,o.y]],near=[],far=[];
+  for(let i=0;i<q.length&&i<1500;i++){const [x,y]=q[i],d=Math.abs(x-o.x)+Math.abs(y-o.y);
+    if(enc.includes((m.rows[y]||'')[x])){if(d>=6&&d<=14)near.push([x,y]);else if(d>=3&&d<=20)far.push([x,y]);}
+    if(d>=20)continue;
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(seen.has(k)||nx<0||ny<0||ny>=m.rows.length||nx>=m.rows[0].length||owSolid(m,nx,ny))continue;seen.add(k);q.push([nx,ny]);}}
+  const c=near.length?near:far;if(!c.length)return false;
+  const [x,y]=pick(c);state.kirari={map:o.map,x,y,ttl:90};sfx('kirari');ui.toast='近くで、何かがキラリと光った！';render();return true;
+}
+function owKirariTick(m,o){
+  if(state.kirari&&state.kirari.map!==o.map)state.kirari=null;
+  if(OWC.kMap!==o.map){OWC.kMap=o.map;OWC.kSteps=0;if(!state.kirari&&Math.random()<owKirariProb())owKirariSpawn(m,o);}
+  else{
+    OWC.kSteps=(OWC.kSteps||0)+1;const k=state.kirari;
+    if(k&&--k.ttl<=0){state.kirari=null;ui.toast='きらりの光が、すうっと消えた……';render();}
+    else if(!state.kirari&&OWC.kSteps%60===0&&Math.random()<owKirariProb())owKirariSpawn(m,o);
+  }
+  if(state.kirariDue>0&&!state.kirari){state.kirariDue--;if(owKirariSpawn(m,o))state.kirariDue=0;}
+}
+function owKirariHit(m){state.kirari=null;OWC.held=null;OWC.mv=null;owCancelPath();save();owEncounter(m.field,true);}
 /* ゴミ箱: 1日1回ずつ調べられる */
 function owTrash(k,kind){
   const pool=kind==='pool',nm=pool?'潮だまり':'ゴミ箱';if(pool&&owTideHigh()){talk([['','潮だまりだ。いまは潮が満ちていて、中がよく見えない。']]);return;}
@@ -2913,7 +3017,7 @@ function owA(){
 }
 /* ---- タップで歩く ---- */
 function owCancelPath(){OWC.path=null;OWC.goal=null;OWC.pathAct=null;}
-function owTapLimit(m){if(m.fog)return 3;if(m.blizzard&&owBliz()==='storm')return 3;if(m.dim)return 4;if(m.dark&&!owFlag(m.dark))return 2;return 99;}
+function owTapLimit(m){if(m.fog)return 3;if(m.blizzard&&owBliz()==='storm')return 3;if(m.dim)return 4;if(m.dark&&!owFlag(m.dark))return 2;if(owWxOutdoor(m)&&owWxId()==='kiri')return 5;return 99;}
 function owFindPath(m,sx,sy,goals){
   const W=m.rows[0].length,Hh=m.rows.length,key=(x,y)=>y*W+x,prev=new Map([[key(sx,sy),null]]),q=[[sx,sy]];
   const isGoal=(x,y)=>goals.some(g=>g[0]===x&&g[1]===y);
@@ -2962,10 +3066,11 @@ function owPathStep(){
 }
 function owLoop(ts){
   OWC.raf=requestAnimationFrame(owLoop);
-  const cv=document.getElementById('owc');if(!cv){return;}
+  const cv=document.getElementById('owc');if(!cv){owWxAudio(false);return;}
   if(cv!==OWC.cv){OWC.cv=cv;OWC.ctx=cv.getContext('2d');}
   const m=owMap();
-  if(B||!m){OWC.held=null;return;}
+  if(B||!m){OWC.held=null;owWxAudio(false);return;}
+  owWxAudio(true);
   if(ui.dlg||ui.result||ui.gacha){OWC.held=null;owDraw();return;}
   owCarsStep(m);owFishStep();
   if(m.wind&&owGust()==='gust'&&!OWC.mv&&m.rows[state.ow.y][state.ow.x]==='H'&&performance.now()>(OWC.pushT||0)){OWC.pushT=performance.now()+420;const o=state.ow,by=o.y+1;if(!owSolid(m,o.x,by)){OWC.mv={fx:o.x,fy:o.y,t:0};o.y=by;OWC.held=null;}}if(OWC.fish&&OWC.held){OWC.fish=null;ui.toast='釣りをやめた。';OWC.held=null;render();return;}
@@ -2989,7 +3094,7 @@ function renderOverworld(){
   const m=owMap(),tm=TIMES[state.time];
   return `<section class="ow" aria-label="${m.name}のマップ">
     <div class="ow-screen"><div class="ow-cv"><canvas id="owc" width="${OWC.vw*TS*OWSCALE}" height="${OWC.vh*TS*OWSCALE}" aria-label="${m.name}を見下ろしたマップ。主人公が立っている"></canvas>
-      <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}</span><div class="ow-sub">${owSubHtml(m)}</div></div>${ui.stampCur?stampHtml(ui.stampCur):''}${ui.band?`<div class="ow-band" style="--tc:${ui.band.c}" role="status"><b>${esc(ui.band.text)}</b></div>`:''}${ui.heal?`<button class="ow-heal" data-act="owHeal">${esc(ui.heal)}</button>`:''}${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
+      <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}${owWxOutdoor(m)?' ・ '+WX[owWxId()].n:''}</span><div class="ow-sub">${owSubHtml(m)}</div></div>${ui.stampCur?stampHtml(ui.stampCur):''}${ui.band?`<div class="ow-band" style="--tc:${ui.band.c}" role="status"><b>${esc(ui.band.text)}</b></div>`:''}${ui.heal?`<button class="ow-heal" data-act="owHeal">${esc(ui.heal)}</button>`:''}${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
     <div class="ow-pad">
       <div class="dpad">${['up','left','right','down'].map(d=>`<button class="dp dp-${d}" data-owdir="${d}" aria-label="${{up:'上',down:'下',left:'左',right:'右'}[d]}">${{up:'▲',down:'▼',left:'◀',right:'▶'}[d]}</button>`).join('')}<span class="dp-c"></span></div>
       ${state.ow.map!==m.town?`<button class="ow-back${ui.owBack?' on':''}" data-act="owBack" aria-label="町の駅へもどる">${ui.owBack?'もう一度で<br>もどる':'駅へ<br>もどる'}</button>`:''}
@@ -3004,7 +3109,7 @@ function wildCard(t){
 }
 function renderStationIn(){
   const h=renderMap(),cut=h.indexOf('<section class="town-grid">');const t=TOWN[state.town];
-  return `${h.slice(0,cut)}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
+  return `${h.slice(0,cut)}${wxPanel()}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
 }
 /* 建物の中 */
 function renderInside(){
