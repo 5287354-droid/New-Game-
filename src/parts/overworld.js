@@ -2682,6 +2682,10 @@ function owThin(m,o){
     talk([['','湖じゅうの氷が、いっせいに鳴りひびいた……！'],['','氷の下から、光るものが浮かび上がってきた。'],['',Object.entries(tp.items).map(([it,n])=>`${ITEMS[it].n}×${n}`).join('と')+'を手に入れた！'],['','割れた氷は、またたく間に凍りなおした。']]);return true;}}
   return false;}
 /* 時間帯・天気のお知らせ帯(マップ上部、2秒)。天気は T1 が owWeatherNote / owWeatherChip を上書きして足す */
+const OWVIG={};
+/* 円形のくもりを毎フレーム作らず、W*2 x H*2 の画像に一度だけ描いて使いまわす(中心=画像の中央) */
+function owVigCache(col,r0,r1,a,W,H){const k=col+'|'+r0+'|'+r1+'|'+a+'|'+W+'|'+H;let v=OWVIG[k];if(v)return v;
+  v=document.createElement('canvas');v.width=W*2;v.height=H*2;const x=v.getContext('2d'),g=x.createRadialGradient(W,H,r0,W,H,r1);g.addColorStop(0,`rgba(${col},0)`);g.addColorStop(1,`rgba(${col},${a})`);x.fillStyle=g;x.fillRect(0,0,W*2,H*2);OWVIG[k]=v;return v;}
 const WX_NOTE={ame:'雨が降りだした',kiri:'霧が出てきた',yuki:'雪が降りだした',hai:'火山灰が降ってきた',hoshi:'星が降りはじめた',kumo:'空がくもってきた',hare:'空が晴れてきた'};
 function owWeatherNote(){
   const tw=state.town,cur=wxNow(tw),prev=wxOf(tw,-1);if(cur===prev)return '';
@@ -2714,7 +2718,7 @@ function owWxFx(c,m){
     for(let i=0;i<7;i++){const ph=((now/700+i*.37)%1);if(ph<.5)c.fillRect(Math.round((i*97+31)%W),Math.round(Hh*.35+((i*53)%(Hh*.6))),Math.round(2+ph*6),1);}
     return;}
   if(wx==='kiri'){
-    const col=nt?'26,32,48':'214,222,230',r1=state.time===0?72:84;c.save();const g=c.createRadialGradient(fx,fy,28,fx,fy,r1);g.addColorStop(0,`rgba(${col},0)`);g.addColorStop(1,`rgba(${col},.93)`);c.fillStyle=g;c.fillRect(0,0,W,Hh);
+    const col=nt?'26,32,48':'214,222,230',r1=state.time===0?72:84;c.save();c.drawImage(owVigCache(col,28,r1,.93,W,Hh),Math.round(fx-W),Math.round(fy-Hh));
     c.fillStyle=`rgba(${col},.16)`;for(let i=0;i<5;i++){const tt=now/4200+i;c.fillRect(((Math.sin(tt)*.5+.5)*W+i*37)%W-20,(i*31)%Hh,56,9);}c.restore();return;}
   if(wx==='yuki'){
     c.fillStyle='rgba(190,214,245,.1)';c.fillRect(0,0,W,Hh);
@@ -3095,7 +3099,7 @@ function renderOverworld(){
   return `<section class="ow" aria-label="${m.name}のマップ">
     <div class="ow-screen"><div class="ow-cv"><canvas id="owc" width="${OWC.vw*TS*OWSCALE}" height="${OWC.vh*TS*OWSCALE}" aria-label="${m.name}を見下ろしたマップ。主人公が立っている"></canvas>
       <div class="ow-name"><span>${m.name}</span><span class="ow-time" style="--tc:${tm.c}">● ${tm.n}${owWxOutdoor(m)?' ・ '+WX[owWxId()].n:''}</span><div class="ow-sub">${owSubHtml(m)}</div></div>${ui.stampCur?stampHtml(ui.stampCur):''}${ui.band?`<div class="ow-band" style="--tc:${ui.band.c}" role="status"><b>${esc(ui.band.text)}</b></div>`:''}${ui.heal?`<button class="ow-heal" data-act="owHeal">${esc(ui.heal)}</button>`:''}${ui.toast?`<div class="ow-toast" role="status">${esc(ui.toast)}</div>`:''}</div></div>
-    <div class="ow-pad">
+    <div class="ow-pad${state.ow.map!==m.town?' has-back':''}">
       <div class="dpad">${['up','left','right','down'].map(d=>`<button class="dp dp-${d}" data-owdir="${d}" aria-label="${{up:'上',down:'下',left:'左',right:'右'}[d]}">${{up:'▲',down:'▼',left:'◀',right:'▶'}[d]}</button>`).join('')}<span class="dp-c"></span></div>
       ${state.ow.map!==m.town?`<button class="ow-back${ui.owBack?' on':''}" data-act="owBack" aria-label="町の駅へもどる">${ui.owBack?'もう一度で<br>もどる':'駅へ<br>もどる'}</button>`:''}
       <div class="abtn"><button class="ob ob-b" data-owb="1" aria-label="Bボタン(押しているあいだ走る)">B</button><button class="ob ob-a" data-act="owA" aria-label="Aボタン(調べる・話す)">A</button></div>
