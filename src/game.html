@@ -3062,7 +3062,7 @@ DEX_MS.push({n:124,reward:{yen:200000,items:{tenpu:3,kakusei:1}}});
 
 Object.assign(SONGS,{
   hinoshima:{bpm:112,ch:[
-    {w:'p25',v:.045,o:5,m:'d4 f8 g8 a4 g8 f8 d4 c8 d8 f4 r4 a4 >c8 d8 c4 <a8 g8 a4 g8 f8 g4 r4 d4 f8 g8 a4 >c4 d8 c8 <a8 g8 f4 g4 a8 g8 f8 d8 c4 d2 r4'},
+    {w:'p25',v:.045,o:5,m:'d4 f8 g8 a4 g8 f8 d4 c8 d8 f4 r4 a4 >c8 d8 c4 <a8 g8 a4 g8 f8 g4 r4 d4 f8 g8 a4 >c4 d8 c8 <a8 g8 f4 g4 a8 g8 f8 d8 c4 d2 r4 r2'},
     {w:'tri',v:.08,o:3,m:'d4 a4 d4 a4 c4 g4 c4 g4 b-4 f4 b-4 f4 a4 e4 a4 e4'},
     {w:'nz',v:.035,m:'k8 k8 s8 r8 k8 r8 s8 h8'}]},
   hisanshou:{bpm:150,ch:[
@@ -3070,8 +3070,8 @@ Object.assign(SONGS,{
     {w:'tri',v:.1,o:2,m:'e8 e8 b8 e8 e8 e8 b8 e8 c8 c8 g8 c8 b8 b8 f+8 b8'},
     {w:'nz',v:.045,m:'k8 k8 s8 k8 k8 s8 s8 s8'}]},
   kagutsuchi:{bpm:128,ch:[
-    {w:'p25',v:.045,o:5,m:'a4 >c4 e4 d8 c8 <b4 a4 g+2 a4 b4 >c4 e4 a4 g8 f8 e2. r4 f4 e4 d4 c4 <b4 a8 b8 >c4 e4 d4 c4 <b4 g+4 a2 e2'},
-    {w:'tri',v:.1,o:3,m:'a2 e2 f2 c2 d2 a2 e2 e2'},
+    {w:'p25',v:.045,o:5,m:'a4 >c4 e4 d8 c8 <b4 a4 g+2 a4 b4 >c4 e4 a4 g8 f8 e2. r4 f4 e4 d4 c4 <b4 a8 b8 >c4 e4 d4 c4 <b4 g+4 a2 e2 r2'},
+    {w:'tri',v:.1,o:3,m:'a2 e2 f2 c2 d2 a2 e2 e2 a2 e2 f2 c2 d2 a2 e2 e2 a2 e2'},
     {w:'nz',v:.04,m:'k4 s8 k8 k4 s4'}]},
 });
 TOWN_BGM.hinoshima='hinoshima';BOSS_BGM.hinoshima='hisanshou';BOSS_BGM.hinoshima_ura='kagutsuchi';
@@ -3440,7 +3440,7 @@ function renderDexReg(DL){
 
 Object.assign(SONGS,{
   sango:{bpm:104,ch:[
-    {w:'p25',v:.045,o:5,m:'c4 e8 f8 g4 b4 >c4 <b8 g8 f4 e4 g4 f8 e8 c4 e8 f8 g2 r4 c4 e8 f8 g4 b4 >c4 e4 d8 c8 <b8 g8 f4 e8 f8 g4 e8 c8 e4 c2 r4'},
+    {w:'p25',v:.045,o:5,m:'c4 e8 f8 g4 b4 >c4 <b8 g8 f4 e4 g4 f8 e8 c4 e8 f8 g2 r4 c4 e8 f8 g4 b4 >c4 e4 d8 c8 <b8 g8 f4 e8 f8 g4 e8 c8 e4 c2 r4 r4'},
     {w:'tri',v:.08,o:3,m:'c4 g4 c4 g4 f4 >c4 <f4 >c4 <e4 b4 e4 b4 f4 g4 c2'},
     {w:'nz',v:.03,m:'k8 h8 h8 s8 h8 k8 s8 h8'}]},
   oniitomaki:{bpm:144,ch:[
@@ -3448,15 +3448,15 @@ Object.assign(SONGS,{
     {w:'tri',v:.1,o:2,m:'d8 d8 a8 d8 b-8 b-8 f8 b-8 g8 g8 d8 g8 a8 a8 e8 a8'},
     {w:'nz',v:.045,m:'k8 s8 k8 k8 s8 k8 s8 s8'}]},
   nirai:{bpm:92,ch:[
-    {w:'p25',v:.045,o:5,m:'e4 g4 b4 >e2 d4 <b4 a4 g2 e4 f+4 g4 a4 b2. r4 >c4 <b4 a4 g4 f+4 e4 d4 e4 g4 a4 b4 >d4 e1'},
-    {w:'tri',v:.1,o:3,m:'e2 b2 c2 g2 a2 e2 b2 b2'},
+    {w:'p25',v:.045,o:5,m:'e4 g4 b4 >e2 d4 <b4 a4 g2 e4 f+4 g4 a4 b2. r4 >c4 <b4 a4 g4 f+4 e4 d4 e4 g4 a4 b4 >d4 e1 r2'},
+    {w:'tri',v:.1,o:3,m:'e2 b2 c2 g2 a2 e2 b2 b2 e2 b2 c2 g2 a2 e2 b2 b2 e2 b2'},
     {w:'nz',v:.03,m:'k4 h4 s4 h4'}]},
   yomi:{bpm:80,ch:[
     {w:'p25',v:.04,o:5,m:'a4 >c4 e2 d4 c4 <b2 a4 g4 a4 >c4 <b2. r4 a4 >c4 e4 g4 f4 e4 d2 c4 <b4 a4 g+4 a2. r4'},
     {w:'tri',v:.08,o:3,m:'a2 e2 f2 c2 d2 a2 e2 e2'},
     {w:'nz',v:.02,m:'k2 h4 h4'}]},
   orochi:{bpm:156,ch:[
-    {w:'saw',v:.032,o:4,m:'a8 a8 >c8 <a8 >e4 d4 c8 <b8 a8 g+8 a4 e4 f8 f8 a8 f8 >d4 c4 <b8 a8 g+8 f8 e4 e4 a8 a8 >c8 <a8 >e4 g4 f8 e8 d8 c8 <b4 >c4 <a2 r2'},
+    {w:'saw',v:.032,o:4,m:'a8 a8 >c8 <a8 >e4 d4 c8 <b8 a8 g+8 a4 e4 f8 f8 a8 f8 >d4 c4 <b8 a8 g+8 f8 e4 e4 a8 a8 >c8 <a8 >e4 g4 f8 e8 d8 c8 <b4 >c4 <a2 r2 r1'},
     {w:'tri',v:.1,o:2,m:'a8 a8 e8 a8 f8 f8 c8 f8 d8 d8 a8 d8 e8 e8 b8 e8'},
     {w:'nz',v:.045,m:'k8 k8 s8 k8 k8 k8 s8 s8'}]},
   tokoyo:{bpm:72,ch:[
