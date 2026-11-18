@@ -118,7 +118,7 @@
   S.income = async function (starter, mapId, lv, hours, seed, o = {}) {
     S.seed(seed); S.newGame(starter, { lv, party: o.party, time: o.time }); S.place(mapId);
     let T = 0, exp = 0, enc = 0, wins = 0, losses = 0, steps = 0, bsec = 0, rests = 0, shiny = 0, metal = 0, foes = 0;
-    const lead = state.party[0]; const y0 = state.yen;
+    const lv0 = state.party.map(m => m.lv); const y0 = state.yen;
     while (T < hours * 3600) {
       const st = S.walkToEncounter(); if (st < 0) break; steps += st; T += st / P.GRASS * P.STEP_S;
       const r = await S.fight(); enc++; exp += r.exp; bsec += r.sec; T += r.sec; r.win ? wins++ : losses++;
@@ -126,7 +126,7 @@
       if (afterFight(r)) { rests++; T += P.REST_S; }
       if (!r.win) S.place(mapId);
       /* 経験値は敵側で決まるので、先頭のLvを固定して測る(HPの割合は保つ) */
-      const hpf = lead.hp / calc(lead).hp; lead.lv = lv; lead.exp = 0; const s = calc(lead); lead.hp = Math.max(1, Math.floor(s.hp * hpf)); lead.mp = s.mp;
+      state.party.forEach((m, i) => { const L = lv0[i], hpf = m.hp / calc(m).hp; m.lv = L; m.exp = 0; const s = calc(m); m.hp = Math.max(m.hp > 0 ? 1 : 0, Math.floor(s.hp * hpf)); m.mp = s.mp; });
     }
     return { hours: T / 3600, exp, yenNet: state.yen - y0, enc, wins, losses, steps, battleSec: bsec, rests, shiny, metal, foes };
   };
@@ -169,6 +169,15 @@
     }
     return rows;
   };
+  /* 8a. ぬし戦だけ: 先頭Lvと仲間の数ごとの勝率(仲間は先頭Lv-1にそろえる) */
+  S.bossWin = async function (starter, lv, party, N, seed) {
+    S.seed(seed); let w = 0, turns = 0;
+    for (let i = 0; i < N; i++) {
+      S.newGame(starter, { lv, party }); state.party.forEach(m => { if (m.lv < lv - 1) { m.lv = lv - 1; learn(m); } }); healAll();
+      H.boss(); const r = await S.fight(); if (r.win) w++; turns += r.turns;
+    }
+    return { win: w / N, turns: turns / N };
+  };
   /* 8. ぬしまで: 草むらで戦い、先頭Lvが閾値に達したらぬしに挑戦 */
   S.toBoss = async function (starter, N, seed, thr0, party) {
     S.seed(seed); const res = [];
@@ -176,7 +185,7 @@
       S.newGame(starter, { party }); S.place('komorebi');
       let thr = thr0, T = 0, battles = 0, tries = 0, done = false, firstTry = null, levelAtTry = 0, rests = 0, loses = 0;
       const lead = state.party[0];
-      while (!done && T < 8 * 3600 && battles < 1500) {
+      while (!done && T < 6 * 3600 && battles < 800) {
         if (state.party.some(m => m.lv >= thr)) {
           tries++; healAll(); T += P.REST_S;
           H.boss(); const r = await S.fight(); battles++; T += r.sec;

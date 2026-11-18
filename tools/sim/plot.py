@@ -34,12 +34,14 @@ def save(fig, n):
 r = load('opening')
 if r:
     fig, ax = plt.subplots(figsize=(6.5, 3.8))
-    ks = list(r)
+    ks = [k for k in r if k in NAME]
     v = [r[k]['win'] * 100 for k in ks]
     err = [[(r[k]['win'] - r[k]['ci'][0]) * 100 for k in ks], [(r[k]['ci'][1] - r[k]['win']) * 100 for k in ks]]
     ax.bar([nm(k) for k in ks], v, yerr=err, color=[COL[k] for k in ks], capsize=4)
     ax.axhline(95, color='k', ls='--', lw=1); ax.text(2.45, 96, L('目標 95%', 'target 95%'), ha='right', fontsize=8)
     for i, x in enumerate(v): ax.text(i, x / 2, f'{x:.0f}%', ha='center', color='w', fontsize=12)
+    if 't812' not in r and 'talent812' in r:
+        t = r['talent812']; ax.scatter(range(len(ks)), [t[k]['win'] * 100 for k in ks], marker='D', color='k', zorder=5, label=L('才能8-12に固定', 'talent 8-12')); ax.legend(loc='upper left', fontsize=8)
     ax.set_ylim(0, 105); ax.set_ylabel(L('勝率(%)', 'win rate (%)')); ax.set_title(L('最初の草むらの最初の1戦(オート, 各1000戦)', 'first battle at the first grass (auto, 1000 each)'))
     save(fig, 'opening_winrate')
     fig, ax = plt.subplots(figsize=(6.5, 3.8)); w = .25
@@ -123,8 +125,9 @@ if r:
     for lab, ls in [('solo', '-'), ('party3', '--')]:
         ks = [k for k in r if k.startswith(lab)]
         th = [int(k.split('thr')[1]) for k in ks]
-        axs[0].plot(th, [r[k]['firstTry'] * 100 for k in ks], ls, marker='o', label=L('相棒のみ' if lab == 'solo' else '3体', lab))
+        bl = sorted([v for v in r.get('byLv', {}).values() if v['party'] == (1 if lab == 'solo' else 3)], key=lambda v: v['lv'])
+        axs[0].plot([v['lv'] for v in bl], [v['win'] * 100 for v in bl], ls, marker='o', label=L('相棒のみ' if lab == 'solo' else '3体', lab))
         axs[1].plot(th, [r[k]['minutes']['p50'] for k in ks], ls, marker='o', label=L('相棒のみ' if lab == 'solo' else '3体', lab))
-    axs[0].set_xlabel(L('挑戦するLv', 'Lv at challenge')); axs[0].set_ylabel(L('ぬし初挑戦の勝率(%)', 'first-try win %')); axs[0].legend()
+    axs[0].set_xlabel(L('先頭のLv(仲間は-1)', 'lead Lv')); axs[0].set_ylabel(L('ぬし戦の勝率(%) 満タンで挑戦', 'boss win %')); axs[0].set_title(L('裏山のぬし: Lvごとの勝率', 'boss win by Lv'), fontsize=9); axs[1].set_title(L('新規ゲームからぬし撃破まで', 'new game to boss clear'), fontsize=9); axs[0].legend()
     axs[1].set_xlabel(L('挑戦するLv', 'Lv at challenge')); axs[1].set_ylabel(L('撃破までの時間 中央値(分)', 'time to clear, median (min)')); axs[1].legend()
     save(fig, 'boss')

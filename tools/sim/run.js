@@ -32,6 +32,13 @@ const items = {
       raw.forEach(r => { byN[r.n][1]++; if (r.win) byN[r.n][0]++; else r.foes.split(',').forEach(f => { const k = f.split(':')[0]; lostBy[k] = (lostBy[k] || 0) + 1; }); });
       res[st] = { n: raw.length, win: wins / raw.length, ci: wilson(wins, raw.length), turns: mean(raw.map(r => r.turns)), sec: mean(raw.map(r => r.sec)), byN, lostBy };
     }
+    /* DESIGN 5-3 の条件(才能 randTalent(8,12) を強制)でも測る。T6 が入った版では既定と同じになるはず */
+    res.talent812 = {};
+    for (const st of STARTERS) {
+      const raw = (await page.evaluate(([s, n, seed]) => SIM.opening(s, n, seed, [8, 12]), [st, n, SEED + 1])).filter(Boolean);
+      const wins = raw.filter(r => r.win).length;
+      res.talent812[st] = { n: raw.length, win: wins / raw.length, ci: wilson(wins, raw.length) };
+    }
     return res;
   },
   /* 続けて戦う(3勝までと4戦目以降) */
@@ -69,11 +76,11 @@ const items = {
   },
   /* 1時間あたりの経験値・円・遭遇数 */
   async income(page) {
-    const hours = N ? Math.max(1, Math.round(N / 200)) : 5, res = {};
-    for (const [key, map, lv] of [['aze_lv5', 'komorebi', 5], ['urayama_lv8', 'urayama', 8], ['urayama_lv11', 'urayama', 11]]) {
+    const hours = N ? Math.max(1, Math.round(N / 200)) : 4, res = {};
+    for (const [key, map, lv, party] of [['aze_lv5_solo', 'komorebi', 5, 1], ['aze_lv5', 'komorebi', 5, 3], ['urayama_lv8', 'urayama', 8, 3], ['urayama_lv11', 'urayama', 11, 3]]) {
       let a = { hours: 0, exp: 0, yenNet: 0, enc: 0, wins: 0, losses: 0, steps: 0, battleSec: 0, rests: 0, shiny: 0, metal: 0, foes: 0 };
       for (const st of STARTERS) {
-        const r = await page.evaluate(([s, m, lv, h, seed]) => SIM.income(s, m, lv, h, seed), [st, map, lv, hours, SEED]);
+        const r = await page.evaluate(([s, m, lv, h, seed, p]) => SIM.income(s, m, lv, h, seed, { party: p }), [st, map, lv, hours, SEED, party]);
         Object.keys(a).forEach(k => a[k] += r[k]);
       }
       res[key] = { ...a, expPerH: a.exp / a.hours, yenPerH: a.yenNet / a.hours, encPerH: a.enc / a.hours, winRate: a.wins / a.enc, stepsPerEnc: a.steps / a.enc, secPerBattle: a.battleSec / a.enc, foesPerEnc: a.foes / a.enc };
@@ -82,18 +89,18 @@ const items = {
   },
   /* 色違い・メタルの遭遇(歩数→遭遇率→1時間換算) */
   async shiny(page) {
-    const n = N ? N * 20 : 20000, res = {};
-    const inc = fs.existsSync(path.join(OUT, 'income.json')) ? JSON.parse(fs.readFileSync(path.join(OUT, 'income.json'))) : null;
+    const n = N ? N * 40 : 40000, res = {};
+    const inc = fs.existsSync(path.join(OUT, 'income.json')) ? JSON.parse(fs.readFileSync(path.join(OUT, 'income.json'))).result : null;
     for (const [key, map, incKey] of [['aze', 'komorebi', 'aze_lv5'], ['urayama', 'urayama', 'urayama_lv8']]) {
       const byTime = {};
-      for (const [tn, t] of [['day', 1], ['night', 3]]) byTime[tn] = await page.evaluate(([m, n, seed, t]) => SIM.encounters('ibote', m, n, seed, t), [map, n, SEED, t]);
+      for (const [tn, t] of [['day', 1], ['night', 3]]) byTime[tn] = await page.evaluate(([m, n, seed, t]) => SIM.encounters('ibote', m, n, seed, t), [map, n, SEED + 1000 * t + (map === 'urayama' ? 7 : 0), t]);
       const tot = { steps: 0, enc: 0, foes: 0, shiny: 0, metal: 0, encMetal: 0, encShiny: 0 };
       Object.values(byTime).forEach(r => Object.keys(tot).forEach(k => tot[k] += r[k]));
       const o = { ...tot, stepsPerEnc: tot.steps / tot.enc, encPerStep: tot.enc / tot.steps, shinyPerFoe: tot.shiny / tot.foes, metalPerEnc: tot.encMetal / tot.enc, shinyPerEnc: tot.encShiny / tot.enc, byTime };
       /* 1時間: 戦闘時間は income の実測(なければ15秒) */
       const bs = inc && inc[incKey] ? inc[incKey].secPerBattle : 15;
       const cycle = o.stepsPerEnc / params.GRASS * params.STEP_S + bs + 0.1 * params.REST_S;
-      o.encPerH = 3600 / cycle; o.shinyPerH = o.encPerH * o.shinyPerEnc; o.metalPerH = o.encPerH * o.metalPerEnc; o.battleSecUsed = bs;
+      o.encPerH = inc && inc[incKey] ? inc[incKey].encPerH : 3600 / cycle; /* income の実測(回復の往復こみ)を優先 */ o.shinyPerH = o.encPerH * o.shinyPerEnc; o.metalPerH = o.encPerH * o.metalPerEnc; o.battleSecUsed = bs;
       o.minPerShiny = 60 / o.shinyPerH; o.minPerMetal = 60 / o.metalPerH;
       res[key] = o;
     }
@@ -122,13 +129,19 @@ const items = {
   /* こもれび町のぬしまで */
   async boss(page) {
     const n = N ? Math.ceil(N / 10) : 60, res = {};
-    for (const [label, party] of [['solo', 1], ['party3', 3]]) for (const thr of [8, 10, 12, 14]) {
+    for (const [label, party] of [['solo', 1], ['party3', 3]]) for (const thr of (opt("thr") || "8,11,14").split(",").map(Number)) {
       const all = [];
       for (const st of STARTERS) all.push(...await page.evaluate(([s, n, seed, thr, p]) => SIM.toBoss(s, n, seed, thr, p), [st, n, SEED, thr, party]));
       const done = all.filter(r => r.done);
       res[`${label}_thr${thr}`] = { n: all.length, clear: done.length / all.length, firstTry: all.filter(r => r.firstTry === true).length / Math.max(1, all.filter(r => r.firstTry != null).length), reached: all.filter(r => r.firstTry != null).length / all.length,
         minutes: { p25: (pct(done.map(r => r.T), .25) || 0) / 60, p50: (pct(done.map(r => r.T), .5) || 0) / 60, p75: (pct(done.map(r => r.T), .75) || 0) / 60 },
-        battles: { p50: pct(done.map(r => r.battles), .5) }, tries: mean(done.map(r => r.tries)), lvAtTry: mean(all.filter(r => r.firstTry != null).map(r => r.levelAtTry)), losses: mean(all.map(r => r.loses)) };
+        battles: { p50: pct(done.map(r => r.battles), .5) }, tries: mean(done.map(r => r.tries)), lvAtTry: mean(all.filter(r => r.firstTry != null).map(r => r.levelAtTry)), losses: mean(all.map(r => r.loses)), lvAtClear: mean(done.map(r => r.lv)) };
+    }
+    res.byLv = {};
+    for (const party of [1, 3]) for (const lv of [10, 14, 18, 22]) {
+      const rs = [];
+      for (const st of STARTERS) rs.push(await page.evaluate(([s, lv, p, n, seed]) => SIM.bossWin(s, lv, p, n, seed), [st, lv, party, 100, SEED]));
+      res.byLv[`p${party}_lv${lv}`] = { party, lv, win: mean(rs.map(r => r.win)), byStarter: rs.map(r => r.win) };
     }
     return res;
   }
