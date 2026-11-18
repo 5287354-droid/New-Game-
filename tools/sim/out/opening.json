@@ -1,0 +1,162 @@
+{
+ "item": "opening",
+ "seed": 1,
+ "n": null,
+ "params": {
+  "STEP_S": 0.185,
+  "BATTLE_OVERHEAD_S": 2.4,
+  "AUTO_TURN_S": 0.35,
+  "REST_S": 40,
+  "REST_HP": 0.45,
+  "GRASS": 1,
+  "GAME": "src/game.html"
+ },
+ "result": {
+  "ibote": {
+   "n": 1000,
+   "win": 0.197,
+   "ci": [
+    0.17352775230416598,
+    0.22279134823918673
+   ],
+   "turns": 6.095,
+   "sec": 20.055130000000023,
+   "byN": {
+    "1": [
+     197,
+     607
+    ],
+    "2": [
+     0,
+     393
+    ],
+    "3": [
+     0,
+     0
+    ]
+   },
+   "lostBy": {
+    "numekuji": 126,
+    "kanahebin": 95,
+    "dokudamin": 154,
+    "watapopo": 138,
+    "chunta": 128,
+    "hasunoha": 32,
+    "gorodango": 141,
+    "amezari": 97,
+    "denden": 100,
+    "happadanuki": 60,
+    "uribou": 45,
+    "medakan": 67,
+    "koganetsubu": 10,
+    "haganetsubu": 3
+   }
+  },
+  "happadanuki": {
+   "n": 1000,
+   "win": 0.447,
+   "ci": [
+    0.4164454520911983,
+    0.4779601991589592
+   ],
+   "turns": 5.399,
+   "sec": 17.056729999999963,
+   "byN": {
+    "1": [
+     406,
+     570
+    ],
+    "2": [
+     41,
+     430
+    ],
+    "3": [
+     0,
+     0
+    ]
+   },
+   "lostBy": {
+    "kanahebin": 91,
+    "dokudamin": 143,
+    "chunta": 65,
+    "watapopo": 77,
+    "medakan": 78,
+    "gorodango": 112,
+    "uribou": 52,
+    "amezari": 81,
+    "happadanuki": 51,
+    "numekuji": 68,
+    "denden": 79,
+    "hasunoha": 37,
+    "koganetsubu": 5,
+    "haganetsubu": 3
+   }
+  },
+  "yamoryu": {
+   "n": 1000,
+   "win": 0.482,
+   "ci": [
+    0.4511578913647933,
+    0.5129798769843169
+   ],
+   "turns": 5.246,
+   "sec": 18.36541999999994,
+   "byN": {
+    "1": [
+     433,
+     592
+    ],
+    "2": [
+     49,
+     408
+    ],
+    "3": [
+     0,
+     0
+    ]
+   },
+   "lostBy": {
+    "dokudamin": 115,
+    "gorodango": 99,
+    "amezari": 81,
+    "denden": 70,
+    "hasunoha": 26,
+    "happadanuki": 53,
+    "watapopo": 85,
+    "numekuji": 62,
+    "koganetsubu": 9,
+    "kanahebin": 83,
+    "chunta": 80,
+    "medakan": 69,
+    "uribou": 41,
+    "haganetsubu": 4
+   }
+  },
+  "talent812": {
+   "ibote": {
+    "n": 1000,
+    "win": 0.178,
+    "ci": [
+     0.15553722047993956,
+     0.20292730220969596
+    ]
+   },
+   "happadanuki": {
+    "n": 1000,
+    "win": 0.501,
+    "ci": [
+     0.4700652689060268,
+     0.5319270772968003
+    ]
+   },
+   "yamoryu": {
+    "n": 1000,
+    "win": 0.517,
+    "ci": [
+     0.48602179171422133,
+     0.5478480937338415
+    ]
+   }
+  }
+ }
+}
