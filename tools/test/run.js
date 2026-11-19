@@ -701,6 +701,26 @@ T('T8: 足場・列車・夜の霧が、各地点でエラーなく描け、1フ
   eq(s.errors, []); await s.close();
 });
 
+T('UI: 光のにじみ(ぼかしのある影・blur)が全画面の計算済みスタイルに無い。駅名は1行', async () => {
+  const s = await open();
+  const r = await s.ev(async () => { const bad = {}, tall = [];
+    const scan = tag => document.querySelectorAll('*').forEach(e => { for (const ps of [null, '::before', '::after']) { const cs = getComputedStyle(e, ps);
+      for (const prop of ['boxShadow', 'textShadow', 'filter', 'backdropFilter']) { const v = cs[prop]; if (!v || v === 'none') continue;
+        const blurFn = /blur\(\s*[1-9.]/.test(v);
+        const sh = [...v.matchAll(/(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px/g)].some(m => +m[3] > 0);
+        if (blurFn || sh) bad[tag + ' ' + (typeof e.className === 'string' ? e.className : e.tagName) + (ps || '') + ' ' + prop] = v.slice(0, 80); } } });
+    scan('title');
+    state = fresh(); H.starter({ id: 'ibote' }); ui.dlg = null; SPL.forEach(x => { state.seen[x.id] = true; state.owned[x.id] = true; });
+    ['ibote', 'houou', 'rinjuu', 'mabonokoshou'].forEach((id, i) => { if (!SP[id]) return; const m = newMon(id, 50); m.shiny = i % 2 === 0; state.box.push(m); });
+    SPL.filter(x => x.rank >= 5 || x.fam === 'myst').slice(0, 12).forEach(x => { const m = newMon(x.id, 50); state.box.push(m); });
+    for (const t of ['map', 'party', 'dex', 'breed', 'shop', 'gacha', 'tower']) { ui.tab = t; render(); await new Promise(r => setTimeout(r, 300)); scan(t); }
+    ui.tab = 'map'; ui.station = true; render(); await new Promise(r => setTimeout(r, 300)); scan('station');
+    document.querySelectorAll('.station .sn').forEach(n => { if (n.getBoundingClientRect().height > parseFloat(getComputedStyle(n).lineHeight) * 1.5) tall.push(n.textContent); });
+    return { bad, tall }; });
+  eq(r.bad, {}, 'ぼかしのある影が残っている'); eq(r.tall, [], '駅名が折れている');
+  eq(s.errors, []); await s.close();
+});
+
 (async () => {
   await new Promise(r => server.listen(0, r)); port = server.address().port;
   browser = await chromium.launch();
