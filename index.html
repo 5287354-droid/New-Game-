@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="e19ed0713c";</script>
+<script>window.JG_APP=true;window.JG_VER="b485ff34fb";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -1484,19 +1484,19 @@ function noiseBuf(ctx){
 /* ========== 効果音(Web Audioで鳴らす短い電子音) ==========
    音の書き方: 音=[周波数,長さ,遅れ,波形,音量,行き先の周波数] / ノイズ=['n',長さ,遅れ,音量,フィルタ,周波数,行き先の周波数,立ち上がり] */
 const SFX={
-  ui_ok:[[784,.05,0,'triangle',.045],[1175,.09,.05,'triangle',.045]],
-  ui_back:[[880,.05,0,'triangle',.04],[587,.09,.05,'triangle',.04]],
-  sel:[[660,.04,0,'triangle',.04]],
+  ui_ok:[[784,.05,0,'triangle',.045],[1175,.09,.05,'triangle',.045],[392,.07,0,'triangle',.05],[587,.1,.05,'triangle',.05]],
+  ui_back:[[880,.05,0,'triangle',.04],[587,.09,.05,'triangle',.04],[440,.07,0,'triangle',.05],[294,.1,.05,'triangle',.05]],
+  sel:[[660,.04,0,'triangle',.04],[330,.06,0,'triangle',.05]],
   hit:[['n',.09,0,.11,'lowpass',2200,300],[150,.11,0,'triangle',.09,60]],
   crit:[['n',.08,0,.13,'bandpass',3200,900],[1000,.05,0,'square',.025],[190,.2,.04,'sawtooth',.045,70],[120,.2,.04,'triangle',.08,50]],
   ko:[[330,.14,0,'triangle',.07,170],[196,.34,.13,'triangle',.07,70],['n',.3,.1,.05,'lowpass',900,150]],
   heal:[[523,.08,0,'triangle',.06],[784,.14,.08,'triangle',.06]],
   lvup:[[523,.09,0,'square',.035],[659,.09,.1,'square',.035],[784,.09,.2,'square',.035],[1046,.28,.3,'square',.04],[523,.28,.3,'triangle',.05]],
-  countup:[[1568,.03,0,'square',.022]],
+  countup:[[1568,.03,0,'square',.022],[784,.04,0,'triangle',.04]],
   newdex:[[659,.08,0,'square',.035],[784,.08,.09,'square',.035],[988,.08,.18,'square',.035],[1318,.32,.27,'triangle',.06],[1976,.32,.27,'sine',.03]],
   rare:[[196,1,0,'sine',.06,520],[392,1,0,'triangle',.03,1040],['n',1,0,.05,'bandpass',500,4200,.6],[1568,.25,1,'sine',.04]],
-  shiny:[[1318,.08,0,'triangle',.05],[1760,.08,.08,'triangle',.05],[2093,.2,.16,'triangle',.05],[2637,.32,.26,'sine',.03],[3136,.32,.34,'sine',.022]],
-  kirari:[[2093,.12,0,'sine',.045],[2794,.15,.07,'sine',.035],[3520,.22,.14,'sine',.025]],
+  shiny:[[659,.3,0,'triangle',.05],[1318,.08,0,'triangle',.05],[1760,.08,.08,'triangle',.05],[2093,.2,.16,'triangle',.05],[2637,.32,.26,'sine',.03],[3136,.32,.34,'sine',.022]],
+  kirari:[[1046,.2,0,'triangle',.05],[2093,.12,0,'sine',.045],[2794,.15,.07,'sine',.035],[3520,.22,.14,'sine',.025]],
   stamp:[['n',.06,0,.09,'lowpass',1200,200],[200,.09,0,'square',.05,80],[1046,.14,.07,'triangle',.045],[1568,.22,.1,'triangle',.035]],
   rain:[['n',.05,0,.04,'highpass',5000,4000],['n',.05,.12,.035,'highpass',6000,5000],['n',.05,.19,.04,'highpass',4500,4000],['n',.05,.33,.03,'highpass',5500,4500],['n',.05,.41,.04,'highpass',5000,4200]],
   wind:[['n',1.3,0,.07,'bandpass',300,900,.45]],
@@ -1530,8 +1530,22 @@ function sfx(type,rate){
   if(!state||!state.sound||!SFX[type]||seVolume()<=0)return;
   try{
     const ctx=audio();if(ctx.state==='suspended')ctx.resume().catch(()=>{});
-    playSpec(ctx,AUD.g.se,ctx.currentTime,SFX[type],rate||1);
+    sfxPlay(ctx,AUD.g,ctx.currentTime,type,rate||1);
   }catch(e){}
+}
+/* 音ごとの音量の補正(tools/audio_levels.js --sfx で測って決めた。BGM 75% の短時間ラウドネスに対して、
+   操作音は 0〜+3 LU、見せ場は +3〜6 LU、countup は小さめ)。SFX_DUCK があるものは、鳴る間だけ BGM を下げる */
+const SFX_TRIM={ui_ok:7.04,ui_back:7.29,sel:48.7,hit:25.56,crit:5.92,ko:3.87,heal:6.06,lvup:3.69,countup:36.52,newdex:3.82,rare:3.74,shiny:6.49,kirari:8.18,stamp:7.12,rain:.6,wind:2.53,station:1.59,scout:3.91,breed:2.77,win:3.18,lose:3.11,fumikiri:5.28};
+SFX_TRIM.levelup=SFX_TRIM.lvup;
+const SFX_DUCK={hit:.7,crit:.6,ko:.6,lvup:.6,levelup:.6,newdex:.6,rare:.6,shiny:.6,kirari:.7,stamp:.7,win:.6,lose:.7,breed:.7,scout:.7};
+function sfxPlay(ctx,g,t,type,rate){
+  const spec=SFX[type],tr=ctx.createGain();tr.gain.value=SFX_TRIM[type]||1;tr.connect(g.se);
+  playSpec(ctx,tr,t,spec,rate||1);
+  const dk=SFX_DUCK[type];
+  if(dk&&!(typeof AUDJ!=='undefined'&&AUDJ.until>t)){
+    let len=0;spec.forEach(s=>{len=Math.max(len,(s[0]==='n'?s[2]:s[2])+s[1]);});
+    const d=g.duck.gain;d.cancelScheduledValues(t);d.setTargetAtTime(dk,t,.02);d.setTargetAtTime(1,t+Math.min(len,1.2),.3);
+  }
 }
 
 /* ---- 環境音(ループ): ambStart('rain'|'wind') / ambStop() ---- */

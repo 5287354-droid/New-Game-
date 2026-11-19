@@ -15,6 +15,7 @@ const opt = k => { const a = args.find(x => x.startsWith('--' + k + '=')); retur
 const file = args.find(x => !x.startsWith('--')) || 'src/game.html';
 const SECS = +(opt('secs') || 12);
 const NOTRIM = args.includes('--notrim');
+const SFX_MODE = args.includes('--sfx');
 
 (async () => {
   const browser = await chromium.launch();
@@ -37,6 +38,42 @@ const NOTRIM = args.includes('--notrim');
   });
   await page.goto('file://' + path.resolve(file));
   await page.waitForFunction(() => typeof SONGS !== 'undefined' && typeof parseMML === 'function');
+
+  if (SFX_MODE) {
+    /* SE・ジングルを、本番と同じ経路(se/jin → master → コンプレッサー → リミッター)を通して測る。音量 75%。
+       BGM(komorebi・battle・mabo・victory)は同じ経路・同じ音量で、400ms 窓の RMS の中央値を「BGM の短時間ラウドネス」とする。
+       SE の短時間ラウドネスは、短い音なので 100ms 窓の RMS の最大値。差は LU(≒dB)で、BGM の平均に対する差。 */
+    const r = await page.evaluate(async () => {
+      const sr = 44100, db = x => 20 * Math.log10(Math.max(x, 1e-9));
+      const win = (d, w, mode) => { const v = []; for (let i = 0; i + w <= d.length; i += w >> 2) { let q = 0; for (let j = i; j < i + w; j++) q += d[j] * d[j]; v.push(db(Math.sqrt(q / w))); }
+        if (mode === 'max') return Math.max(...v); v.sort((a, b) => a - b); return v[v.length >> 1]; };
+      const meas = (buf, w, mode) => { const d = buf.getChannelData(0); let pk = 0; for (let ch = 0; ch < buf.numberOfChannels; ch++) { const c = buf.getChannelData(ch); for (let i = 0; i < c.length; i++) { const a = Math.abs(c[i]); if (a > pk) pk = a; } }
+        return { peak: +db(pk).toFixed(1), loud: +win(d, w, mode).toFixed(1) }; };
+      const out = { bgm: {}, sfx: {}, jin: {} };
+      for (const k of ['komorebi', 'battle', 'mabo', 'victory']) out.bgm[k] = meas(await audioOfflineSong(k, 14), 17640, 'med');
+      const play = typeof sfxPlay === 'function';
+      for (const k of Object.keys(SFX)) {
+        const ctx = new OfflineAudioContext(2, sr * 2, sr), g = audioGraph(ctx); g.se.gain.value = volGain(.75);
+        if (play) sfxPlay(ctx, g, .01, k, 1); else playSpec(ctx, g.se, .01, SFX[k], 1);
+        out.sfx[k] = meas(await ctx.startRendering(), 4410, 'max');
+      }
+      for (const k of Object.keys(JINGLES)) {
+        const J = JINGLES[k], ctx = new OfflineAudioContext(2, Math.ceil(sr * (jingleLen(k) + 1)), sr), g = audioGraph(ctx); g.jin.gain.value = volGain(.75);
+        const rig = { gain: g.jin, send: null, noise: null, waves: {} }, spb = 60 / J.bpm;
+        J.ch.forEach(c => parseMML(c.m, c.o).ev.forEach(e => bgmNote(ctx, Object.assign({ env: 'pad' }, c), e, .02 + e.t * spb, spb, rig)));
+        out.jin[k] = meas(await ctx.startRendering(), 17640, 'max');
+      }
+      return out;
+    });
+    await browser.close();
+    const ref = Object.values(r.bgm).reduce((a, v) => a + v.loud, 0) / 4;
+    console.log(`BGM(75%) 短時間ラウドネス(400ms窓中央値) 基準 ${ref.toFixed(1)} dBFS`);
+    console.log('| 種類 | 名前 | ピーク dBFS | 短時間 dBFS | BGM差 LU |\n|---|---|---:|---:|---:|');
+    for (const [k, v] of Object.entries(r.bgm)) console.log(`| BGM | ${k} | ${v.peak} | ${v.loud} | ${(v.loud - ref).toFixed(1)} |`);
+    for (const t of ['sfx', 'jin']) for (const [k, v] of Object.entries(r[t])) console.log(`| ${t === 'sfx' ? 'SE' : 'ジングル'} | ${k} | ${v.peak} | ${v.loud} | ${(v.loud - ref).toFixed(1)} |`);
+    const j = opt('json'); if (j) require('fs').writeFileSync(j, JSON.stringify(r, null, 1));
+    return;
+  }
 
   const rows = await page.evaluate(async ({ SECS, NOTRIM }) => {
     const db = x => 20 * Math.log10(Math.max(x, 1e-9));
