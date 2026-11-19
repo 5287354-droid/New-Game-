@@ -28,7 +28,7 @@ async function open({ w = 390, h = 844 } = {}) {
   return { page, ctx, errors, ev: (f, a) => page.evaluate(f, a), close: () => ctx.close() };
 }
 /* 「更新前」のセーブを作る: ゲームを始めて、あとから足したキーを消した状態 */
-const OLD_KEYS = ['wins', 'wxN', 'wxLog', 'foot', 'mpt', 'mptAll', 'stamps', 'detour', 'kirari', 'dexReg', 'seenAt'];
+const OLD_KEYS = ['wins', 'wxN', 'wxLog', 'wxDay', 'foot', 'mpt', 'mptAll', 'stamps', 'detour', 'kirari', 'dexReg', 'seenAt'];
 async function makeOldSave(s, stage) {
   return s.ev(([stage, OLD]) => {
     state = fresh(); H.starter({ id: 'ibote' }); ui.dlg = null;
@@ -200,6 +200,7 @@ T('T7: 歩行中は細いバー、メニューで7タブが開く', async () => 
 
 /* ---- T2 みちくさ踏破 ---- */
 const GAME_SRC = fs.readFileSync(path.join(ROOT, 'src/game.html'), 'utf-8');
+const startGame0 = async () => { const s = await open(); await startGame(s); return s; };
 const startGame = s => s.ev(() => { H.starter({ id: 'ibote' }); ui.dlg = null; state.bgm = false; state.sound = false; state.boss = { komorebi: true, kasumi: true }; ui.tab = 'map'; ui.station = false; ui.inside = null; ui.toast = ''; state.ow = null; owEnsureState(); render(); });
 /* 地図 id のいちばん最初に見つかる、通れるマス(区画ごと) */
 const tileOfBlocks = (s, id) => s.ev(id => { const m = MAPS[id], fi = footInfo(id), out = {}; for (let y = 0; y < m.rows.length; y++) for (let x = 0; x < m.rows[y].length; x++) { const i = (y >> 2) * fi.bw + (x >> 2); if (fi.valid[i] && !out[i] && !OW_SOLID.includes(m.rows[y][x])) out[i] = [x, y]; } return Object.values(out); }, id);
@@ -222,33 +223,27 @@ T('T2: 区画の記録(同じ区画は1点だけ)・全区画で100%・金スタ
   eq(r2.pct, 100); eq(r2.stamp, 2); eq(r2.p80, 1, '80%で銀スタンプ'); eq(r2.stars, 3); eq(r2.again, [0, 3], '2回目に再付与された');
   eq(s.errors, []); await s.close();
 });
-T('T2: 全マップで、到達できる区画を全部踏むと踏破100%(実際の通行判定 owSolid で解く)', async () => {
-  const s = await open(); await startGame(s);
-  const r = await s.ev(() => {
-    /* ソルバー: しかけは全部解けるものとして(ぬしを倒し、旗が立ち、物は拾い、岩は穴に押し込み、流氷は全位置・潮と夜昼は全部・霧は晴れの時)、
-       入口から実際の owSolid で広げて、立てたマスの全部を踏む */
+const WALK_SOLVER = require('./walk_solver.js');
+T('T2: 全マップで、氷のすべり・押す岩・流氷の物理で状態を探索して、踏破100%に届く(tools/test/walk_solver.js)', async () => {
+  const s = await startGame0();
+  const r = await s.ev(f => {
+    /* しかけは全部解けるものとして(ぬしを倒し、旗が立ち、物は拾い、流氷は全位置・潮と夜昼は全部・霧は晴れの時)、
+       入口から owTryMove/owArrive と同じ物理(すべる氷・岩を押す・氷塊・輪・間欠泉・トロッコ)で探索して、踏めるマスを全部踏む */
+    const solve = eval('(' + f + ')');
     state.owFlags = new Proxy({}, { get: () => true }); TOWNS.forEach(t => state.boss[t.id] = true); state.owItems = new Proxy({}, { get: () => true });
-    const bad = [], rows = []; let n = 0;
+    const bad = [], rows = [], states = {}; let n = 0;
     for (const id in MAPS) {
-      const m = MAPS[id]; n++; state.foot = {}; state.stamps = {};
-      if (m.rocks) { const f = {}; m.rows.forEach((r, y) => [...r].forEach((c, x) => { if (c === 'O') f[x + ',' + y] = true; })); OWC.rk = { map: id, rocks: [], filled: f }; }
-      const orig = owFloatPos; let sel = -1; window.owFloatPos = f => { if (sel < 0) return orig(f); const t = owFloatTiles(f); return t[Math.min(sel, t.length - 1)]; };
-      const mx = Math.max(1, ...(m.floats || []).map(f => owFloatTiles(f).length));
-      state.ow = { map: id, x: m.spawn.x, y: m.spawn.y, dir: 'down' };
-      const okAny = (x, y) => { for (let t = 0; t < 4; t++) { state.time = t; for (sel = m.floats ? 0 : -1; sel < (m.floats ? mx : 0); sel++) if (!owSolid(m, x, y)) { sel = -1; return true; } } sel = -1; return false; };
-      const DN = Date.now; if (m.fogStone) Date.now = () => m.fogStone.per * 1000 + m.fogStone.on + 1;
-      const { seen, R, C } = footReach(id, okAny); Date.now = DN; window.owFloatPos = orig; OWC.rk = null;
-      const fi = footInfo(id), hit = new Set(), tiles = [];
-      for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) if (seen[y * C + x]) { tiles.push([x, y]); hit.add((y >> 2) * fi.bw + (x >> 2)); }
-      let extra = 0, lack = 0; for (let i = 0; i < fi.nb; i++) { if (hit.has(i) && !fi.valid[i]) extra++; if (!hit.has(i) && fi.valid[i]) lack++; }
-      for (const [x, y] of tiles) { state.ow = { map: id, x, y, dir: 'down' }; owFoot(); }
-      const pct = footShow(id);
-      if (!fi.total || pct !== 100 || extra || lack || state.stamps[id] !== 2) bad.push(`${id}:${pct}%(${footCount(id)}/${fi.total}) 数えすぎ${lack} 数え漏れ${extra}`);
+      n++; state.foot = {}; state.stamps = {};
+      let sol; try { sol = solve(id); } catch (e) { bad.push(`${id}: ${e.message}`); continue; }
+      states[id] = sol.states;
+      for (const [x, y] of sol.tiles) { state.ow = { map: id, x, y, dir: 'down' }; owFoot(); }
+      const fi = footInfo(id), pct = footShow(id);
+      if (!fi.total || pct !== 100 || sol.extra || sol.lack.length || state.stamps[id] !== 2) bad.push(`${id}:${pct}%(${footCount(id)}/${fi.total}) 物理で届かない区画${sol.lack} 数え漏れ${sol.extra}`);
       rows.push(fi.total);
     }
-    return { n, bad, tot: rows.reduce((a, b) => a + b, 0) };
-  });
-  eq(r.bad, [], '踏み尽くしても100%にならない/到達できない区画を分母に入れている'); console.log(`      ${r.n}マップ 全${r.tot}区画 すべて到達でき、踏むと100%`);
+    return { n, bad, tot: rows.reduce((a, b) => a + b, 0), max: Math.max(...Object.values(states)) };
+  }, WALK_SOLVER.toString());
+  eq(r.bad, [], '実際の移動の物理で踏み尽くしても100%にならない区画がある'); eq(r.n, 46); console.log(`      ${r.n}マップ 全${r.tot}区画 すべて物理で届き、踏むと100%(探索した状態の最大 ${r.max})`);
   eq(s.errors, []); await s.close();
 });
 T('T2: しかけスタンプ18種がすべて取れる(関数を呼ぶ + ソースにフックがある)', async () => {
@@ -386,19 +381,67 @@ T('T2/T4: foot・seenAt・stamps を全部埋めても 引き継ぎコード・�
 });
 
 /* ===== T1(空もよう)・T3(きらり) ===== */
-T('T1: 天気は日付+町+時間帯だけで決まり(保存しない)、ベンチで休んでも(wxNが進んでも)振り直せない', async () => {
+T('T1: 天気は 実際の日付+町+その日の旅の日数+時間帯 で決まり(天気そのものは保存しない)、wxN に左右されない', async () => {
   const s = await open(); await goMap(s, 'komorebi');
   const r = await s.ev(() => {
     const a = wxOf('komorebi'), b = wxOf('komorebi'), keys = JSON.parse(JSON.stringify(state));
     const seq = []; for (let i = 0; i < 12; i++) { dayAt(i); seq.push(wxOf('komorebi')); } dayAt(0);
-    /* 同じ日・同じ時間帯なら、wxN をどれだけ動かしても同じ。4つ進めて(丸1日)から戻ると、次の日の同じ時間帯 */
-    const w0 = wxOf('komorebi'), t0 = state.time; let same = true; for (let i = 0; i < 50; i++) { state.wxN = i * 7; if (wxOf('komorebi') !== w0 || wxNow('komorebi') !== w0) same = false; }
-    const day = []; for (let k = 0; k < 4; k++) { state.time = k; day.push(wxOf('komorebi')); } state.time = t0;
-    const rest = []; for (let i = 0; i < 20; i++) { state.time = 1; const x = wxOf('komorebi'); advanceTime(); advanceTime(); advanceTime(); advanceTime(); rest.push(wxOf('komorebi') === x && state.time === 1); }
-    return { same: a === b && same, noSaved: !('wx' in keys) && !('weather' in keys), kinds: new Set(seq).size, day, rest };
+    const w0 = wxOf('komorebi'); let same = true; for (let i = 0; i < 50; i++) { state.wxN = i * 7; if (wxOf('komorebi') !== w0 || wxNow('komorebi') !== w0) same = false; }
+    const t0 = state.time, day = []; for (let k = 0; k < 4; k++) { state.time = k; day.push(wxOf('komorebi')); } state.time = t0;
+    return { same: a === b && same, noSaved: !('wx' in keys) && !('weather' in keys), wxDay: keys.wxDay, kinds: new Set(seq).size, day, fresh: fresh().wxDay };
   });
-  ok(r.same, '同じ状態で天気が変わる / wxN に左右される'); ok(r.noSaved, '天気を保存している'); ok(r.rest.every(x => x), '丸1日休むと(同じ日の)同じ時間帯の天気が変わった');
+  ok(r.same, '同じ状態で天気が変わる / wxN に左右される'); ok(r.noSaved, '天気を保存している'); ok(r.wxDay && typeof r.wxDay.d === 'string' && r.wxDay.n === 0, 'wxDay がない'); ok(r.fresh && r.fresh.n === 0);
   ok(r.kinds >= 2, '天気が変化しない'); eq(r.day.length, 4); eq(s.errors, []); await s.close();
+});
+T('T1: 天気の日数: 夜→朝で旅の日数が1進み、実際の日付が変わると0に戻る。3日分を超えたら3日目を繰り返す(1日に最大12コマ)', async () => {
+  const s = await open(); await goMap(s, 'komorebi');
+  const r = await s.ev(() => {
+    const out = {}; dayAt(0); state.wxDay = { d: dayKey(), n: 0 }; state.time = 1;
+    const ns = [], seq = [], towns = ['komorebi', 'kasumi', 'tengu', 'yomi'], seqT = {}; towns.forEach(t => seqT[t] = []);
+    for (let i = 0; i < 44; i++) { ns.push(state.wxDay.n + ':' + state.time); towns.forEach(t => seqT[t].push(wxNow(t))); advanceTime(); }
+    out.ns = ns.slice(0, 12); out.nMax = Math.max(...ns.map(x => +x.split(':')[0]));
+    /* 3日目の朝(8コマ目)から先は、4コマ周期のくり返し(time=1 から数えて i=7 から) */
+    out.period = towns.every(t => { for (let i = 7; i + 4 < seqT[t].length; i++) if (seqT[t][i] !== seqT[t][i + 4]) return false; return true; });
+    /* 実際の日付が変わると 0 に戻り、そこから数える */
+    dayAt(1); out.rolled = wxDn(); state.time = 3; advanceTime(); out.afterRoll = [state.wxDay.n, state.wxDay.d === dayKey()];
+    /* 同じ日の中で振り直せない: 12コマ(3日×4時間帯)ぶんだけで、それ以外のキーは使われない */
+    dayAt(2); state.wxDay = { d: dayKey(), n: 0 }; state.time = 0; const keys = new Set(); for (let i = 0; i < 80; i++) { keys.add(Math.min(state.wxDay.n, 2) + ':' + state.time); advanceTime(); } out.keys = keys.size;
+    /* 日付のちがう保存(古い日の n=2)は、今日は 0 として読む */
+    dayAt(5); state.wxDay = { d: '2000-01-01', n: 2 }; out.stale = wxDn(); delete state.wxDay; out.none = wxDn();
+    dayAt(0); return out;
+  });
+  eq(r.ns.slice(0, 5), ['0:1', '0:2', '0:3', '1:0', '1:1'], '夜→朝で日数が進まない'); eq(r.nMax, 2, '3日分を超えて数えている'); ok(r.period, '3日分を超えたあとが 3日目のくり返しでない');
+  eq(r.rolled, 0); eq(r.afterRoll, [1, true], '日付が変わったあと、夜→朝で 0 から数え直して1になる'); eq(r.keys, 12, '1日に12コマ以外のキーがある'); eq(r.stale, 0); eq(r.none, 0);
+  eq(s.errors, []); await s.close();
+});
+T('T1: 天気の目標(a) 霞ヶ丘のぬしを倒したあと、7割以上の日に まぼろし駅(霧×夜)の条件がそろう(1日12コマのうち)', async () => {
+  const s = await open(); await goMap(s, 'kasumi');
+  const r = await s.ev(() => {
+    state.boss.kasumi = true; const DN = Date.now, base = new Date(2026, 0, 1, 12).getTime(); let days = 0, hit = 0, byN = [0, 0, 0];
+    for (let d = 0; d < 365; d++) { Date.now = () => base + d * 864e5; days++; let any = false;
+      for (let n = 0; n < 3; n++) { state.wxDay = { d: dayKey(), n }; state.time = 3; state.town = 'kasumi'; wxNow.k = null; B = null; if (maboOpen()) { any = true; byN[n]++; } }
+      if (any) hit++; }
+    Date.now = DN; return { rate: hit / days, byN };
+  });
+  console.log(`      まぼろし駅に入れる日: ${(r.rate * 100).toFixed(1)}% (夜の霧: 旅の1〜3日目 ${r.byN.join('/')} 日)`);
+  ok(r.rate >= .7, `まぼろし駅に入れる日が ${(r.rate * 100).toFixed(1)}% しかない`); eq(s.errors, []); await s.close();
+});
+T('T1: 天気の目標(b) 天候限定の7体は、出る町で、7日のうち少なくとも1日は出会える天気がそろう(窓の99%以上)', async () => {
+  const s = await open(); await goMap(s, 'komorebi');
+  const r = await s.ev(() => {
+    const lim = [['amayadori', 'komorebi'], ['kirigarasu', 'tengu'], ['nijimimizu', 'kasumi'], ['yukiwata', 'ryuhyo'], ['haikagura', 'hinoshima'], ['kumozumi', 'shiomi'], ['hoshikuzume', 'komorebi'], ['hoshikuzume', 'tengu'], ['hoshikuzume', 'yomi']];
+    const DN = Date.now, base = new Date(2026, 0, 1, 12).getTime(), DAYS = 365, res = {}, miss = [];
+    const ok = lim.map(() => new Array(DAYS).fill(false));
+    for (let d = 0; d < DAYS; d++) { Date.now = () => base + d * 864e5;
+      for (let n = 0; n < 3; n++) for (let t = 0; t < 4; t++) { state.wxDay = { d: dayKey(), n }; state.time = t; wxNow.k = null;
+        lim.forEach(([sp, tw], i) => { const wx = wxOf(tw); TOWN[tw].fields.forEach(f => f.table.forEach(([s, , tg]) => { if (s === sp && tg && tagOK(tg, t, wx)) ok[i][d] = true; })); }); } }
+    Date.now = DN;
+    lim.forEach(([sp, tw], i) => { let w = 0, f = 0; for (let d = 0; d + 7 <= DAYS; d++) { w++; if (ok[i].slice(d, d + 7).some(Boolean)) f++; else miss.push(sp + '@' + tw + ' ' + d); } res[sp + '@' + tw] = +(f / w * 100).toFixed(1); });
+    return { res, miss, tag: lim.every(([sp, tw]) => TOWN[tw].fields.some(f => f.table.some(([s, , tg]) => s === sp && tg))) };
+  });
+  ok(r.tag, '天候限定の種が出現表にない');
+  console.log('      7日以内に出会える天気がそろう率: ' + Object.entries(r.res).map(([k, v]) => k + ' ' + v + '%').join(' / '));
+  ok(Object.values(r.res).every(v => v >= 99), '7日のうちに一度も出会える天気がそろわない期間が多い: ' + r.miss.slice(0, 5).join(', '));   /* 日付は乱数でなくハッシュなので、まれに(0.1%ほど)外れる窓がある。99%以上を求める */ eq(s.errors, []); await s.close();
 });
 T('T1: 予報(k=1,2)が、時間を進めたときの天気と一致する', async () => {
   const s = await open(); await goMap(s, 'tengu');
@@ -412,11 +455,11 @@ T('T1: 各町で天気の割合が表の±3%以内(昼)', async () => {
     for (const id of WXK) { const exp = id === 'hoshi' ? 0 : (tb[id] || 0) / tot, got = (cnt[id] || 0) / N; if (Math.abs(exp - got) > .03) out.push(`${t}:${id} ${got.toFixed(3)} vs ${exp.toFixed(3)}`); } } return out; });
   eq(r, [], '割合のずれ'); await s.close();
 });
-T('T1: 天気の偏り: どの町でも、各天気が7日のうちに少なくとも1回は出る(星降りは夜だけなので14日で)', async () => {
+T('T1: 天気の偏り: どの町でも、各天気が7日のうちに少なくとも1回は出る(1日12コマぶんを見る。星降りは夜だけなので14日で)', async () => {
   const s = await open();
   const r = await s.ev(() => {
     const D = 2000, bad = [], worst = {}, R = Date.now.bind(Date), tab = {};
-    for (const t of Object.keys(WX_TBL)) { tab[t] = []; for (let d = 0; d < D; d++) { dayAt(d); const row = []; for (let tm = 0; tm < 4; tm++) { state.time = tm; row.push(wxOf(t)); } tab[t].push(row); } }
+    for (const t of Object.keys(WX_TBL)) { tab[t] = []; for (let d = 0; d < D; d++) { dayAt(d); const row = []; for (let n = 0; n < 3; n++) for (let tm = 0; tm < 4; tm++) { state.wxDay = { d: dayKey(), n }; state.time = tm; row.push(wxOf(t)); } tab[t].push(row); } }   /* 1日は 3日分×4時間帯=12コマ */
     dayAt(0);
     for (const t of Object.keys(WX_TBL)) for (const w of WXK) { if (!WX_TBL[t][w]) continue; const win = w === 'hoshi' ? 14 : 7; let miss = 0, n = 0;
       for (let d = 0; d + win <= D; d++) { n++; if (!tab[t].slice(d, d + win).some(row => row.includes(w))) miss++; }
@@ -511,11 +554,11 @@ T('T3: メタルに逃げられると「勝利」でなく逃げられた扱い�
     const m = owMap(), o = state.ow; state.kirari = null; OWC.kMap = o.map; let n = 0; while (state.kirariDue > 0 && n < 40) { OWC.kSteps = 1; owKirariTick(m, o); n++; } res.spawned = !!state.kirari; res.steps = n; res.due2 = state.kirariDue; return res; });
   eq(r.win, false); eq(r.flee, true); eq(r.head, '逃げられた……'); eq(r.wins, 0); eq(r.due, 30); ok(r.spawned && r.steps <= 30 && r.due2 === 0, JSON.stringify(r)); await s.close();
 });
-T('T3: 新キー(wxN/wxLog/kirari/kirariDue)が旧セーブに補われ、state.v は1のまま', async () => {
+T('T3: 新キー(wxN/wxLog/wxDay/kirari/kirariDue)が旧セーブに補われ、state.v は1のまま', async () => {
   const s = await open(); await makeOldSave(s, 1);
   await s.page.reload(); await s.page.waitForFunction(() => typeof state !== 'undefined' && state); await wait(600);
-  const r = await s.ev(() => { const a = JSON.stringify(state); migrate(); migrate(); return { v: state.v, wxN: state.wxN, wxLog: state.wxLog, kirari: state.kirari, due: state.kirariDue, same: a === JSON.stringify(state) }; });
-  eq(r.v, 1); eq(r.wxN, 0); eq(typeof r.wxLog, 'object'); eq(r.kirari, null); eq(r.due, 0); ok(r.same, 'migrate が冪等でない'); eq(s.errors, []); await s.close();
+  const r = await s.ev(() => { const a = JSON.stringify(state); migrate(); migrate(); return { v: state.v, wxN: state.wxN, wxLog: state.wxLog, wxDay: state.wxDay, day: dayKey(), kirari: state.kirari, due: state.kirariDue, same: a === JSON.stringify(state) }; });
+  eq(r.v, 1); eq(r.wxN, 0); eq(typeof r.wxLog, 'object'); eq(r.wxDay, { d: r.day, n: 0 }, 'wxDay が補われない'); eq(r.kirari, null); eq(r.due, 0); ok(r.same, 'migrate が冪等でない'); eq(s.errors, []); await s.close();
 });
 T('T1: 駅のみちくさ便りが出て、予報どおり(3コマ)', async () => {
   const s = await open(); await goMap(s, 'komorebi'); await wait(300);
@@ -533,6 +576,20 @@ T('T8: 初めて着くまで、駅の札も路線図も「？？駅へ行く」(
     o.before = txt(); ui.station = false; ui.tab = 'map'; render(); o.beforeMap = txt(); state.flags.mabo = true; ui.station = true; render(); o.after = txt(); ui.station = false; render(); o.afterMap = txt(); return o; });
   ok(/？？駅へ行く/.test(r.before) && !/まぼろし/.test(r.before), '初回の駅の札で名前を明かしている: ' + r.before); ok(!/まぼろし/.test(r.beforeMap), '初回の路線図で名前を明かしている: ' + r.beforeMap);
   ok(/まぼろし駅へ行く/.test(r.after), '着いたあとの札: ' + r.after); eq(s.errors, []); await s.close();
+});
+T('S: 駅の画面に開発中の文言「試作」がなく、まだ開いていない町の名前も出ない(路線図と同じ ？？？)', async () => {
+  const s = await open(); await goMap(s, 'komorebi'); await wait(300);
+  const r = await s.ev(() => { state.boss = {}; ui.station = true; render(); const el = document.querySelector('.wxnews'), root = el ? el.closest('main,section,div[class*="view"]') || document.body : document.body;
+    const txt = document.body.innerText; const closed = TOWNS.filter(x => !townOpen(x)).map(x => x.name); return { shisaku: /試作/.test(txt), note: /電車でほかの駅へ。歩いて探索できるのは、いままでに降りた町。/.test(txt), leaked: closed.filter(n => txt.includes(n)), closed: closed.length }; });
+  ok(!r.shisaku, '「試作」が出ている'); ok(r.note, '駅の説明が製品版の文言でない'); ok(r.closed > 0); eq(r.leaked, [], '開いていない町の名前が駅の画面に出ている'); eq(s.errors, []); await s.close();
+});
+T('9: なかまの詳細の「出現」は、初めてまぼろし駅に着くまで「？？？」(flags.mabo のあとで名前が出る)', async () => {
+  const s = await open(); await goMap(s, 'komorebi'); await wait(300);
+  const r = await s.ev(() => { const mabo = TOWN.mabo.fields[0].table[0][0]; const a = habOf(mabo).join('/'); const r0 = habOf('dokudamin').join('/'); state.flags.mabo = true; const b = habOf(mabo).join('/'); return { mabo, a, b, r0, raw: HAB[mabo].join('/') }; });
+  ok(r.a.includes('？？？') && !r.a.includes('まぼろし'), '着く前に名前が出ている: ' + r.a); ok(r.b.includes('まぼろし駅・夢の野原'), '着いたあとに名前が出ない: ' + r.b); ok(!r.r0.includes('？？？'), 'ほかの出現表が隠れている');
+  /* 実際の詳細の画面(図鑑)にも出ない */
+  const h = await s.ev(m => { state.flags.mabo = false; state.seen[m] = true; state.owned[m] = true; ui.tab = 'dex'; ui.dex = m; ui.dexSel = m; render(); return document.body.innerText.includes('まぼろし駅・夢の野原'); }, r.mabo);
+  ok(!h, '図鑑の詳細に まぼろし駅 の名前が出ている'); eq(s.errors, []); await s.close();
 });
 T('T2: 区画番号は変えていない(旧セーブの foot ビットがそのまま読める)', async () => {
   const s = await open(); await startGame(s);
