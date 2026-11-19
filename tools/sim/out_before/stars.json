@@ -1,0 +1,195 @@
+{
+ "item": "stars",
+ "seed": 1,
+ "n": null,
+ "params": {
+  "STEP_S": 0.185,
+  "BATTLE_OVERHEAD_S": 2.4,
+  "AUTO_TURN_S": 0.35,
+  "REST_S": 40,
+  "REST_HP": 0.45,
+  "RAMP_S": 120,
+  "TOUR_X": 2,
+  "GRASS": 1,
+  "GAME": "src/game.html"
+ },
+ "result": {
+  "nMaps": 45,
+  "nTown": 9,
+  "ms": [
+   {
+    "n": 10,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 20,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 30,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 40,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 51,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 55,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 60,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 65,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 71,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 78,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 86,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 95,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 105,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 116,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 124,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 133,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 141,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 70,
+    "stars": 20,
+    "all": false
+   },
+   {
+    "n": 80,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 90,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 100,
+    "stars": 50,
+    "all": false
+   },
+   {
+    "n": 110,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 120,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 130,
+    "stars": 100,
+    "all": false
+   },
+   {
+    "n": 140,
+    "stars": 5,
+    "all": false
+   },
+   {
+    "n": 148,
+    "stars": 5,
+    "all": true
+   }
+  ],
+  "oldMsStars": 25,
+  "newMsStars": 260,
+  "regStars": 90,
+  "stampStars": 135,
+  "base": {
+   "boss": 135,
+   "cups": 70,
+   "reqs": 100,
+   "firstOwn": 148
+  },
+  "mexDay": [
+   {
+    "id": "star",
+    "stars": 10,
+    "pt": 50
+   }
+  ],
+  "reqs": 50,
+  "cups": 7,
+  "gacha": {
+   "c1": 100,
+   "c10": 1000,
+   "rate": [
+    [
+     8,
+     0.03
+    ],
+    [
+     7,
+     0.15
+    ],
+    [
+     6,
+     0.82
+    ]
+   ],
+   "pity": 100
+  },
+  "dexN": 148,
+  "daily": {
+   "login": 5,
+   "missions": 14
+  }
+ }
+}

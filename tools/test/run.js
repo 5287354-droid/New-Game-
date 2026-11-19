@@ -78,7 +78,7 @@ T('index.html が src/game.html から作り直したものと一致', async () 
 });
 
 /* ---- T6 ---- */
-T('T6: 相棒の才能が8以上、はじめの3勝は敵1体・Lv-1、ぬし後は補正なし', async () => {
+T('T6: 相棒の才能が8以上、はじめの1戦は敵1体・Lv-2、3勝までは敵1体・Lv-1、あぜ道では仲間1体のあいだ敵1体、ぬし後は補正なし', async () => {
   const s = await open();
   const r = await s.ev(() => {
     H.starter({ id: 'happadanuki' }); ui.dlg = null; const talent = Object.values(state.party[0].talent);
@@ -87,9 +87,11 @@ T('T6: 相棒の才能が8以上、はじめの3勝は敵1体・Lv-1、ぬし後
     state.wins = 3; const b = owEarly([['ibote', 9], ['ibote', 9]]);
     state.wins = 0; state.boss = { komorebi: true }; const c = owEarly([['ibote', 9], ['ibote', 9]]);
     state.boss = {}; lead.lv = 1; const d = owEarly([['ibote', 9]]);
-    return { min: Math.min(...talent), a, b, c, d };
+    lead.lv = 5; state.wins = 1; const a1 = owEarly([['ibote', 9], ['ibote', 9]]);
+    state.wins = 3; const aze = owEarly([['ibote', 9], ['ibote', 9]], { id: 'aze' }), uray = owEarly([['ibote', 9], ['ibote', 9]], { id: 'urayama' });
+    return { min: Math.min(...talent), a, a1, aze, uray, b, c, d };
   });
-  ok(r.min >= 8, '才能 ' + r.min); eq(r.a, [['ibote', 4]]); eq(r.b.length, 2); eq(r.c.length, 2); eq(r.d, [['ibote', 1]]);
+  ok(r.min >= 8, '才能 ' + r.min); eq(r.a, [['ibote', 3]]); eq(r.a1, [['ibote', 4]]); eq(r.aze, [['ibote', 4]]); eq(r.uray.length, 2); eq(r.b.length, 2); eq(r.c.length, 2); eq(r.d, [['ibote', 1]]);
   eq(s.errors, []); await s.close();
 });
 T('T6: 野生に勝つと wins が増える', async () => {
@@ -275,21 +277,22 @@ T('T2: 結果画面に「寄り道 +N%」が出る', async () => {
 T('T2: みちくさ帳の交換(点が足りないと不可・1日1回・累計1回・称号)', async () => {
   const s = await open(); await startGame(s);
   const r = await s.ev(() => {
-    const o = {}; state.mpt = 10; o.poor = mexBuy('kirakira'); state.mpt = 600; state.items.kirakira = 0; state.items.kai = 0; state.items.saino = 0; state.items.tenpu = 0; const st0 = state.stars;
+    const o = {}; state.mpt = 10; o.poor = mexBuy('kirakira'); state.mpt = 5000; state.items.kirakira = 0; state.items.kai = 0; state.items.saino = 0; state.items.tenpu = 0; const st0 = state.stars;
     o.k = mexBuy('kirakira'); o.kai = mexBuy('kai'); o.s1 = mexBuy('saino'); o.s2 = mexBuy('saino'); o.st1 = mexBuy('star'); o.st2 = mexBuy('star'); o.t1 = mexBuy('tenpu'); o.t2 = mexBuy('tenpu');
     o.items = [state.items.kirakira, state.items.kai, state.items.saino, state.items.tenpu]; o.stars = state.stars - st0; o.mpt = state.mpt;
-    state.mptAll = 999; o.t0 = mchiTitle(); state.mptAll = 1000; o.t1x = mchiTitle();
+    o.starPt = [['kirakira', 'kai', 'saino', 'star', 'tenpu'].map(id => MEX.find(x => x.id === id).pt), MEX.find(x => x.id === 'star').stars];
+    state.mptAll = 2499; o.t0 = mchiTitle(); state.mptAll = 2500; o.t1x = mchiTitle();
     H.mchi(); o.inside = ui.inside; o.html = document.querySelector('.mex') ? document.querySelectorAll('.mex').length : 0; o.stamps = document.querySelectorAll('.mst').length;
     return o;
   });
   eq(r.poor, false); eq([r.k, r.kai, r.s1, r.s2, r.st1, r.st2, r.t1, r.t2], [true, true, true, false, true, false, true, false]);
-  eq(r.items, [1, 1, 1, 1]); eq(r.stars, 10); eq(r.mpt, 600 - 15 - 40 - 80 - 50 - 400);
+  eq(r.items, [1, 1, 1, 1]); eq(r.stars, r.starPt[1]); eq(r.mpt, 5000 - r.starPt[0].reduce((a, b) => a + b, 0));
   eq(r.t0, ''); eq(r.t1x, 'みちくさ名人'); eq(r.inside, 'mchi'); eq(r.html, 5); eq(r.stamps, 18);
   eq(s.errors, []); await s.close();
 });
 T('T2: 画面(みちくさ帳)は390pxでもはみ出さず、ボタンが44px以上', async () => {
   const s = await open(); await startGame(s);
-  await s.ev(() => { state.mpt = 999; state.mptAll = 1200; for (const d of OW_STAMPS.slice(0, 5)) state.stamps[d[0]] = 1; H.mchi(); });
+  await s.ev(() => { state.mpt = 999; state.mptAll = 2600; for (const d of OW_STAMPS.slice(0, 5)) state.stamps[d[0]] = 1; H.mchi(); });
   await wait(300);
   const r = await s.ev(() => ({ sw: document.documentElement.scrollWidth, btn: [...document.querySelectorAll('.mex .btn')].map(b => b.getBoundingClientRect().height), sub: !!document.querySelector('.ow-sub') }));
   ok(r.sw <= 390, 'はみ出し ' + r.sw); ok(r.btn.every(h => h >= 44), '交換ボタンが小さい ' + r.btn);
