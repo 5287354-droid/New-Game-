@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="50dbf12cd8";</script>
+<script>window.JG_APP=true;window.JG_VER="cf64f533cd";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -846,6 +846,20 @@ body.bshake2 .battle{animation:bshk2 .42s linear}
 .tiles>p.small{grid-column:1/-1}
 @media (max-height:760px){.rw{gap:6px}.rwh{font-size:24px}.rwn1 b{font-size:30px}.rwnums{padding-top:5px;gap:12px}.rwc{padding:5px 8px}.rwgoal{gap:3px;padding-top:5px}.rwg{font-size:12px;line-height:1.3}.rwg b{font-size:14px}.rwm .seal{--s:48px;--i:36px}}
 .rwnums{flex-wrap:wrap}
+/* 格の印: 丸い輪は四角いカードからはみ出すので、四角い多重枠(静止・にじみなし)にする。A<S<SS<SSS<創世 */
+.seal.r-S::before,.seal.r-SS::before,.seal.r-SSS::before,.seal.r-創世::before{content:"";position:absolute;inset:-5px;border-radius:9px;padding:3px;pointer-events:none;animation:none;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.seal.r-S::before{inset:-4px;padding:2px;background:linear-gradient(135deg,#fff3c4,#f2b13c 50%,#fff3c4)}
+.seal.r-SS::before{inset:-5px;padding:3px;background:linear-gradient(135deg,#ff7ab8,#ffd36a,#7af2c8,#7ab8ff)}
+.seal.r-SSS::before{inset:-7px;padding:5px;background:linear-gradient(135deg,#fff,#ffd36a,#ff7ab8,#c89aff,#7ab8ff,#7af2c8,#fff)}
+.seal.r-創世::before{inset:-8px;padding:6px;background:repeating-linear-gradient(135deg,#f2c84a 0 6px,#1a1020 6px 9px,#9a7af2 9px 15px,#1a1020 15px 18px)}
+.seal.xs.r-S::before,.seal.xs.r-SS::before,.seal.xs.r-SSS::before,.seal.xs.r-創世::before{inset:-3px;padding:2px;border-radius:7px}
+.seal.r-S{box-shadow:inset 0 0 0 2px var(--fam)}
+.seal.r-SS{box-shadow:inset 0 0 0 2px var(--fam),inset 0 0 0 5px var(--bg2)}
+.seal.r-SSS{box-shadow:inset 0 0 0 2px var(--fam),inset 0 0 0 5px var(--bg2),inset 0 0 0 7px #ffd36a}
+.seal.r-創世{box-shadow:inset 0 0 0 2px #f2c84a,inset 0 0 0 5px #120c1c,inset 0 0 0 7px #f2c84a}
+.seal.xs.r-SS,.seal.xs.r-SSS,.seal.xs.r-創世{box-shadow:none}
+.bc .seal.r-SS,.bc .seal.r-SSS,.bc .seal.r-創世{margin-bottom:8px}
 </style>
 
 <div id="app"></div>
