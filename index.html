@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="e19ed0713c";</script>
+<script>window.JG_APP=true;window.JG_VER="de2d623930";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -111,10 +111,9 @@ body.sgshake .shell{animation:sgshk .36s steps(1,end)}
 .seal img.spr{width:var(--i);height:var(--i);filter:drop-shadow(0 2px 0 color-mix(in srgb,var(--bg) 60%,transparent))}
 .seal.xs img.spr{image-rendering:auto}
 .seal img.art{width:calc(var(--s) - 6px);height:calc(var(--s) - 6px);border-radius:50%;object-fit:cover;-webkit-mask:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%);mask:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%)}
-.seal img.art.shiny{filter:hue-rotate(150deg) saturate(1.4)}
 .bc.foe img.art{animation:none}
 .seal img.spr.shiny{filter:drop-shadow(0 2px 0 color-mix(in srgb,var(--bg) 60%,transparent))}
-.seal.sh::after{content:"✦";position:absolute;right:-4px;bottom:-4px;color:var(--accent);font-size:15px;line-height:1;text-shadow:0 0 6px var(--accent);animation:twinkle 1.6s ease-in-out infinite}
+.seal.sh::after{content:"✦";position:absolute;right:-4px;bottom:-4px;color:var(--accent);font-size:15px;line-height:1;animation:twinkle 1.6s ease-in-out infinite}
 .seal.xs.sh::after{font-size:10px;right:-2px;bottom:-2px}
 @keyframes twinkle{50%{opacity:.35;transform:scale(.8)}}
 .seal .rk{position:absolute;top:-3px;right:-6px;font-family:var(--f-disp);font-size:11px;line-height:1;padding:3px 4px;border-radius:4px;background:var(--fam);color:var(--bg)}
@@ -369,15 +368,15 @@ body.sgshake .shell{animation:sgshk .36s steps(1,end)}
 .seal.r-S::before{background:conic-gradient(#f2b13c,#fff3c4 12%,transparent 25%,#f2b13c 50%,#fff3c4 62%,transparent 75%,#f2b13c)}
 .seal.r-SS::before{inset:-6px;background:conic-gradient(#ff7ab8,#ffd36a,#7af2c8,#7ab8ff,#c89aff,#ff7ab8);animation-duration:3s}
 .seal.xs.r-S::before,.seal.xs.r-SS::before{inset:-3px;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px))}
-.seal.r-S img.spr{filter:drop-shadow(0 2px 0 #0009) drop-shadow(0 0 5px #f2b13c88)}
+.seal.r-S img.spr{filter:drop-shadow(0 2px 0 #0009)}
 .seal.r-SS img.spr{animation:ssglow 2.4s ease-in-out infinite}
-.seal.r-S img.spr.shiny{filter:drop-shadow(0 2px 0 #0009) drop-shadow(0 0 5px #f2b13c88)}
-.seal.r-SS img.spr.shiny{animation:none;filter:drop-shadow(0 0 7px #ff9ad8)}
+.seal.r-S img.spr.shiny{filter:drop-shadow(0 2px 0 #0009)}
+.seal.r-SS img.spr.shiny{animation:none;filter:drop-shadow(0 2px 0 #0009)}
 .seal.r-SS{box-shadow:inset 0 0 0 2px var(--fam),inset 0 0 0 5px var(--bg2),0 0 22px -4px #ff9ad8}
 .seal.r-S .rk{background:linear-gradient(#ffe08a,#e89a2a);color:#2a1800}
 .seal.r-SS .rk{background:linear-gradient(90deg,#ff7ab8,#ffd36a,#7af2c8,#7ab8ff);color:#1a0820}
 @keyframes spin{to{transform:rotate(1turn)}}
-@keyframes ssglow{0%,100%{filter:drop-shadow(0 2px 0 #0009) drop-shadow(0 0 4px #ff9ad877)}50%{filter:drop-shadow(0 2px 0 #0009) drop-shadow(0 0 10px #ffd36acc)}}
+@keyframes ssglow{0%,100%{filter:drop-shadow(0 2px 0 #0009) brightness(1)}50%{filter:drop-shadow(0 2px 0 #0009) brightness(1.12)}}
 @media (min-width:700px){.bc.foe.mighty .seal{--s:204px;--i:192px}}
 .bc.foe.mighty{border-color:color-mix(in srgb,#f2b13c 60%,var(--line))}
 .battle.enter .bc.foe.mighty img.spr{animation:roar .9s ease-out,bob 1.2s steps(2) .9s infinite}
@@ -387,7 +386,7 @@ body.sgshake .shell{animation:sgshk .36s steps(1,end)}
 .saipick{border:1px dashed #f29ad8;border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
 .panel.ura{border-color:#f29ad8}
 .seal.metal img.spr{animation:metal 2.4s ease-in-out infinite}
-@keyframes metal{0%,70%,100%{filter:drop-shadow(0 2px 0 #0008)}80%{filter:brightness(1.8) drop-shadow(0 0 6px #fff)}}
+@keyframes metal{0%,70%,100%{filter:drop-shadow(0 2px 0 #0008)}80%{filter:brightness(1.8)}}
 .transfer textarea{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;font-family:ui-monospace,Consolas,monospace;font-size:12px;word-break:break-all;resize:vertical}
 .transfer textarea:focus{border-color:var(--accent);outline:none}
 @media (max-width:820px){
@@ -1270,7 +1269,11 @@ function artLight(ax,st,RC){
   const N=ASZ,im=ax.getImageData(0,0,N,N),d=im.data,H=new Float32Array(N*N),T=new Float32Array(N*N);
   for(let i=0;i<N*N;i++)H[i]=d[i*4+3]/255;
   const r0=st.blur;
-  const blur=(S,D,r,s1)=>{for(let y=0;y<N;y++)for(let xx=0;xx<N;xx++){let s=0;for(let q=-r;q<=r;q++){const u=s1?Math.min(N-1,Math.max(0,xx+q)):xx,v=s1?y:Math.min(N-1,Math.max(0,y+q));s+=S[v*N+u];}D[y*N+xx]=s/(2*r+1);}};
+  /* 箱ぼかし(端は端の値でのばす)。窓を1画素ずつずらして和を更新するので、半径に関係なく速い */
+  const blur=(S,D,r,s1)=>{const st=s1?1:N,ln=s1?N:1,w=2*r+1;
+    for(let k=0;k<N;k++){const base=k*ln;let s=0;
+      for(let q=-r;q<=r;q++)s+=S[base+Math.min(N-1,Math.max(0,q))*st];
+      for(let t=0;t<N;t++){D[base+t*st]=s/w;s+=S[base+Math.min(N-1,t+r+1)*st]-S[base+Math.max(0,t-r)*st];}}};
   for(let p=0;p<2;p++){blur(H,T,r0,1);blur(T,H,r0,0);}
   for(let y=1;y<N-1;y++)for(let xx=1;xx<N-1;xx++){const i=y*N+xx,o4=i*4;if(!d[o4+3])continue;
     const gx=(H[i+1]-H[i-1])*9,gy=(H[i+N]-H[i-N])*9;
@@ -2547,7 +2550,7 @@ Object.assign(SK,{
   onsen:{n:'あったかおんせん',mp:10,k:'heal',t:'allies',b:24,cure:true,d:'湯けむりで味方全体を回復し、状態異常も治す'},
   takatobikomi:{n:'たかとびこみ',mp:7,k:'phys',t:'one',p:190,crit:.2,d:'高い枝から一直線に飛びこむ。会心が出やすい'},
   kenken:{n:'けんけんのこえ',mp:5,k:'buff',t:'allies',buff:{atk:1},d:'するどく鳴いて、味方全体の攻撃を上げる'},
-  houounohono:{n:'ほうおうのほのお',mp:26,k:'mag',t:'all',b:54,e:'炎',d:'不死鳥の炎で敵全体を焼きつくす'},
+  houounohono:{n:'ほうらいのほのお',mp:26,k:'mag',t:'all',b:54,e:'炎',d:'瑞鳥の炎で敵全体を焼きつくす'},
   kamagiri:{n:'カマぎり',mp:6,k:'phys',t:'one',p:170,crit:.25,d:'鎌で切りつける。会心が出やすい'},
   nekkyu:{n:'ねっきゅう',mp:9,k:'mag',t:'all',b:20,e:'炎',d:'仲間で取りかこみ、体温の熱で敵全体を蒸し焼きにする'},
   kongou:{n:'こんごうのうで',mp:20,k:'phys',t:'all',p:200,d:'長い前脚で敵全体をなぎ払う'},
@@ -2571,7 +2574,7 @@ S('shikanosuke','シカノスケ','beast','C','鹿','ニホンジカ','神の使
 S('yukizaru','ユキザル','beast','B','猿','ニホンザル','世界でいちばん北に暮らすサル。雪の日は温泉につかって、群れでのんびり暖まる。',[40,18,16,13,13,14],[[1,'kamitsuki'],[1,'onsen'],[20,'tobikakari'],[30,'kamikudaku']],'shizen');
 S('kawasemin','カワセミン','bird','D','翡','カワセミ','「清流の宝石」と呼ばれる青い小鳥。枝の上からまっすぐ水へ飛びこみ、魚をとらえる。',[18,10,12,6,16,9],[[1,'tsuttsuki'],[6,'mizudeppou'],[13,'takatobikomi'],[24,'tsumuji']],'kaishin');
 S('kijimaru','キジマル','bird','C','雉','キジ','日本の国鳥。地震の前に「ケーン」と鳴いて知らせる、という言い伝えがある。',[28,12,14,10,13,10],[[1,'tsuttsuki'],[8,'kenken'],[16,'rentsutsuki'],[26,'tsumuji']],'iatsu');
-S('houou','ホウオウ','bird','S','鳳','オナガドリ','尾の長さが10メートルを超える鶏が、千年の配合の果てに不死鳥となった姿。めでたい世にだけ姿をあらわす。',[60,34,22,16,20,26],[[1,'honoonoiki'],[1,'iyashi'],[25,'sosei'],[40,'houounohono']],'saisei',true);
+S('houou','ホウライ','bird','S','鳳','オナガドリ','尾の長さが10メートルを超える鶏が、千年の配合の果てに瑞鳥となった姿。渦を巻く金と朱の尾羽をひろげ、めでたい世にだけ蓬莱の山から舞い降りる。',[60,34,22,16,20,26],[[1,'honoonoiki'],[1,'iyashi'],[25,'sosei'],[40,'houounohono']],'saisei',true);
 S('kamakirin','カマキリン','bug','D','鎌','オオカマキリ','草むらの殺し屋。両腕の鎌をかまえて、じっと獲物を待ちぶせる。',[20,6,13,8,13,6],[[1,'kamagiri'],[6,'konohagakure'],[13,'otakebi'],[24,'kamikudaku']],'kaishin');
 S('mitsubachin','ミツバチン','bug','E','蜜','ニホンミツバチ','花の蜜を集める小さな蜂。天敵のスズメバチが来ると、みんなで取りかこんで熱で倒す。',[14,12,7,6,12,10],[[1,'dokubari'],[5,'amaimitsu'],[12,'yakusou'],[22,'nekkyu']],'mpkaifuku');
 S('tagamen','タガメン','bug','C','鼈','タガメ','田んぼにすむ日本最大級の水生昆虫。カエルもヘビも、前脚でつかまえて体液を吸う。',[28,10,15,12,9,8],[[1,'hasami'],[8,'kyuuketsu'],[16,'shoukaeki'],[26,'kamikudaku']],'kyuuketsu');
@@ -2653,10 +2656,10 @@ RECIPES.push(
   {a:'kamakirin',b:'haganetsubu',out:'harigane',hint:'理科の先生「カマキリの中で育つハリガネムシ。鉄の巻貝と配合すると、本当に針金になるんですよ」'},
   {a:'kabutoo',b:'kamakirin',out:'ookuwa',hint:'虫取りの少年「カブトとカマキリを配合したら、黒くてでっかいクワガタが出てきた！」'},
   {a:'uribou',b:'tsukinowa',out:'yukizaru',hint:'温泉宿の女将「熊と猪が温泉で仲よくなって……子どもはなぜか、お猿さんだったのよ」'},
-  {a:'kijimaru',b:'hikui',out:'houou',plusSum:12,hint:'神社の宮司「国の鳥と火を食う鳥。強き血(+値の合計12以上)を重ねれば、不死鳥が舞う」'},
+  {a:'kijimaru',b:'hikui',out:'houou',plusSum:12,hint:'神社の宮司「国の鳥と火を食う鳥。強き血(+値の合計12以上)を重ねれば、蓬莱の瑞鳥が舞う」'},
   {a:'ookuwa',b:'kabutoo',out:'tenagaou',plusSum:10,aGen:3,hint:'昆虫館の館長「第3世代以上のオオクワと甲虫の王。+値の合計10以上で、南の森の巨人が生まれる」'},
   {a:'kurageru',b:'hitoden',out:'tokowaka',plusSum:14,hint:'水族館の飼育員「クラゲとヒトデ、どちらも再生の名人。+値の合計14以上なら、不老不死のクラゲに……」'},
-  {a:'houou',b:'horobiookami',out:'rinjuu',plusSum:26,aGen:5,hint:'古い絵巻「第5世代以上の鳳凰と、滅びし狼。+値の合計26以上の血から、千年に一度の聖獣があらわれる」'},
+  {a:'houou',b:'horobiookami',out:'rinjuu',plusSum:26,aGen:5,hint:'古い絵巻「第5世代以上の蓬莱の瑞鳥と、滅びし狼。+値の合計26以上の血から、千年に一度の聖獣があらわれる」'},
   {a:'shikanosuke',b:'happadanuki',out:'anaguman',hint:'森の古老「鹿とタヌキが同じ穴で暮らしたら、穴掘り名人のアナグマになった」'},
 );
 REQUESTS.push(
@@ -2823,6 +2826,257 @@ const EXTRA={
 };
 /* 細い種は、ふくらませを強くして外形をぽってりさせる(不透明率の規格のため) */
 const FATX={mukadeou:0};   /* 細かい脚が多い種は、ふくらませると脚がつぶれるので 0 */
+/*MF-START*/
+/* ========== 描き直し(監査 第1回): かっこよさと48pxの読みやすさ。既存IPに似るものの作り変え ========== */
+/* 中心線の点列をなめらかにつなぎ、太さが変わる帯(ヒレ・首・胴・しっぽ)にする。返り値は中心線のサンプル */
+const mfCurve=(P,n=8)=>{const o=[];for(let i=0;i<P.length-1;i++){const p0=P[Math.max(0,i-1)],p1=P[i],p2=P[i+1],p3=P[Math.min(P.length-1,i+2)];
+  for(let k=0;k<n;k++){const t=k/n,t2=t*t,t3=t2*t;o.push([0,1].map(d=>.5*(2*p1[d]+(-p0[d]+p2[d])*t+(2*p0[d]-5*p1[d]+4*p2[d]-p3[d])*t2+(-p0[d]+3*p1[d]-3*p2[d]+p3[d])*t3)));}}
+  o.push(P[P.length-1]);return o;};
+const mfBand=(g,P,w0,w1,c,n=8,off=0)=>{const s=mfCurve(P,n),L=s.length,A=[],B=[];
+  s.forEach((p,i)=>{const a=s[Math.max(0,i-1)],b=s[Math.min(L-1,i+1)];let tx=b[0]-a[0],ty=b[1]-a[1];const m=Math.hypot(tx,ty)||1;tx/=m;ty/=m;
+    const t=i/(L-1),w=typeof w0==='function'?w0(t):w0+(w1-w0)*t;A.push([p[0]-ty*(w+off),p[1]+tx*(w+off)]);B.push([p[0]+ty*(w-off),p[1]-tx*(w-off)]);});
+  g.p(A.concat(B.reverse()),c);return s;};
+/* 点列に沿った位置と向き(0〜1) */
+const mfAt=(s,t)=>{const i=Math.min(s.length-2,Math.max(0,Math.round(t*(s.length-1)))),a=s[i],b=s[i+1],m=Math.hypot(b[0]-a[0],b[1]-a[1])||1;return {x:a[0],y:a[1],tx:(b[0]-a[0])/m,ty:(b[1]-a[1])/m};};
+Object.assign(DRAW,{
+  /* ギンタチ: 立って泳ぐ太刀魚。反った刀身の体、のこぎり状の背びれ、牙をむく頭 */
+  gintachi:g=>{
+    const S='#d3dbe8',S2='#9fb0c6',W='#f6f9fc',F='#6f9fd6',Dk='#2a1424';
+    g.p([[23,9],[31,13],[29,19],[36,24],[33,30],[39,36],[35,41],[44,39],[45,45],[34,47],[27,40],[25,30],[21,20]],F);
+    g.l(30,14,26,20,'#a9c8ec',1);g.l(35,25,29,29,'#a9c8ec',1);g.l(38,37,31,38,'#a9c8ec',1);
+    g.p([[20,18],[11,25],[19,27]],'#8fb4dc');
+    g.p([[3,10],[12,11],[21,16],[11,19]],Dk);
+    g.p([[5,13],[13,15],[21,17],[18,22],[9,19]],S2);
+    const b=mfBand(g,[[19,15],[23,21],[27,29],[28,37],[33,42],[44,44]],t=>7.2*(1-t)**.8+.8,0,S);
+    mfBand(g,[[18,15],[22,21],[26,29],[27,37]],1.5,.6,W,8,-2.6);
+    for(let t=.22;t<.8;t+=.14){const q=mfAt(b,t);const w=7.2*(1-t)**.8+.8;g.l(q.x-q.ty*w*.9,q.y+q.tx*w*.9,q.x+q.ty*w*.9,q.y-q.tx*w*.9,'#aab8cc',.9);}
+    g.p([[2,10],[11,3],[21,7],[22,15],[12,14]],S);
+    g.p([[5,10],[7,14],[8.5,10.5]],W);g.p([[10,11],[12,15.5],[13.5,12]],W);g.p([[16,12.5],[17.5,17],[19.5,13.5]],W);
+    g.p([[2,10],[11,3],[14,5],[6,10]],W);
+    g.p([[15,6],[22,3],[20,9]],'#f2c43a');
+    g.eyeC(14.5,8.5,.95);
+  },
+  /* ハリガネン: 鋼線を巻いた「立ち上がるバネ蛇」。胴の輪、針の鼻先、しっぽの針 */
+  harigane:g=>{
+    const M='#b4bccb',M2='#7e889e',Wh='#eef3fa',Rd='#e0443a';
+    g.p([[41,40],[47,32],[44,42]],M2);
+    [[40,16,5],[34.5,14.5,4.6],[29,13,4.2]].forEach(([y,rx,h],i)=>{g.e(27,y+1,rx+1,h+.8,M2);g.e(27,y,rx,h,i%2?M:'#cfd6e2');g.e(25,y-1.2,rx*.55,h*.4,Wh);});
+    const s=mfBand(g,[[29,27],[37,21],[32,13],[22,10],[14,12]],4.3,3.3,M);
+    mfBand(g,[[29,26],[36,20],[31,12.5],[22,9]],1.1,.8,Wh,8,-2);
+    for(let t=.12;t<1;t+=.13){const q=mfAt(s,t),w=4.3-t;g.l(q.x-q.ty*w,q.y+q.tx*w,q.x+q.ty*w,q.y-q.tx*w,M2,1);}
+    g.p([[0,15],[7,8],[17,7],[22,11],[17,17],[8,16]],'#c9d0dc');
+    g.p([[0,15],[7,12],[8,16]],Wh);
+    g.p([[8,9],[14,4],[17,9]],M2);
+    g.p([[-2,16],[5,13.5],[5,16]],Wh);
+    g.eyeC(12.5,11.5,.95,'glow',1,'#ff6a4a');
+  },
+  /* ゴロダンゴ: 丸まりかけの装甲ダンゴムシ。段になった甲、前に突き出す小さな頭と触角 */
+  gorodango:g=>{
+    const A='#8c96aa',A2='#5e667c',D='#343a4e',H='#d4dcea';
+    [[16,41],[22,42.5],[29,42.5],[36,41.5]].forEach(([x,y])=>{g.l(x,y-3,x-2,y+4.5,D,2.6);});
+    g.h(27,42,21,18,A2);
+    const top=x=>42-18*Math.sqrt(Math.max(0,1-((x-27)/21)**2));
+    const xs=[11,16.5,22,27.5,33,38.5,44];
+    for(let i=0;i<xs.length-1;i++){const a=xs[i],b=xs[i+1],m=(a+b)/2,k=i%2?1:0;
+      g.p([[a,42],[a,top(a)-.6],[m,top(m)-1.4],[b+1,top(b)-.6],[b+1,42]],k?'#98a2b6':'#7f8aa0');}
+    for(let i=1;i<xs.length-1;i++){g.l(xs[i]+1,top(xs[i])-.4,xs[i]+1.4,41,D,1);}
+    g.path(xs.map(x=>[x+1.5,top(x)+1.6]),H,1.3);
+    g.p([[43,38],[49,34],[44,43]],A2);g.p([[44,41],[50,40],[45,44]],A2);
+    g.e(9,37,7,6,'#aab4c8');g.p([[3,37],[8,31],[12,33]],'#c3ccdc');
+    g.path([[5,32],[2,26],[5,21]],D,1.4);g.path([[9,31],[10,24],[15,20]],D,1.4);
+    g.eyeC(7,36,.95);
+  },
+  /* コオリユウレイ: 透きとおる氷の幽霊魚。氷柱の冠、すけた背骨、裾がほどけて消える尾 */
+  kooriyuurei:g=>{
+    const B='#cfeaf8',B2='#8fc0dc',Wh='#f4fdff',C='#7ae0ff',V='#6a74b8';
+    mfBand(g,[[26,29],[26,37],[22,43],[24,48]],2.3,.4,V,8,0);
+    mfBand(g,[[31,29],[34,37],[31,44],[34,48]],2.6,.4,B2,8,0);
+    mfBand(g,[[36,27],[43,33],[41,41],[46,46]],3,.5,V,8,0);
+    g.p([[17,20],[22,7],[27,19]],C);g.p([[24,18],[30,2],[35,18]],'#e8fbff');g.p([[33,20],[38,9],[41,23]],C);
+    g.l(22,8,22,18,'#ffffff',.8);g.l(30,3,30,17,'#c8f4ff',.8);
+    const b=mfBand(g,[[10,24],[18,18],[28,17],[37,22],[45,31]],t=>9*(1-t*.8)**.9+.7,0,B);
+    mfBand(g,[[12,22],[20,16],[28,15]],1.4,1,Wh,8,-1.8);
+    for(let t=.16;t<.8;t+=.09){const q=mfAt(b,t),w=9*(1-t*.8)**.9;g.l(q.x-q.ty*w*.55,q.y+q.tx*w*.55,q.x+q.ty*w*.55,q.y-q.tx*w*.55,'#a8d4ea',1);}
+    mfBand(g,[[10,24],[18,19],[28,18],[37,23],[44,31]],.9,.5,'#6a9cc0',8,0);
+    g.p([[1,24],[8,14],[18,14],[20,25],[10,28]],B);
+    g.p([[1,24],[8,15],[11,17],[5,24]],Wh);
+    g.p([[4,25],[11,27],[8,30]],B2);
+    [[5,8],[41,12],[8,36],[45,22]].forEach(([x,y])=>g.p([[x,y-3],[x+2,y],[x,y+3],[x-2,y]],'#e8fbff'));
+    g.eyeC(10.5,20,1,'glow',1,'#8a7aff');
+  },
+  /* テナガオウ: 体より長い剛腕で大木を抱える甲虫。つやのある緑の甲、節のある金の腕 */
+  tenagaou:g=>{
+    const G='#2a8a52',G2='#5ad08a',Au='#e0b030',Au2='#a87a1a',K='#3a2a18';
+    LEGS(g,[[26,38,20,47],[32,39,33,47],[38,37,44,46]],K,2.6);
+    g.e(31,29,15,12.5,G);g.e(27,23,8,4.5,G2,-.4);g.l(31,17,31,41,'#17583a',1.2);g.l(24,19,22,39,'#17583a',.9);g.l(38,19,40,39,'#17583a',.9);
+    g.e(18,30,7,7.5,'#2a6a3a');g.p([[13,23],[10,13],[17,22]],'#e0b030');
+    g.p([[6,31],[1,26],[7,24],[12,28]],'#2a6a3a');
+    const up=mfBand(g,[[19,31],[8,25],[3,13],[10,2]],3.6,2.8,Au);
+    mfBand(g,[[18,30],[8,24],[3,13]],1,.8,'#fff0a8',8,-1.6);
+    g.e(8,25,3.6,3.6,Au2);
+    g.p([[8,4],[13,-2],[15,4],[11,6]],'#fff0a8');g.p([[10,6],[16,1],[16,8]],Au2);
+    mfBand(g,[[22,35],[12,42],[3,36],[3,27]],3.3,2.6,Au2);
+    g.e(12,42,3.2,3.2,Au);g.p([[2,28],[-3,32],[4,34]],'#fff0a8');
+    g.eyeC(14.5,28,1);
+  },
+  /* ヒトダマ: 青い魂火のホタルイカ。炎の尾、点々と光る発光器、揺れる三本の足 */
+  hitodama:g=>{
+    const O='#4f86f0',I='#bff4ff',V='#6a5ad8',T='#4a4ab8';
+    [[15,38,10,45],[24,40,25,47],[33,38,38,45]].forEach(([x,y,ex,ey],i)=>{mfBand(g,[[x,y],[x+(i-1)*3,y+4],[ex,ey]],2.8,.7,T);g.e(ex,ey,1.9,1.9,'#8af4ff');});
+    g.p([[12,26],[3,15],[9,14],[17,20]],V);g.p([[36,26],[45,15],[39,14],[31,20]],V);
+    mfBand(g,[[24,22],[30,14],[28,7],[35,2]],6.5,.4,O);
+    mfBand(g,[[24,21],[29,14],[28,8],[34,4]],3,.3,I);
+    g.e(24,29,13.5,12.5,O);g.e(24,27,10.5,9.5,'#7ec8ff');g.e(22,24,6,4.5,I);
+    [[13,36],[18,39],[24,40],[30,39],[35,36]].forEach(([x,y])=>g.e(x,y,1.6,1.6,'#d8fbff'));
+    g.eyeC(18.8,29,.95,'glow',1,'#5a3ad8');g.eyeC(29,29,.85,'glow',-1,'#5a3ad8');
+  },
+  /* サギリ: 霧をまとう白鷺。太い首、広げた羽、頭の飾り羽。足もとは霧のかたまり */
+  sagiri:g=>{
+    const W='#f6f8fb',W2='#c4d0e4',Y='#f2b734',L='#4a4e60',Mi='#d6e2f2';
+    g.p([[27,27],[30,12],[35,5],[40,12],[44,8],[46,20],[44,26],[47,34],[36,36]],W2);
+    g.p([[30,24],[33,12],[36,8]],'#e6edf8');g.l(36,14,33,31,'#aebdd6',1);g.l(41,14,38,32,'#aebdd6',1);
+    g.p([[36,26],[47,33],[38,36]],W2);
+    g.e(10,45,9,3.4,Mi);g.e(24,46,13,3.2,'#e6eef8');g.e(38,45,9,3.4,Mi);
+    g.l(24,34,22,44,L,2.6);g.l(31,34,33,44,L,2.6);g.l(22,44,17,45,L,2.2);g.l(33,44,38,45,L,2.2);
+    g.e(29,29,12,8.5,W);g.e(25,27,7,4,'#ffffff');
+    mfBand(g,[[22,26],[16,21],[20,14],[14,8]],3.6,2.6,W);
+    g.p([[20,5],[32,3],[22,9]],W2);g.p([[20,7],[30,8],[21,10]],W2);
+    g.e(14,7.5,5.5,4.2,W);
+    g.p([[10,5.5],[0,9.5],[10,11]],Y);g.l(0,9.5,10,8.2,'#c8921a',.8);
+    g.eyeC(14.5,6.5,.9,'round',1);
+  },
+});
+Object.assign(DRAW96,{
+  /* ヤツマタ: 八つの頭。奥の頭は暗く小さく、手前の頭は大きく。ひとつずつ角・目・牙がはっきり読める */
+  yatsumata:g=>{
+    const N='#3a5a3c',Nb='#2a4430',H='#6a9a62',H2='#4a7a4a',Bn='#efdfae',Ey='#ffe04a';
+    g.e(48,92,44,3.5,'#1a1820');
+    const head=(x,y,a,s,c,c2,eye,sz)=>{const dx=Math.cos(a),dy=Math.sin(a),px=-dy,py=dx,P=(u,v)=>[x+dx*u*s+px*v*s,y+dy*u*s+py*v*s];
+      g.p([P(-3,-3),P(-13,-9),P(-6,-.5)],Bn);g.p([P(-3,3),P(-13,9),P(-6,.5)],Bn);
+      g.p([P(-8,0),P(-5,-6.6),P(4,-7.2),P(12,-3.4),P(15,0),P(12,3.4),P(4,7.2),P(-5,6.6)],c);
+      g.p([P(1,2.4),P(14,2.2),P(11,5.8),P(2,7)],c2);
+      g.p([P(5,.6),P(14,.4),P(13,2.8),P(5,3)],'#4a0e1a');
+      g.p([P(8,.8),P(9.5,3.6),P(10.6,.8)],'#ffffff');g.p([P(12,.6),P(12.6,3),P(13.8,.6)],'#ffffff');
+      g.p([P(-1,-6),P(2,-9.5),P(5,-6)],Bn);
+      g.l(...P(1,-4.3),...P(8,-5),c2,1.4);
+      const e=P(3.4,-2.6);g.eyeC(e[0],e[1],sz,'slit',dx<0?1:-1,Ey);};
+    const hs=[[-2,78,Math.PI*.97,.9,0],[100,72,-.03,.9,0],[-4,56,-3.0,1,1],[101,50,-.3,1,1],[8,32,-2.5,1.05,2],[90,26,-.65,1.1,2],[28,14,-1.95,1.15,3],[68,10,-1.15,1.2,3]];
+    const base=([x,y])=>[48+(x-48)*.3,68+(y-68)*.2];
+    const order=[0,1,2,3,4,5,6,7];
+    order.forEach(i=>{const [x,y,a,s,l]=hs[i],b=base([x,y]),m=[(x+b[0])/2+(x<48?-5:5),(y+b[1])/2-3];
+      const c=l%2?H:H2;
+      mfBand(g,[b,m,[x-Math.cos(a)*5,y-Math.sin(a)*5]],6.2,4.2,l%2?'#3a6a44':N);
+      head(x,y,a,s,c,l%2?'#5a8a54':'#3a6a44',0,i===6?.85:.62);});
+    g.e(48,78,30,14,'#34523a');g.e(48,74,24,9,'#3f6444');
+    for(let x=26;x<=70;x+=7)g.p([[x,68],[x+3.5,61],[x+7,68],[x+3.5,72]],'#4a6e4c');
+    g.p([[26,84],[48,92],[70,84],[48,80]],'#2a1a14');
+    g.path([[30,84],[38,88],[46,84],[54,89],[64,84]],'#ff7a2a',1.8);g.path([[38,88],[42,91]],'#ffb04a',1.2);g.path([[56,88],[60,91]],'#ffb04a',1.2);
+    g.p([[14,80],[30,78],[32,92],[12,92]],'#2c4430');claw(g,[[14,94],[19,94],[24,94]],Bn);
+    const tl=mfBand(g,[[66,82],[80,90],[92,84],[95,70]],6.5,.8,'#34523a');for(let t=.15;t<.9;t+=.16){const q=mfAt(tl,t);g.p([[q.x-1.5,q.y-5],[q.x+.5,q.y-9.5],[q.x+2.5,q.y-5]],'#4a6e4c');}
+  },
+  /* ムカデオウ: 太く短い節、強い顎、大きくうねる体。48pxでも体の輪郭と顎が読める */
+  mukadeou:g=>{
+    const K='#2c2236',K2='#4a3c5c',R='#d8402c',O='#f2a43a',Gd='#f0c84a';
+    const s=mfCurve([[90,84],[62,86],[32,82],[14,68],[28,52],[62,50],[82,38],[68,22],[42,20],[28,18]],10);
+    const pts=[];let acc=0,last=s[0];pts.push(s[0]);
+    for(let i=1;i<s.length;i++){acc+=Math.hypot(s[i][0]-last[0],s[i][1]-last[1]);last=s[i];if(acc>=6.6){pts.push(s[i]);acc=0;}}
+    const nm=pts.length,tan=i=>{const a=pts[Math.max(0,i-1)],b=pts[Math.min(nm-1,i+1)],m=Math.hypot(b[0]-a[0],b[1]-a[1])||1;return [(b[0]-a[0])/m,(b[1]-a[1])/m];};
+    const wd=i=>3.8+3.8*Math.min(1,i/(nm*.7));
+    pts.forEach((p,i)=>{if(i>=nm-1)return;const [tx,ty]=tan(i),nx=-ty,ny=tx,w=wd(i);
+      [-1,1].forEach(sd=>{const bx=p[0]+nx*w*sd,by=p[1]+ny*w*sd,kx=bx+nx*sd*5.2-tx*2.6,ky=by+ny*sd*5.2-ty*2.6;
+        g.l(bx,by,kx,ky,O,2.3);g.l(kx,ky,kx+nx*sd*2.6-tx*3.4,ky+ny*sd*2.6-ty*3.4,'#c8741e',1.8);});});
+    for(let i=0;i<nm-1;i++){const p=pts[i],[tx,ty]=tan(i),nx=-ty,ny=tx,w=wd(i),l=4.1;
+      g.p([[p[0]+nx*w-tx*l,p[1]+ny*w-ty*l],[p[0]+nx*w*.8+tx*l,p[1]+ny*w*.8+ty*l],[p[0]-nx*w*.8+tx*l,p[1]-ny*w*.8+ty*l],[p[0]-nx*w-tx*l,p[1]-ny*w-ty*l]],i%2?K:K2);
+      g.l(p[0]+nx*w*.9-tx*l,p[1]+ny*w*.9-ty*l,p[0]-nx*w*.9-tx*l,p[1]-ny*w*.9-ty*l,O,1.5);}
+    const h=pts[nm-1],[hx,hy]=tan(nm-1),px=-hy,py=hx,P=(u,v)=>[h[0]+hx*u+px*v,h[1]+hy*u+py*v];
+    g.path([P(-2,-9),P(8,-16),P(18,-14),P(22,-8)],Gd,3.6);g.path([P(-2,9),P(8,16),P(18,14),P(22,8)],Gd,3.6);
+    g.p([P(18,-14),P(24,-8),P(19,-8)],'#fff0b0');g.p([P(18,14),P(24,8),P(19,8)],'#fff0b0');
+    g.p([P(-9,0),P(-6,-11),P(6,-12.5),P(15,-8),P(17,0),P(15,8),P(6,12.5),P(-6,11)],R);
+    g.p([P(-5,-9),P(-14,-17),P(-8,-6)],Gd);g.p([P(-5,9),P(-14,17),P(-8,6)],Gd);
+    g.path([P(10,-7),P(22,-24),P(34,-27)],R,2);g.path([P(10,7),P(22,24),P(34,27)],R,2);
+    g.l(...P(4,-6.5),...P(14,-4),'#7a1a10',1.6);
+    const e=P(7,-5);g.eyeC(e[0],e[1],.95,'compound',hx<0?1:-1,'#ffe04a');
+    const e2=P(7,5.5);g.eyeC(e2[0],e2[1],.7,'compound',hx<0?1:-1,'#ffe04a');
+  },
+});
+Object.assign(DRAW,{
+  /* ホウライ(id: houou): 蓬莱の瑞鳥。金と朱の羽、渦を巻く長い尾羽とその目玉模様、頭の三本の飾り羽 */
+  houou:g=>{
+    const Au='#eab43a',Au2='#c8861e',Vr='#d8342c',Dr='#8a1e2a',Te='#2aa89a',Cr='#fff0b0';
+    [[30,33,38,41,45,37,45,30,2.4,Vr],[31,35,36,46,45,46,46,40,2.6,Au2],[29,34,32,44,40,47,44,44,2.2,Dr]].forEach(([a,b,c,d,e,f,h,i,w,col],k)=>{
+      mfBand(g,[[a,b],[c,d],[e,f],[h,i]],w+1,w*.45,col);
+      g.e(h,i-1,2.5,3,'#f6e27a');g.e(h,i-1,1.5,2,Te);g.e(h,i-1,.7,.9,Dr);});
+    [[24,25,30,6],[26,24,38,7],[27,25,44,14],[27,27,47,24]].forEach(([a,b,c,d],i)=>{
+      mfBand(g,[[a,b],[(a+c)/2+(i%2?-3:2),(b+d)/2-3],[c,d]],3.4,1.1,['#c8301e','#e0602a','#eab43a','#f6d672'][i]);});
+    g.p([[24,26],[28,14],[33,24]],'#f6d672');
+    g.l(24,25,33,10,Cr,.9);g.l(25,26,41,13,Cr,.9);
+    g.l(22,38,19,46,Au2,2.6);g.l(27,38,28,46,Au2,2.6);g.l(19,46,14,47,Au2,2);g.l(28,46,33,47,Au2,2);
+    g.e(22,31,10.5,9,Au);g.e(19,35,7,5,'#fbe9a8');
+    g.p([[12,29],[18,27],[22,36],[14,36]],Vr);
+    [[15,31],[19,33],[23,34]].forEach(([x,y])=>g.e(x,y,1.4,1.1,Dr));
+    mfBand(g,[[17,26],[11,21],[13,14],[11,10]],3.6,2.7,Au);
+    g.e(11,10,5.2,4.6,Au);
+    g.p([[7,8.5],[0,12.5],[7,13]],'#f6e6b0');g.p([[7,8.5],[1,10],[0,12.5]],'#d49a28');
+    g.path([[12,5],[16,0],[24,-1]],Vr,2);g.path([[11,5],[12,-2],[18,-6]],'#e0602a',2);g.path([[9,6],[5,0],[7,-5]],Au2,1.8);
+    g.eyeC(10,9.5,.9,'round',1);
+  },
+});
+Object.assign(DRAW96,{
+  /* ココノビ: 奥宮の九尾。濃い藍の毛、神使らしい赤い首飾り、輪になって燃える九本の尾(白い狐の扇にならない) */
+  kokonobi:g=>{
+    const In='#4f4690',In2='#6a60b4',Cr='#f2e6c8',Au='#eab83a',Rd='#d8342c',Fl='#5af0d0',Fl2='#e6fff6';
+    const cx=66,cy=60;
+    for(let i=0;i<9;i++){const a=-Math.PI*(1.02-i*1.04/8),dx=Math.cos(a),dy=Math.sin(a),px=-dy,py=dx,sw=i%2?5:-5,R=40+(i%2?0:5);
+      const tip=[cx+dx*R+px*sw,cy+dy*R+py*sw*.6];
+      mfBand(g,[[cx,cy],[cx+dx*R*.45+px*sw*.4,cy+dy*R*.45+py*sw*.4],[cx+dx*R*.8-px*sw*.5,cy+dy*R*.8-py*sw*.3],tip],t=>3.2+5*Math.sin(Math.PI*Math.min(1,t*1.15))*(1-t*.5),0,i%2?In:In2);
+      g.e(tip[0],tip[1],3.2,3.2,Au);
+      const fx=tip[0]+dx*4,fy=tip[1]+dy*4;
+      g.p([[fx-3,fy+1],[fx+dx*10+px*.5,fy+dy*10-3],[fx+3,fy+1],[fx,fy+4]],Fl);g.p([[fx-1.4,fy+1.5],[fx+dx*4.5,fy+dy*4.5-1.5],[fx+1.4,fy+1.5]],Fl2);}
+    g.e(60,92,34,3,'#1a1626');
+    g.p([[56,52],[76,52],[84,88],[48,90]],In);
+    g.e(66,76,22,17,In);g.e(60,70,14,8,In2);
+    g.p([[34,62],[52,60],[54,92],[30,92]],In2);g.p([[34,92],[30,94],[54,94]],'#2a2450');
+    g.p([[34,92],[53,92],[55,95],[31,95]],Cr);
+    g.p([[26,58],[36,48],[50,52],[52,66],[36,70]],'#e8dcc0');
+    g.p([[20,86],[34,80],[38,95],[18,95]],In);g.p([[16,95],[22,92],[38,95]],Cr);
+    g.p([[44,56],[58,50],[60,66],[48,70]],Rd);
+    g.e(53,66,3.2,3.2,Au);g.l(46,60,60,56,'#fff0b0',1);
+    g.p([[8,50],[18,38],[40,34],[48,46],[44,60],[22,62]],In2);
+    g.p([[8,50],[14,46],[22,60],[10,56]],Cr);
+    g.p([[14,48],[8,56],[6,50]],Cr);g.p([[22,56],[16,64],[28,62],[32,52]],Cr);g.p([[40,56],[46,70],[34,66]],Cr);
+    g.p([[20,40],[20,8],[34,34]],In);g.p([[34,42],[44,10],[48,42]],In2);
+    g.p([[23,34],[23,15],[31,32]],Rd);g.p([[38,38],[43,18],[45,36]],Rd);
+    g.p([[2,52],[8,48],[7,55]],'#1a1626');
+    g.path([[16,40],[26,34],[38,36]],Au,1.6);
+    g.eyeC(22,46,.95,'slit',1,'#ffd84a');
+    g.path([[10,56],[20,60],[30,58]],'#1a1626',1);
+  },
+});
+Object.assign(DRAW,{
+  /* ウミボウズ: 嵐の海から立つ濃紺の大入道。つるりとした頭、数珠、波でできた腕。紫のどろ塊ではない */
+  umibouzu:g=>{
+    const N='#243c64',N2='#3a5a8a',T='#2f7aa8',Fm='#e6f4fa',Bd='#f2f0e0';
+    mfBand(g,[[13,44],[2,34],[-3,18],[3,3],[10,-1]],4.4,1.3,T);
+    mfBand(g,[[35,44],[46,34],[51,18],[45,3],[38,-1]],4.4,1.3,T);
+    [[10,-1],[3,3],[-2,14]].forEach(([x,y])=>g.e(x,y,2.4,2,Fm));[[38,-1],[45,3],[50,14]].forEach(([x,y])=>g.e(x,y,2.4,2,Fm));
+    g.l(5,38,2,22,'#7ac0e0',1);g.l(43,38,46,22,'#7ac0e0',1);
+    g.h(24,46,14,25,N);
+    [[14,36],[20,40],[28,38],[33,34],[24,34],[17,30],[31,28]].forEach(([x,y])=>g.e(x,y,2.2,1.7,N2));
+    g.e(24,20,11.5,12,'#2c4672');g.e(21,15,5.5,4.5,'#4a6ea0');
+    g.e(13,21,2.2,3.4,'#2c4672');g.e(35,21,2.2,3.4,'#2c4672');
+    g.p([[12,16],[24,12],[36,16],[36,18],[24,15],[12,18]],'#16243e');
+    g.p([[15,28],[24,31.5],[33,28],[31,33],[24,36],[17,33]],'#0e1226');
+    [[18,29.2],[22,31.2],[26,31.2],[30,29.2]].forEach(([x,y])=>g.p([[x-1.4,y],[x,y+3],[x+1.4,y]],Bd));
+    for(let i=0;i<9;i++){const a=Math.PI*(.12+i*.095),x=24-Math.cos(a)*11.5+0,y=40+Math.sin(a)*3.2-3;g.e(x+0,y-0,1.7,1.7,Bd);}
+    g.e(24,44,2.4,2.4,'#f6e0a0');
+    g.h(24,47,19,5.5,'#25608e');
+    for(let i=0;i<5;i++)g.e(9+i*7.5,43.5,3.8,1.9,Fm);
+    g.eyeC(19,22,1,'glow',1,'#ffe27a');g.eyeC(29,22,.9,'glow',-1,'#ffe27a');
+  },
+});
+['harigane','gorodango','umibouzu'].forEach(k=>delete EXTRA[k]);
+['gintachi','harigane','gorodango','yatsumata','kooriyuurei','tenagaou','hitodama','sagiri','mukadeou','houou','kokonobi','umibouzu'].forEach(k=>delete EYES[k]);
+/*MF-END*/
 /* 色違いの配色の型(tools/art_assign.js が系統ごとに3種をめぐらせて割り当てた) */
 Object.assign(SHREC,{
   dokudamin:'momiji',ibote:'fuji',tsubokurau:'momiji',yadoridake:'fuji',dobuchu:'tsukishiro',happadanuki:'kokuyou',
@@ -3065,7 +3319,7 @@ Object.assign(STORY,{
 RECIPES.push(
   {a:'akahara',b:'hidanedori',out:'yukemuri',hint:'湯治場のおかみ「赤いおなかのイモリと、火種の鳥。湯けむりの谷で配合すると、歌うカエルが生まれるのよ」'},
   {a:'oohanzaki',b:{fam:'dragon',minRank:5},out:'hisanshou',plusSum:14,hint:'火山学者「オオサンショウウオに、強い竜(Aランク以上)の血を+値の合計14以上で重ねると……溶岩を泳ぐ竜になるはずだ」'},
-  {a:'hisanshou',b:'houou',out:'kagutsuchi',plusSum:28,aGen:6,hint:'火口の石碑「第6世代以上の火の竜と、不死の鳥。+値の合計28以上の血から、最初の火がよみがえる」'},
+  {a:'hisanshou',b:'houou',out:'kagutsuchi',plusSum:28,aGen:6,hint:'火口の石碑「第6世代以上の火の竜と、蓬莱の瑞鳥。+値の合計28以上の血から、最初の火がよみがえる」'},
 );
 REQUESTS.push(
   {id:'r38',town:'hinoshima',from:'島の小学校の先生',text:'島の鳥、ヒダネドリを子どもたちに見せてあげたいんです。',need:{sp:'hidanedori'},reward:{yen:3000,items:{tea:3}}},
@@ -3460,7 +3714,7 @@ function dexMsClaim(k){
 const wxLabel=id=>{try{return id&&typeof WX!=='undefined'&&WX[id]?(WX[id].n||WX[id].name||''):'';}catch(e){return '';}};
 function seenAtText(sp){const a=state.seenAt&&state.seenAt[sp];if(!a)return state.seen[sp]?'はじめて会った場所: 記録なし':'';const t=TOWN[a[0]];return `はじめて会った場所: ${t?t.name:'?'}・${TIMES[a[1]]?TIMES[a[1]].n:''}${wxLabel(a[2])?'・'+wxLabel(a[2]):''}`;}
 function renderDexReg(DL){
-  const cell=({s,tm})=>{const sn=!!state.seen[s],sp=SP[s],i=SPL.indexOf(sp);return `<button class="dexc ${ui.dexSel===s?'on':''} ${state.owned[s]?'own':''}" data-act="dex" data-id="${s}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s]?' <b class="shn">✦</b>':''}</span>${seal(s,'sm',sn?true:false)}<span class="nm">${sn?sp.name:'？？？'}</span>${tm?`<span class="rtag">${(typeof TM!=='undefined'&&TM[tm])||(tm==='n'?'夕方・夜':'朝・昼')}</span>`:''}</button>`;};
+  const cell=({s,tm})=>{const sn=!!state.seen[s],sp=SP[s],i=SPL.indexOf(sp);return `<button class="dexc ${ui.dexSel===s?'on':''} ${state.owned[s]?'own':''}" data-act="dex" data-id="${s}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s]?' <b class="shn">✦</b>':''}</span>${seal(s,'sm',sn?true:false,false,true)}<span class="nm">${sn?sp.name:'？？？'}</span>${tm?`<span class="rtag">${(typeof TM!=='undefined'&&TM[tm])||(tm==='n'?'夕方・夜':'朝・昼')}</span>`:''}</button>`;};
   const mabo=TOWN.mabo,mst=regStat('mabo'),mgot=state.dexReg&&state.dexReg.mabo,mdone=regDone('mabo'),mrw=REG_RW.mabo||{};
   const maboHtml=!state.flags.mabo?'':`<div class="dexgroup reg" style="--fam:${TLC.mabo}"><h4>?? ${mabo.name}</h4>
       <div class="regsum"><span>見つけた <b class="num">${mst.seen}</b></span><span>なかま <b class="num">${mst.own}</b></span><span>全 <b class="num">${mst.all}</b></span>
@@ -6968,12 +7222,28 @@ const townOpen=t=>!t.req||state.boss[t.req];
 /*ART-START*/const ART={};/*ART-END*/
 /* 路線の色(町ごと) */
 const TLC={komorebi:'#62c46e',kasumi:'#9aa8c4',shiomi:'#35a8e6',tengu:'#c8964a',mayoiga:'#b79cf4',ryuhyo:'#8fd6f6',hinoshima:'#ff6a3a',sango:'#ff8db0',yomi:'#e9344a',mabo:'#8c93a3'};
+/* 図鑑など数が多い一覧は、絵を「見える順」に遅れて作る(全種そろっても最初の表示が止まらない) */
+const LZPH='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const sprCached=(id,sil,sh)=>!!SPRC[id+(sil?'_s':'')+(sh&&!sil?'_x':'')];
+function lazyFill(){
+  const list=[...document.querySelectorAll('img[data-lz]')];if(!list.length)return;
+  const fill=im=>{const v=im.getAttribute('data-lz');if(!v||!im.isConnected)return;const [id,sil,sh]=v.split('|');im.removeAttribute('data-lz');im.src=sprite(id,sil==='1',sh==='1');};
+  if(lazyFill.io)lazyFill.io.disconnect();
+  if(typeof IntersectionObserver==='function'){
+    const io=lazyFill.io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fill(e.target);}}),{rootMargin:'200px'});
+    list.forEach(im=>io.observe(im));
+  }
+  /* 見えていないぶんも、ひまなときに1枚ずつ作っておく */
+  let i=0;const tok=lazyFill.tok=(lazyFill.tok||0)+1;
+  const step=()=>{if(lazyFill.tok!==tok)return;let n=0;while(i<list.length&&n<1){const im=list[i++];if(im.isConnected&&im.hasAttribute('data-lz')){fill(im);n++;}}if(i<list.length)setTimeout(step,16);};
+  setTimeout(step,300);
+}
 /* ========== 描画パーツ ========== */
-function seal(spId,size='',known=true,shiny=false){
+function seal(spId,size='',known=true,shiny=false,lazy=false){
   const sp=SP[spId];
   if(!known)return `<div class="seal ${size}" aria-label="未発見"><span>？</span></div>`;
   const sil=known==='sil',sh=shiny&&!sil;
-  return `<div class="seal ${size} ${sh?'sh':''} ${sp.fam==='metal'&&!sil?'metal':''} ${sp.fam==='myst'&&!sil?'myst':''} ${!sil&&sp.rank>=5?'r-'+RANKS[sp.rank]:''}" style="--fam:${sil?'var(--faint)':FAM[sp.fam].c}" aria-hidden="true">${!sil&&ART[spId]&&size!=='xs'?`<img class="art ${sh?'shiny':''}" src="${ART[spId]}" alt="">`:`<img class="spr ${sh?'shiny':''}" src="${sprite(spId,sil,sh)}" alt="">`}${sil?'':`<b class="rk">${RANKS[sp.rank]}</b>`}${!sil&&(size==='lg'||size==='xl')?`<i class="gl">${sp.glyph}</i>`:''}</div>`;
+  return `<div class="seal ${size} ${sh?'sh':''} ${sp.fam==='metal'&&!sil?'metal':''} ${sp.fam==='myst'&&!sil?'myst':''} ${!sil&&sp.rank>=5?'r-'+RANKS[sp.rank]:''}" style="--fam:${sil?'var(--faint)':FAM[sp.fam].c}" aria-hidden="true">${!sil&&ART[spId]&&size!=='xs'?`<img class="art ${sh?'shiny':''}" src="${ART[spId]}" alt="">`:`<img class="spr ${sh?'shiny':''}" ${lazy&&!sprCached(spId,sil,sh)?`src="${LZPH}" data-lz="${spId}|${sil?1:0}|${sh?1:0}"`:`src="${sprite(spId,sil,sh)}"`} alt="">`}${sil?'':`<b class="rk">${RANKS[sp.rank]}</b>`}${!sil&&(size==='lg'||size==='xl')?`<i class="gl">${sp.glyph}</i>`:''}</div>`;
 }
 function hpBar(v,max,cls=''){
   const r=max?v/max:0;const c=cls||(r<.25?'low':r<.5?'mid':'');
@@ -6998,7 +7268,7 @@ function render(){
   ui._st=ui.tab+(B?'b':'')+(ui.station?'s':'')+(ui.inside||'');const nm=document.getElementById('main');if(nm&&keep)nm.scrollTop=keep;
   if(!walking&&ui.wmenu)ui.wmenu=false;
   if(document.getElementById('owc')){owResize();owEnsureLoop();owStampShow();if(ui.band){clearTimeout(OWC.bdt);const bv=ui.band;OWC.bdt=setTimeout(()=>{if(ui.band===bv){ui.band=null;const e=document.querySelector('.ow-band');if(e)e.remove();}},2000);}if(ui.toast){clearTimeout(OWC.tt);const tv=ui.toast;OWC.tt=setTimeout(()=>{if(ui.toast===tv){ui.toast='';const e=document.querySelector('.ow-toast');if(e)e.remove();}},2600);}}
-  bgmUpdate();
+  bgmUpdate();lazyFill();
 }
 /* 会話ウィンドウ */
 const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;}catch(e){return false;}};
@@ -7594,13 +7864,13 @@ function renderDex(){
   const famProg=FK.map(f=>{const all=DL.filter(s=>s.fam===f),o=all.filter(s=>state.owned[s.id]).length;return `<span class="fp ${o===all.length?'full':''}" style="--fam:${FAM[f].c}"><b>${FAM[f].n}</b><span class="num">${o}/${all.length}</span></span>`;}).join('');
   const msL=[...DEX_MS].sort((a,b)=>(a.all?1:0)-(b.all?1:0)||a.n-b.n);
   const ms=msL.map(x=>{const k=dexKey(x),got=state.dexClaim[k],ok=own>=x.n;return `<div class="ms ${got?'got':ok?'ok':''}"><b class="num">${x.all?'全種 '+x.n+'種':x.n+'種'}</b><span class="small muted">${msText(x)}</span>${got?'<span class="badge good">受取済み</span>':`<button class="btn sm ${ok?'primary':''}" data-act="dexms" data-n="${k}" ${ok?'':'disabled'}>受け取る</button>`}</div>`;}).join('');
-  const groups=FK.map(f=>`<div class="dexgroup"><h4 style="--fam:${FAM[f].c}">${FAM[f].n}</h4><div class="dex">${DL.filter(s=>s.fam===f).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id],i=SPL.indexOf(s);return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`).join('');
+  const groups=FK.map(f=>`<div class="dexgroup"><h4 style="--fam:${FAM[f].c}">${FAM[f].n}</h4><div class="dex">${DL.filter(s=>s.fam===f).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id],i=SPL.indexOf(s);return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false,false,true)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`).join('');
   return `<section class="stack"><div class="row between"><h2>魔生物図鑑</h2><span class="lv num">見つけた ${seen} ・ なかまにした ${own} / ${DL.length}</span></div>
     <div class="progress" role="progressbar" aria-valuenow="${own}" aria-valuemax="${DL.length}"><i style="width:${own/DL.length*100}%"></i></div>
     <div class="famprog">${famProg}</div>
     <details class="panel rules"><summary>図鑑の記念品(${DEX_MS.filter(x=>own>=x.n&&!state.dexClaim[dexKey(x)]).length}個受け取れる)</summary><div class="mslist">${ms}</div></details>
     <div class="dmode" role="group" aria-label="図鑑の見かた"><button data-act="dexmode" data-v="fam" aria-pressed="${ui.dexMode!=='reg'}">系統別</button><button data-act="dexmode" data-v="reg" aria-pressed="${ui.dexMode==='reg'}">地域別</button></div>
-    ${det}${ui.dexMode==='reg'?renderDexReg(DL):groups}${ui.dexMode==='reg'?'':`<div class="dexgroup"><h4 style="--fam:#ffd36a">ガチャ限定(星降りの祠)</h4><div class="dex">${SPL.filter(s=>s.gacha).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id];return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">${RANKS[s.rank]}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`}</section>`;
+    ${det}${ui.dexMode==='reg'?renderDexReg(DL):groups}${ui.dexMode==='reg'?'':`<div class="dexgroup"><h4 style="--fam:#ffd36a">ガチャ限定(星降りの祠)</h4><div class="dex">${SPL.filter(s=>s.gacha).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id];return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">${RANKS[s.rank]}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false,false,true)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`}</section>`;
 }
 const itemOpen=it=>!it.open||townOpen(TOWN[it.open]);
 function renderShop(){
