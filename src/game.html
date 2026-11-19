@@ -97,7 +97,6 @@ body.sgshake .shell{animation:sgshk .36s steps(1,end)}
 .seal img.spr{width:var(--i);height:var(--i);filter:drop-shadow(0 2px 0 color-mix(in srgb,var(--bg) 60%,transparent))}
 .seal.xs img.spr{image-rendering:auto}
 .seal img.art{width:calc(var(--s) - 6px);height:calc(var(--s) - 6px);border-radius:50%;object-fit:cover;-webkit-mask:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%);mask:radial-gradient(circle at 50% 50%,#000 58%,transparent 71%)}
-.seal img.art.shiny{filter:hue-rotate(150deg) saturate(1.4)}
 .bc.foe img.art{animation:none}
 .seal img.spr.shiny{filter:drop-shadow(0 2px 0 color-mix(in srgb,var(--bg) 60%,transparent))}
 .seal.sh::after{content:"✦";position:absolute;right:-4px;bottom:-4px;color:var(--accent);font-size:15px;line-height:1;text-shadow:0 0 6px var(--accent);animation:twinkle 1.6s ease-in-out infinite}
@@ -355,15 +354,15 @@ body.sgshake .shell{animation:sgshk .36s steps(1,end)}
 .seal.r-S::before{background:conic-gradient(#f2b13c,#fff3c4 12%,transparent 25%,#f2b13c 50%,#fff3c4 62%,transparent 75%,#f2b13c)}
 .seal.r-SS::before{inset:-6px;background:conic-gradient(#ff7ab8,#ffd36a,#7af2c8,#7ab8ff,#c89aff,#ff7ab8);animation-duration:3s}
 .seal.xs.r-S::before,.seal.xs.r-SS::before{inset:-3px;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px));mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 2px))}
-.seal.r-S img.spr{filter:drop-shadow(0 2px 0 #0009) drop-shadow(0 0 5px #f2b13c88)}
+.seal.r-S img.spr{filter:drop-shadow(0 2px 0 #0009)}
 .seal.r-SS img.spr{animation:ssglow 2.4s ease-in-out infinite}
-.seal.r-S img.spr.shiny{filter:drop-shadow(0 2px 0 #0009) drop-shadow(0 0 5px #f2b13c88)}
-.seal.r-SS img.spr.shiny{animation:none;filter:drop-shadow(0 0 7px #ff9ad8)}
+.seal.r-S img.spr.shiny{filter:drop-shadow(0 2px 0 #0009)}
+.seal.r-SS img.spr.shiny{animation:none;filter:drop-shadow(0 2px 0 #0009)}
 .seal.r-SS{box-shadow:inset 0 0 0 2px var(--fam),inset 0 0 0 5px var(--bg2),0 0 22px -4px #ff9ad8}
 .seal.r-S .rk{background:linear-gradient(#ffe08a,#e89a2a);color:#2a1800}
 .seal.r-SS .rk{background:linear-gradient(90deg,#ff7ab8,#ffd36a,#7af2c8,#7ab8ff);color:#1a0820}
 @keyframes spin{to{transform:rotate(1turn)}}
-@keyframes ssglow{0%,100%{filter:drop-shadow(0 2px 0 #0009) drop-shadow(0 0 4px #ff9ad877)}50%{filter:drop-shadow(0 2px 0 #0009) drop-shadow(0 0 10px #ffd36acc)}}
+@keyframes ssglow{0%,100%{filter:drop-shadow(0 2px 0 #0009) brightness(1)}50%{filter:drop-shadow(0 2px 0 #0009) brightness(1.12)}}
 @media (min-width:700px){.bc.foe.mighty .seal{--s:204px;--i:192px}}
 .bc.foe.mighty{border-color:color-mix(in srgb,#f2b13c 60%,var(--line))}
 .battle.enter .bc.foe.mighty img.spr{animation:roar .9s ease-out,bob 1.2s steps(2) .9s infinite}
@@ -373,7 +372,7 @@ body.sgshake .shell{animation:sgshk .36s steps(1,end)}
 .saipick{border:1px dashed #f29ad8;border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
 .panel.ura{border-color:#f29ad8}
 .seal.metal img.spr{animation:metal 2.4s ease-in-out infinite}
-@keyframes metal{0%,70%,100%{filter:drop-shadow(0 2px 0 #0008)}80%{filter:brightness(1.8) drop-shadow(0 0 6px #fff)}}
+@keyframes metal{0%,70%,100%{filter:drop-shadow(0 2px 0 #0008)}80%{filter:brightness(1.8)}}
 .transfer textarea{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;font-family:ui-monospace,Consolas,monospace;font-size:12px;word-break:break-all;resize:vertical}
 .transfer textarea:focus{border-color:var(--accent);outline:none}
 @media (max-width:820px){
@@ -1256,7 +1255,11 @@ function artLight(ax,st,RC){
   const N=ASZ,im=ax.getImageData(0,0,N,N),d=im.data,H=new Float32Array(N*N),T=new Float32Array(N*N);
   for(let i=0;i<N*N;i++)H[i]=d[i*4+3]/255;
   const r0=st.blur;
-  const blur=(S,D,r,s1)=>{for(let y=0;y<N;y++)for(let xx=0;xx<N;xx++){let s=0;for(let q=-r;q<=r;q++){const u=s1?Math.min(N-1,Math.max(0,xx+q)):xx,v=s1?y:Math.min(N-1,Math.max(0,y+q));s+=S[v*N+u];}D[y*N+xx]=s/(2*r+1);}};
+  /* 箱ぼかし(端は端の値でのばす)。窓を1画素ずつずらして和を更新するので、半径に関係なく速い */
+  const blur=(S,D,r,s1)=>{const st=s1?1:N,ln=s1?N:1,w=2*r+1;
+    for(let k=0;k<N;k++){const base=k*ln;let s=0;
+      for(let q=-r;q<=r;q++)s+=S[base+Math.min(N-1,Math.max(0,q))*st];
+      for(let t=0;t<N;t++){D[base+t*st]=s/w;s+=S[base+Math.min(N-1,t+r+1)*st]-S[base+Math.max(0,t-r)*st];}}};
   for(let p=0;p<2;p++){blur(H,T,r0,1);blur(T,H,r0,0);}
   for(let y=1;y<N-1;y++)for(let xx=1;xx<N-1;xx++){const i=y*N+xx,o4=i*4;if(!d[o4+3])continue;
     const gx=(H[i+1]-H[i-1])*9,gy=(H[i+N]-H[i-N])*9;
@@ -3446,7 +3449,7 @@ function dexMsClaim(k){
 const wxLabel=id=>{try{return id&&typeof WX!=='undefined'&&WX[id]?(WX[id].n||WX[id].name||''):'';}catch(e){return '';}};
 function seenAtText(sp){const a=state.seenAt&&state.seenAt[sp];if(!a)return state.seen[sp]?'はじめて会った場所: 記録なし':'';const t=TOWN[a[0]];return `はじめて会った場所: ${t?t.name:'?'}・${TIMES[a[1]]?TIMES[a[1]].n:''}${wxLabel(a[2])?'・'+wxLabel(a[2]):''}`;}
 function renderDexReg(DL){
-  const cell=({s,tm})=>{const sn=!!state.seen[s],sp=SP[s],i=SPL.indexOf(sp);return `<button class="dexc ${ui.dexSel===s?'on':''} ${state.owned[s]?'own':''}" data-act="dex" data-id="${s}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s]?' <b class="shn">✦</b>':''}</span>${seal(s,'sm',sn?true:false)}<span class="nm">${sn?sp.name:'？？？'}</span>${tm?`<span class="rtag">${(typeof TM!=='undefined'&&TM[tm])||(tm==='n'?'夕方・夜':'朝・昼')}</span>`:''}</button>`;};
+  const cell=({s,tm})=>{const sn=!!state.seen[s],sp=SP[s],i=SPL.indexOf(sp);return `<button class="dexc ${ui.dexSel===s?'on':''} ${state.owned[s]?'own':''}" data-act="dex" data-id="${s}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s]?' <b class="shn">✦</b>':''}</span>${seal(s,'sm',sn?true:false,false,true)}<span class="nm">${sn?sp.name:'？？？'}</span>${tm?`<span class="rtag">${(typeof TM!=='undefined'&&TM[tm])||(tm==='n'?'夕方・夜':'朝・昼')}</span>`:''}</button>`;};
   const mabo=TOWN.mabo,mst=regStat('mabo'),mgot=state.dexReg&&state.dexReg.mabo,mdone=regDone('mabo'),mrw=REG_RW.mabo||{};
   const maboHtml=!state.flags.mabo?'':`<div class="dexgroup reg" style="--fam:${TLC.mabo}"><h4>?? ${mabo.name}</h4>
       <div class="regsum"><span>見つけた <b class="num">${mst.seen}</b></span><span>なかま <b class="num">${mst.own}</b></span><span>全 <b class="num">${mst.all}</b></span>
@@ -6954,12 +6957,28 @@ const townOpen=t=>!t.req||state.boss[t.req];
 /*ART-START*/const ART={};/*ART-END*/
 /* 路線の色(町ごと) */
 const TLC={komorebi:'#62c46e',kasumi:'#9aa8c4',shiomi:'#35a8e6',tengu:'#c8964a',mayoiga:'#b79cf4',ryuhyo:'#8fd6f6',hinoshima:'#ff6a3a',sango:'#ff8db0',yomi:'#e9344a',mabo:'#8c93a3'};
+/* 図鑑など数が多い一覧は、絵を「見える順」に遅れて作る(全種そろっても最初の表示が止まらない) */
+const LZPH='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const sprCached=(id,sil,sh)=>!!SPRC[id+(sil?'_s':'')+(sh&&!sil?'_x':'')];
+function lazyFill(){
+  const list=[...document.querySelectorAll('img[data-lz]')];if(!list.length)return;
+  const fill=im=>{const v=im.getAttribute('data-lz');if(!v||!im.isConnected)return;const [id,sil,sh]=v.split('|');im.removeAttribute('data-lz');im.src=sprite(id,sil==='1',sh==='1');};
+  if(lazyFill.io)lazyFill.io.disconnect();
+  if(typeof IntersectionObserver==='function'){
+    const io=lazyFill.io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fill(e.target);}}),{rootMargin:'200px'});
+    list.forEach(im=>io.observe(im));
+  }
+  /* 見えていないぶんも、ひまなときに1枚ずつ作っておく */
+  let i=0;const tok=lazyFill.tok=(lazyFill.tok||0)+1;
+  const step=()=>{if(lazyFill.tok!==tok)return;let n=0;while(i<list.length&&n<1){const im=list[i++];if(im.isConnected&&im.hasAttribute('data-lz')){fill(im);n++;}}if(i<list.length)setTimeout(step,16);};
+  setTimeout(step,300);
+}
 /* ========== 描画パーツ ========== */
-function seal(spId,size='',known=true,shiny=false){
+function seal(spId,size='',known=true,shiny=false,lazy=false){
   const sp=SP[spId];
   if(!known)return `<div class="seal ${size}" aria-label="未発見"><span>？</span></div>`;
   const sil=known==='sil',sh=shiny&&!sil;
-  return `<div class="seal ${size} ${sh?'sh':''} ${sp.fam==='metal'&&!sil?'metal':''} ${sp.fam==='myst'&&!sil?'myst':''} ${!sil&&sp.rank>=5?'r-'+RANKS[sp.rank]:''}" style="--fam:${sil?'var(--faint)':FAM[sp.fam].c}" aria-hidden="true">${!sil&&ART[spId]&&size!=='xs'?`<img class="art ${sh?'shiny':''}" src="${ART[spId]}" alt="">`:`<img class="spr ${sh?'shiny':''}" src="${sprite(spId,sil,sh)}" alt="">`}${sil?'':`<b class="rk">${RANKS[sp.rank]}</b>`}${!sil&&(size==='lg'||size==='xl')?`<i class="gl">${sp.glyph}</i>`:''}</div>`;
+  return `<div class="seal ${size} ${sh?'sh':''} ${sp.fam==='metal'&&!sil?'metal':''} ${sp.fam==='myst'&&!sil?'myst':''} ${!sil&&sp.rank>=5?'r-'+RANKS[sp.rank]:''}" style="--fam:${sil?'var(--faint)':FAM[sp.fam].c}" aria-hidden="true">${!sil&&ART[spId]&&size!=='xs'?`<img class="art ${sh?'shiny':''}" src="${ART[spId]}" alt="">`:`<img class="spr ${sh?'shiny':''}" ${lazy&&!sprCached(spId,sil,sh)?`src="${LZPH}" data-lz="${spId}|${sil?1:0}|${sh?1:0}"`:`src="${sprite(spId,sil,sh)}"`} alt="">`}${sil?'':`<b class="rk">${RANKS[sp.rank]}</b>`}${!sil&&(size==='lg'||size==='xl')?`<i class="gl">${sp.glyph}</i>`:''}</div>`;
 }
 function hpBar(v,max,cls=''){
   const r=max?v/max:0;const c=cls||(r<.25?'low':r<.5?'mid':'');
@@ -6984,7 +7003,7 @@ function render(){
   ui._st=ui.tab+(B?'b':'')+(ui.station?'s':'')+(ui.inside||'');const nm=document.getElementById('main');if(nm&&keep)nm.scrollTop=keep;
   if(!walking&&ui.wmenu)ui.wmenu=false;
   if(document.getElementById('owc')){owResize();owEnsureLoop();owStampShow();if(ui.band){clearTimeout(OWC.bdt);const bv=ui.band;OWC.bdt=setTimeout(()=>{if(ui.band===bv){ui.band=null;const e=document.querySelector('.ow-band');if(e)e.remove();}},2000);}if(ui.toast){clearTimeout(OWC.tt);const tv=ui.toast;OWC.tt=setTimeout(()=>{if(ui.toast===tv){ui.toast='';const e=document.querySelector('.ow-toast');if(e)e.remove();}},2600);}}
-  bgmUpdate();
+  bgmUpdate();lazyFill();
 }
 /* 会話ウィンドウ */
 const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;}catch(e){return false;}};
@@ -7580,13 +7599,13 @@ function renderDex(){
   const famProg=FK.map(f=>{const all=DL.filter(s=>s.fam===f),o=all.filter(s=>state.owned[s.id]).length;return `<span class="fp ${o===all.length?'full':''}" style="--fam:${FAM[f].c}"><b>${FAM[f].n}</b><span class="num">${o}/${all.length}</span></span>`;}).join('');
   const msL=[...DEX_MS].sort((a,b)=>(a.all?1:0)-(b.all?1:0)||a.n-b.n);
   const ms=msL.map(x=>{const k=dexKey(x),got=state.dexClaim[k],ok=own>=x.n;return `<div class="ms ${got?'got':ok?'ok':''}"><b class="num">${x.all?'全種 '+x.n+'種':x.n+'種'}</b><span class="small muted">${msText(x)}</span>${got?'<span class="badge good">受取済み</span>':`<button class="btn sm ${ok?'primary':''}" data-act="dexms" data-n="${k}" ${ok?'':'disabled'}>受け取る</button>`}</div>`;}).join('');
-  const groups=FK.map(f=>`<div class="dexgroup"><h4 style="--fam:${FAM[f].c}">${FAM[f].n}</h4><div class="dex">${DL.filter(s=>s.fam===f).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id],i=SPL.indexOf(s);return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`).join('');
+  const groups=FK.map(f=>`<div class="dexgroup"><h4 style="--fam:${FAM[f].c}">${FAM[f].n}</h4><div class="dex">${DL.filter(s=>s.fam===f).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id],i=SPL.indexOf(s);return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">No.${String(i+1).padStart(2,'0')}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false,false,true)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`).join('');
   return `<section class="stack"><div class="row between"><h2>魔生物図鑑</h2><span class="lv num">見つけた ${seen} ・ なかまにした ${own} / ${DL.length}</span></div>
     <div class="progress" role="progressbar" aria-valuenow="${own}" aria-valuemax="${DL.length}"><i style="width:${own/DL.length*100}%"></i></div>
     <div class="famprog">${famProg}</div>
     <details class="panel rules"><summary>図鑑の記念品(${DEX_MS.filter(x=>own>=x.n&&!state.dexClaim[dexKey(x)]).length}個受け取れる)</summary><div class="mslist">${ms}</div></details>
     <div class="dmode" role="group" aria-label="図鑑の見かた"><button data-act="dexmode" data-v="fam" aria-pressed="${ui.dexMode!=='reg'}">系統別</button><button data-act="dexmode" data-v="reg" aria-pressed="${ui.dexMode==='reg'}">地域別</button></div>
-    ${det}${ui.dexMode==='reg'?renderDexReg(DL):groups}${ui.dexMode==='reg'?'':`<div class="dexgroup"><h4 style="--fam:#ffd36a">ガチャ限定(星降りの祠)</h4><div class="dex">${SPL.filter(s=>s.gacha).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id];return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">${RANKS[s.rank]}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`}</section>`;
+    ${det}${ui.dexMode==='reg'?renderDexReg(DL):groups}${ui.dexMode==='reg'?'':`<div class="dexgroup"><h4 style="--fam:#ffd36a">ガチャ限定(星降りの祠)</h4><div class="dex">${SPL.filter(s=>s.gacha).sort((a,b)=>a.rank-b.rank).map(s=>{const sn=!!state.seen[s.id];return `<button class="dexc ${ui.dexSel===s.id?'on':''} ${state.owned[s.id]?'own':''}" data-act="dex" data-id="${s.id}" ${sn?'':'disabled'}><span class="no">${RANKS[s.rank]}${state.shinySeen[s.id]?' <b class="shn">✦</b>':''}</span>${seal(s.id,'sm',sn?true:false,false,true)}<span class="nm">${sn?s.name:'？？？'}</span></button>`;}).join('')}</div></div>`}</section>`;
 }
 const itemOpen=it=>!it.open||townOpen(TOWN[it.open]);
 function renderShop(){
