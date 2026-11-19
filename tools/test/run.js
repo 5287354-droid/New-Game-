@@ -221,11 +221,33 @@ T('T2: 区画の記録(同じ区画は1点だけ)・全区画で100%・金スタ
   eq(r2.pct, 100); eq(r2.stamp, 2); eq(r2.p80, 1, '80%で銀スタンプ'); eq(r2.stars, 3); eq(r2.again, [0, 3], '2回目に再付与された');
   eq(s.errors, []); await s.close();
 });
-T('T2: 全マップで踏破100%が到達可能(歩ける区画が1つ以上、区画に番号がつく)', async () => {
+T('T2: 全マップで、到達できる区画を全部踏むと踏破100%(実際の通行判定 owSolid で解く)', async () => {
   const s = await open(); await startGame(s);
-  const r = await s.ev(() => { const bad = [], skipped = []; for (const id in MAPS) { const m = MAPS[id], fi = footInfo(id); if (!fi.total) bad.push(id);
-      let any = 0; for (let y = 0; y < m.rows.length; y++) for (let x = 0; x < m.rows[y].length; x++) if (!OW_SOLID.includes(m.rows[y][x])) { const i = (y >> 2) * fi.bw + (x >> 2); if (!fi.valid[i]) any++; } if (any) skipped.push(id + ':' + any); } return { n: Object.keys(MAPS).length, bad, skipped }; });
-  eq(r.bad, [], '歩ける区画がないマップ'); console.log(`      ${r.n}マップ / 到達判定で外れたマスがあるマップ: ${r.skipped.length}件 ${r.skipped.slice(0, 8).join(' ')}`);
+  const r = await s.ev(() => {
+    /* ソルバー: しかけは全部解けるものとして(ぬしを倒し、旗が立ち、物は拾い、岩は穴に押し込み、流氷は全位置・潮と夜昼は全部・霧は晴れの時)、
+       入口から実際の owSolid で広げて、立てたマスの全部を踏む */
+    state.owFlags = new Proxy({}, { get: () => true }); TOWNS.forEach(t => state.boss[t.id] = true); state.owItems = new Proxy({}, { get: () => true });
+    const bad = [], rows = []; let n = 0;
+    for (const id in MAPS) {
+      const m = MAPS[id]; n++; state.foot = {}; state.stamps = {};
+      if (m.rocks) { const f = {}; m.rows.forEach((r, y) => [...r].forEach((c, x) => { if (c === 'O') f[x + ',' + y] = true; })); OWC.rk = { map: id, rocks: [], filled: f }; }
+      const orig = owFloatPos; let sel = -1; window.owFloatPos = f => { if (sel < 0) return orig(f); const t = owFloatTiles(f); return t[Math.min(sel, t.length - 1)]; };
+      const mx = Math.max(1, ...(m.floats || []).map(f => owFloatTiles(f).length));
+      state.ow = { map: id, x: m.spawn.x, y: m.spawn.y, dir: 'down' };
+      const okAny = (x, y) => { for (let t = 0; t < 4; t++) { state.time = t; for (sel = m.floats ? 0 : -1; sel < (m.floats ? mx : 0); sel++) if (!owSolid(m, x, y)) { sel = -1; return true; } } sel = -1; return false; };
+      const DN = Date.now; if (m.fogStone) Date.now = () => m.fogStone.per * 1000 + m.fogStone.on + 1;
+      const { seen, R, C } = footReach(id, okAny); Date.now = DN; window.owFloatPos = orig; OWC.rk = null;
+      const fi = footInfo(id), hit = new Set(), tiles = [];
+      for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) if (seen[y * C + x]) { tiles.push([x, y]); hit.add((y >> 2) * fi.bw + (x >> 2)); }
+      let extra = 0, lack = 0; for (let i = 0; i < fi.nb; i++) { if (hit.has(i) && !fi.valid[i]) extra++; if (!hit.has(i) && fi.valid[i]) lack++; }
+      for (const [x, y] of tiles) { state.ow = { map: id, x, y, dir: 'down' }; owFoot(); }
+      const pct = footShow(id);
+      if (!fi.total || pct !== 100 || extra || lack || state.stamps[id] !== 2) bad.push(`${id}:${pct}%(${footCount(id)}/${fi.total}) 数えすぎ${lack} 数え漏れ${extra}`);
+      rows.push(fi.total);
+    }
+    return { n, bad, tot: rows.reduce((a, b) => a + b, 0) };
+  });
+  eq(r.bad, [], '踏み尽くしても100%にならない/到達できない区画を分母に入れている'); console.log(`      ${r.n}マップ 全${r.tot}区画 すべて到達でき、踏むと100%`);
   eq(s.errors, []); await s.close();
 });
 T('T2: しかけスタンプ18種がすべて取れる(関数を呼ぶ + ソースにフックがある)', async () => {
