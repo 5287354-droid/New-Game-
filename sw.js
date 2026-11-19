@@ -1,5 +1,5 @@
-/* ミチクサ鉄道 オフライン用 (版 6e6883c67f) */
-const V='michikusa-6e6883c67f';
+/* ミチクサ鉄道 オフライン用 (版 d31ca06e32) */
+const V='michikusa-d31ca06e32';
 const CORE=['./','./index.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/icon-maskable-512.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('michikusa-')&&k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});

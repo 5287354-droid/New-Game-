@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="6e6883c67f";</script>
+<script>window.JG_APP=true;window.JG_VER="d31ca06e32";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -1905,7 +1905,7 @@ const TOWN={};TOWNS.forEach(t=>TOWN[t.id]=t);
 let METAL_FLEE=.15,METAL_HIT=1;   /* メタル系: 1ターンごとに逃げる確率 / ふつうの攻撃が1ダメージ通る確率 */
 const TM={n:'夕方・夜',d:'朝・昼',R:'雨の日',F:'霧の日',S:'雪の日',A:'火山灰の日',C:'くもりの日',H:'晴れの日','*':'星降りの夜',nC:'くもりの夜',nR:'雨の夜',dR:'雨の昼'};
 const tagMark=tm=>{const w=[...(tm||'')].map(c=>WXT[c]).filter(Boolean);return w.length?WX[w[0]].s:tm==='n'?'夜':'昼';};
-/* ===== T1: 空もよう(天気)。天気は保存せず、日付+町+state.wxN から毎回計算する ===== */
+/* ===== T1: 空もよう(天気)。天気は保存せず、実際の日付+町+時間帯(state.time)だけから毎回計算する。ベンチで休んでも振り直せない ===== */
 const WX={hare:{n:'晴れ',s:'晴',c:'#ffc94a',t:'H'},kumo:{n:'くもり',s:'曇',c:'#a7b1c4',t:'C'},ame:{n:'雨',s:'雨',c:'#5aa7ff',t:'R'},kiri:{n:'霧',s:'霧',c:'#c8d2da',t:'F'},yuki:{n:'雪',s:'雪',c:'#dff2ff',t:'S'},hai:{n:'火山灰',s:'灰',c:'#e0825a',t:'A'},hoshi:{n:'星降り',s:'星',c:'#ffe27a',t:'*'}};
 const WXK=Object.keys(WX),WXT={};WXK.forEach(k=>WXT[WX[k].t]=k);
 /* 町ごとの天気の重み(星は夜のあいだだけ足される) */
@@ -1920,7 +1920,7 @@ function hashF(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i
 /* k=0 はいま、k=1,2 は次・次の次の時間帯(予報)。k=-1 は直前 */
 function wxOf(town,k=0){
   const tb=WX_TBL[town]||WX_TBL.komorebi,tm=(((state.time||0)+k)%4+4)%4,ws=WXK.map(id=>[id,(tb[id]||0)*(id==='hoshi'?(tm===3?1:0):1)]).filter(x=>x[1]>0);
-  const tot=ws.reduce((s,x)=>s+x[1],0);let r=hashF(dayKey()+':'+town+':'+((state.wxN||0)+k))*tot;
+  const tot=ws.reduce((s,x)=>s+x[1],0);let r=hashF(dayKey()+':'+town+':'+tm)*tot;   /* 1日は時間帯ごとに4つの天気。ゲーム内の時間帯は何周しても、同じ日・同じ時間帯なら同じ天気 */
   for(const [id,w] of ws){r-=w;if(r<0)return id;}return ws[ws.length-1][0];
 }
 /* 出現表のタグ: n/d=時間 R雨 F霧 S雪 A灰 *星降り C曇 H晴。時間と天気の両方があるときは AND(天気の文字どうしは OR) */
@@ -1942,8 +1942,10 @@ function wxPanel(){
     <p class="small muted">${msg}</p>${state.boss.kasumi?`<p class="small muted">${maboOpen()?'いまなら、路線図に知らない駅が見える。':rows.some(r=>r.wx==='kiri'&&r.tm===3)?'霧の夜には、路線図にない駅が現れるという。':''}</p>`:''}</div>`;
 }
 /* T8: 霧 × 夜 × 霞ヶ丘のぬし撃破 のときだけ、路線図に「？？」駅が出る */
+/* 初めて着くまでは、名前を明かさず「？？駅」 */
+const maboName=()=>state&&state.flags&&state.flags.mabo?'まぼろし駅':'？？駅';
 const maboOpen=()=>!!(state&&state.started&&!B&&state.boss&&state.boss.kasumi&&MAPS[state.town]&&state.time===3&&wxNow(state.town)==='kiri');
-function wxNow(town){town=town||state.town;const k=town+'|'+(state.wxN||0)+'|'+state.time+'|'+dayKey();if(wxNow.k!==k){wxNow.k=k;wxNow.v=wxOf(town);}
+function wxNow(town){town=town||state.town;const k=town+'|'+state.time+'|'+dayKey();if(wxNow.k!==k){wxNow.k=k;wxNow.v=wxOf(town);}
   if(state.wxLog&&!state.wxLog[wxNow.v])state.wxLog[wxNow.v]=true;return wxNow.v;}
 const HAB={};
 TOWNS.forEach(t=>t.fields.forEach(f=>f.table.forEach(([s,,tm])=>{(HAB[s]=HAB[s]||[]).push(t.name+'・'+f.name+(tm?`(${TM[tm]})`:''));})));
@@ -6786,7 +6788,7 @@ function wildCard(t){
 }
 function renderStationIn(){
   const h=renderMap(),cut=h.indexOf('<section class="town-grid">');const t=TOWN[state.town];
-  return `${h.slice(0,cut)}${wxPanel()}${maboOpen()?`<div class="panel stack mabo-note"><h3>？？駅</h3><p class="small">霧の向こうに、知らないホームが見える……</p><div><button class="btn primary" data-act="mabo">まぼろし駅へ行く</button></div></div>`:''}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
+  return `${h.slice(0,cut)}${wxPanel()}${maboOpen()?`<div class="panel stack mabo-note"><h3>${maboName()}</h3><p class="small">霧の向こうに、知らないホームが見える……</p><div><button class="btn primary" data-act="mabo">${maboName()}へ行く</button></div></div>`:''}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
 }
 /* 建物の中 */
 function renderInside(){
@@ -7124,7 +7126,7 @@ function cupsPanel(alive){return `<div class="panel stack cups"><div class="row 
     <div class="list">${CUPS.map(c=>{const open=cupOpen(c),won=state.cups[c.id];return `<div class="cuprow ${won?'won':''}"><span class="rankbadge">${c.id}</span><div class="stack tight"><b>${c.name}</b><span class="small muted">Lv${c.lv[0]}〜${c.lv[1]} ・ ${won?'優勝済み(再挑戦で賞金)':'賞品 '+rewardText(c.reward)}</span></div><button class="btn sm ${open&&!won?'primary':''}" data-act="cup" data-id="${c.id}" ${open&&alive?'':'disabled'}>${open?'出場':'未解放'}</button></div>`;}).join('')}</div></div>`;}
 function renderMap(){
   const t=TOWN[state.town],ti=TOWNS.indexOf(t),prev=TOWNS[ti-1],next=TOWNS[ti+1];
-  const mabo=maboOpen(),maboBtn=`<button class="station mabo" role="listitem" data-act="mabo" aria-label="まぼろし駅へ(霧の夜だけ)"><span class="dot">？？</span><span class="sn">？？？？</span><span class="sk">霧の夜だけ</span></button>`;
+  const mabo=maboOpen(),maboBtn=`<button class="station mabo" role="listitem" data-act="mabo" aria-label="${maboName()}へ(霧の夜だけ)"><span class="dot">？？</span><span class="sn">？？？？</span><span class="sk">霧の夜だけ</span></button>`;
   const rail=`<div class="railwrap"><div class="rail" role="list" style="--n:${TOWNS.length+(mabo?1:0)}">${TOWNS.map(x=>{const open=townOpen(x);return `<button class="station ${x.id===state.town?'cur':''} ${open?'':'locked'}" role="listitem" data-act="town" data-id="${x.id}" ${open?'':'disabled'}><span class="dot">${x.code.slice(2)}</span><span class="sn">${open?x.name:'？？？'}</span><span class="sk">${open?x.kind:'未開通'}</span></button>${mabo&&x.id===state.town?maboBtn:''}`;}).join('')}</div></div>`;
   const hero=`<section class="hero town-hero"><img class="scene" src="${scene(t.scene,state.time)}" alt="${t.name}の風景">
     <div class="plate"><div class="plate-main"><span class="code">${t.code}</span><div class="plate-name"><b>${t.name}</b><span class="roma">${t.roma}</span></div></div>
