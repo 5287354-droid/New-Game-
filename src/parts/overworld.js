@@ -2908,7 +2908,7 @@ const footPct=id=>{const fi=footInfo(id);return fi.total?footCount(id)/fi.total:
 const footShow=id=>{const p=footPct(id);return p>=1?100:Math.floor(p*100);};
 function owPoint(n){state.mpt=(state.mpt||0)+n;state.mptAll=(state.mptAll||0)+n;}
 const mchiTitle=()=>(state.mptAll||0)>=2500?'みちくさ名人':'';
-const detourBar=d=>'▮'.repeat(d)+'▯'.repeat(5-d);
+const detourBar=d=>`<span class="dgauge" aria-label="${d}段">${[1,2,3,4,5].map(i=>`<i class="${i<=d?'on':''}"></i>`).join('')}</span>`;
 /* マップ左上の小さな札: 踏破率と寄り道の段 */
 function owSubHtml(m){
   const id=state.ow.map,hub=id===m.town,pct=footShow(id),d=state.detour||0;

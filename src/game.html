@@ -819,6 +819,20 @@ body.bshake2 .battle{animation:bshk2 .42s linear}
 .regsum{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13px}
 .regsum .btn{min-height:44px;margin-left:auto}
 .dexc .rtag{font:700 10px var(--f-disp);color:var(--accent)}
+/* ---- UI/演出班: 見切れ・文字化けの修正 ---- */
+.ow-name .dgauge,.dgauge{background:none;border:0;padding:0;border-radius:0;display:inline-flex;gap:2px;vertical-align:-1px;margin:0 3px}
+.dgauge i{display:block;width:7px;height:12px;border:1.5px solid var(--tl);border-radius:1px;box-sizing:border-box}
+.dgauge i.on{background:var(--tl)}
+.shell.walking .ow-screen{align-items:flex-start}
+.partybar .pb .nm{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2;overflow-wrap:anywhere}
+.partybar .pb .nm small{white-space:nowrap;margin-left:4px}
+@media (max-width:480px){.shell .partybar .pb .seal{display:none}.shell .partybar .pb{padding:4px 7px}.top2 .loc{flex:none}.top2 .loc-name{overflow:visible}.top2 .tchip{font-size:11px;padding:3px 5px}.top2 .tchip.wx{display:none}.top2 .ib{width:27px}.top2 .grow{min-width:0}.top2 .yen small{font-size:11px}}
+.bc .nm{overflow:visible;text-overflow:clip;white-space:normal;line-height:1.15;overflow-wrap:anywhere}
+.subtabs .stab{flex:none}
+@media (max-width:480px){.subtabs{gap:0}.subtabs .stab{flex:1 1 auto;padding:8px 5px;font-size:13px}}
+.tiles>p.small{grid-column:1/-1}
+@media (max-height:760px){.rw{gap:6px}.rwh{font-size:24px}.rwn1 b{font-size:30px}.rwnums{padding-top:5px;gap:12px}.rwc{padding:5px 8px}.rwgoal{gap:3px;padding-top:5px}.rwg{font-size:12px;line-height:1.3}.rwg b{font-size:14px}.rwm .seal{--s:48px;--i:36px}}
+.rwnums{flex-wrap:wrap}
 </style>
 
 <div id="app"></div>
@@ -6418,7 +6432,7 @@ const footPct=id=>{const fi=footInfo(id);return fi.total?footCount(id)/fi.total:
 const footShow=id=>{const p=footPct(id);return p>=1?100:Math.floor(p*100);};
 function owPoint(n){state.mpt=(state.mpt||0)+n;state.mptAll=(state.mptAll||0)+n;}
 const mchiTitle=()=>(state.mptAll||0)>=2500?'みちくさ名人':'';
-const detourBar=d=>'▮'.repeat(d)+'▯'.repeat(5-d);
+const detourBar=d=>`<span class="dgauge" aria-label="${d}段">${[1,2,3,4,5].map(i=>`<i class="${i<=d?'on':''}"></i>`).join('')}</span>`;
 /* マップ左上の小さな札: 踏破率と寄り道の段 */
 function owSubHtml(m){
   const id=state.ow.map,hub=id===m.town,pct=footShow(id),d=state.detour||0;

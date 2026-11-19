@@ -23,7 +23,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await new Promise(r => server.listen(0, r));
   const port = server.address().port;
   const browser = await chromium.launch();
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true, serviceWorkers: 'block' });
+  const ctx = await browser.newContext({ viewport: { width: +(process.env.SHOT_W || 390), height: +(process.env.SHOT_H || 844) }, deviceScaleFactor: 2, hasTouch: true, isMobile: true, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   const errors = [];
   page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') errors.push(`[${m.type()}] ${m.text()}`); });
@@ -73,27 +73,26 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
       await wait(500);
       if (i === 5) await shot('12_battle_auto_mid', 0);
       const ended = await ev(() => { const b = document.querySelector('[data-act="bend"],[data-act="bendStop"]'); return !!b; });
-      if (ended && !n++) await shot('13_battle_end_panel', 200);
+      if (ended && !n++) { await shot('13_battle_end_panel', 200); await shot('13b_result', 2800); }
       await ev(() => { const b = document.querySelector('[data-act="bend"],[data-act="bendStop"]'); if (b) b.click(); });
     }
     await ev(() => { if (B) B = null; ui.dlg = null; ui.toast = ''; render(); });
-    if (await ev(() => !!ui.result)) await shot('13b_result', 200);
     await ev(() => { ui.result = null; ui.toast = ''; render(); });
     await shot('14_battle_after_map');
   });
   await step('battle_win', async () => {
     // 勝利画面を撮るため仲間を強くして再戦(スカウト成功率も見る)
-    await ev(() => { state.party[0].lv = 12; healAll(); const fid = TOWN[state.town].fields[0].id; owEncounter(fid); B.lockUntil = 0; render(); });
+    await ev(() => { state.party[0].lv = 12; state.detour = 3; state.detourN = 34; healAll(); const fid = TOWN[state.town].fields[0].id; owEncounter(fid); B.lockUntil = 0; render(); });
     await shot('15_battle_strong', 900);
+    let n2 = 0;
     for (let i = 0; i < 60 && await ev(() => !!B); i++) {
       await ev(() => { if (B && B.phase === 'input') { B.auto = true; autoTurn(); } });
       await wait(500);
       const ended = await ev(() => !!document.querySelector('[data-act="bend"],[data-act="bendStop"]'));
-      if (ended) { await shot('16_battle_win_panel', 200); }
+      if (ended && !n2++) { await shot('16_battle_win_panel', 200); await shot('17_result', 2800); }
       await ev(() => { const b = document.querySelector('[data-act="bend"],[data-act="bendStop"]'); if (b) b.click(); });
     }
     await ev(() => { if (B) B = null; ui.dlg = null; ui.toast = ''; render(); });
-    if (await ev(() => !!ui.result)) await shot('17_result', 200);
     await ev(() => { ui.result = null; ui.toast = ''; render(); });
   });
   await step('menus', async () => {
