@@ -11,9 +11,9 @@ horobiookami,ホロビオオカミ,procedural-canvas,none,src/game.html DRAW96.h
 chunta,チュンタ,procedural-canvas,none,src/game.html DRAW.chunta + flatPainter/sprite(),,2026-11-18,yes
 nyaame,ニャーメ,procedural-canvas,none,src/game.html DRAW.nyaame + flatPainter/sprite(),,2026-11-18,yes
 hashibuton,ハシブトン,procedural-canvas,none,src/game.html DRAW.hashibuton + flatPainter/sprite(),,2026-11-18,yes
-sagiri,サギリ,procedural-canvas,none,src/game.html DRAW.sagiri + flatPainter/sprite(),,2026-11-18,yes
+sagiri,サギリ,procedural-canvas,none,src/game.html DRAW.sagiri (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 yomizuku,ヨミズク,procedural-canvas,none,src/game.html DRAW.yomizuku + flatPainter/sprite(),,2026-11-18,yes
-gorodango,ゴロダンゴ,procedural-canvas,none,src/game.html DRAW.gorodango + flatPainter/sprite(),,2026-11-18,yes
+gorodango,ゴロダンゴ,procedural-canvas,none,src/game.html DRAW.gorodango (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 hotarubi,ホタルビ,procedural-canvas,none,src/game.html DRAW.hotarubi + flatPainter/sprite(),,2026-11-18,yes
 kurobikari,クロビカリ,procedural-canvas,none,src/game.html DRAW.kurobikari + flatPainter/sprite(),,2026-11-18,yes
 kabutoo,カブトオー,procedural-canvas,none,src/game.html DRAW.kabutoo + flatPainter/sprite(),,2026-11-18,yes
@@ -49,25 +49,25 @@ akahara,アカハラ,procedural-canvas,none,src/game.html DRAW.akahara + flatPai
 hakamori,ハカモリ,procedural-canvas,none,src/game.html DRAW.hakamori + flatPainter/sprite(),,2026-11-18,yes
 yotakage,ヨタカゲ,procedural-canvas,none,src/game.html DRAW.yotakage + flatPainter/sprite(),,2026-11-18,yes
 shikouchou,シコウチョウ,procedural-canvas,none,src/game.html DRAW.shikouchou + flatPainter/sprite(),,2026-11-18,yes
-kokonobi,ココノビ,procedural-canvas,none,src/game.html DRAW96.kokonobi + flatPainter/sprite(),,2026-11-18,yes
+kokonobi,ココノビ,procedural-canvas,none,src/game.html DRAW96.kokonobi (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 haganetsubu,ハガネツブ,procedural-canvas,none,src/game.html DRAW.haganetsubu + flatPainter/sprite(),,2026-11-18,yes
-gintachi,ギンタチ,procedural-canvas,none,src/game.html DRAW.gintachi + flatPainter/sprite(),,2026-11-18,yes
+gintachi,ギンタチ,procedural-canvas,none,src/game.html DRAW.gintachi (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 nijitama,ニジタマ,procedural-canvas,none,src/game.html DRAW.nijitama + flatPainter/sprite(),,2026-11-18,yes
 ougontsubu,オウゴンツブ,procedural-canvas,none,src/game.html DRAW.ougontsubu + flatPainter/sprite(),,2026-11-18,yes
 yumekui,ユメクイ,procedural-canvas,none,src/game.html DRAW.yumekui + flatPainter/sprite(),,2026-11-18,yes
 hikui,ヒクイ,procedural-canvas,none,src/game.html DRAW.hikui + flatPainter/sprite(),,2026-11-18,yes
-mukadeou,ムカデオウ,procedural-canvas,none,src/game.html DRAW96.mukadeou + flatPainter/sprite(),,2026-11-18,yes
+mukadeou,ムカデオウ,procedural-canvas,none,src/game.html DRAW96.mukadeou (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 mandora,マンドラ,procedural-canvas,none,src/game.html DRAW.mandora + flatPainter/sprite(),,2026-11-18,yes
 kawappa,カワッパ,procedural-canvas,none,src/game.html DRAW.kawappa + flatPainter/sprite(),,2026-11-18,yes
 ningyo,ニンギョ,procedural-canvas,none,src/game.html DRAW.ningyo + flatPainter/sprite(),,2026-11-18,yes
-umibouzu,ウミボウズ,procedural-canvas,none,src/game.html DRAW.umibouzu + flatPainter/sprite(),,2026-11-18,yes
+umibouzu,ウミボウズ,procedural-canvas,none,src/game.html DRAW.umibouzu (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 mizuchi,ミズチ,procedural-canvas,none,src/game.html DRAW96.mizuchi + flatPainter/sprite(),,2026-11-18,yes
 nekomata,ネコマタ,procedural-canvas,none,src/game.html DRAW.nekomata + flatPainter/sprite(),,2026-11-18,yes
-hitodama,ヒトダマ,procedural-canvas,none,src/game.html DRAW.hitodama + flatPainter/sprite(),,2026-11-18,yes
+hitodama,ヒトダマ,procedural-canvas,none,src/game.html DRAW.hitodama (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 kamaitachi,カマイタチ,procedural-canvas,none,src/game.html DRAW.kamaitachi + flatPainter/sprite(),,2026-11-18,yes
 nue,ヌエ,procedural-canvas,none,src/game.html DRAW96.nue + flatPainter/sprite(),,2026-11-18,yes
 yatagarasu,ヤタガラス,procedural-canvas,none,src/game.html DRAW96.yatagarasu + flatPainter/sprite(),,2026-11-18,yes
-yatsumata,ヤツマタ,procedural-canvas,none,src/game.html DRAW96.yatsumata + flatPainter/sprite(),,2026-11-18,yes
+yatsumata,ヤツマタ,procedural-canvas,none,src/game.html DRAW96.yatsumata (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 sorakujira,ソラクジラ,procedural-canvas,none,src/game.html DRAW96.sorakujira + flatPainter/sprite(),,2026-11-18,yes
 hakugin,ハクギンコウ,procedural-canvas,none,src/game.html DRAW.hakugin + flatPainter/sprite(),,2026-11-18,yes
 yukimaru,ユキマル,procedural-canvas,none,src/game.html DRAW.yukimaru + flatPainter/sprite(),,2026-11-18,yes
@@ -80,7 +80,7 @@ yukigitsune,ユキギツネ,procedural-canvas,none,src/game.html DRAW.yukigitsun
 kooryu,コオリュウ,procedural-canvas,none,src/game.html DRAW.kooryu + flatPainter/sprite(),,2026-11-18,yes
 gomafu,ゴマフ,procedural-canvas,none,src/game.html DRAW.gomafu + flatPainter/sprite(),,2026-11-18,yes
 todoroki,トドロキ,procedural-canvas,none,src/game.html DRAW.todoroki + flatPainter/sprite(),,2026-11-18,yes
-kooriyuurei,コオリユウレイ,procedural-canvas,none,src/game.html DRAW.kooriyuurei + flatPainter/sprite(),,2026-11-18,yes
+kooriyuurei,コオリユウレイ,procedural-canvas,none,src/game.html DRAW.kooriyuurei (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 onihiguma,オニヒグマ,procedural-canvas,none,src/game.html DRAW.onihiguma + flatPainter/sprite(),,2026-11-18,yes
 sakamata,サカマタ,procedural-canvas,none,src/game.html DRAW.sakamata + flatPainter/sprite(),,2026-11-18,yes
 sennenzuru,センネンヅル,procedural-canvas,none,src/game.html DRAW.sennenzuru + flatPainter/sprite(),,2026-11-18,yes
@@ -95,12 +95,12 @@ shikanosuke,シカノスケ,procedural-canvas,none,src/game.html DRAW.shikanosuk
 yukizaru,ユキザル,procedural-canvas,none,src/game.html DRAW.yukizaru + flatPainter/sprite(),,2026-11-18,yes
 kawasemin,カワセミン,procedural-canvas,none,src/game.html DRAW.kawasemin + flatPainter/sprite(),,2026-11-18,yes
 kijimaru,キジマル,procedural-canvas,none,src/game.html DRAW.kijimaru + flatPainter/sprite(),,2026-11-18,yes
-houou,ホウオウ,procedural-canvas,none,src/game.html DRAW.houou + flatPainter/sprite(),,2026-11-18,yes
+houou,ホウライ,procedural-canvas,none,src/game.html DRAW.houou (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 kamakirin,カマキリン,procedural-canvas,none,src/game.html DRAW.kamakirin + flatPainter/sprite(),,2026-11-18,yes
 mitsubachin,ミツバチン,procedural-canvas,none,src/game.html DRAW.mitsubachin + flatPainter/sprite(),,2026-11-18,yes
 tagamen,タガメン,procedural-canvas,none,src/game.html DRAW.tagamen + flatPainter/sprite(),,2026-11-18,yes
 ookuwa,オオクワ,procedural-canvas,none,src/game.html DRAW.ookuwa + flatPainter/sprite(),,2026-11-18,yes
-tenagaou,テナガオウ,procedural-canvas,none,src/game.html DRAW.tenagaou + flatPainter/sprite(),,2026-11-18,yes
+tenagaou,テナガオウ,procedural-canvas,none,src/game.html DRAW.tenagaou (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 amezari,アメザリ,procedural-canvas,none,src/game.html DRAW.amezari + flatPainter/sprite(),,2026-11-18,yes
 namazun,ナマズン,procedural-canvas,none,src/game.html DRAW.namazun + flatPainter/sprite(),,2026-11-18,yes
 denden,デンデン,procedural-canvas,none,src/game.html DRAW.denden + flatPainter/sprite(),,2026-11-18,yes
@@ -110,7 +110,7 @@ kinoboryu,キノボリュウ,procedural-canvas,none,src/game.html DRAW.kinoboryu
 gamelyu,ガメリュウ,procedural-canvas,none,src/game.html DRAW.gamelyu + flatPainter/sprite(),,2026-11-18,yes
 yakou,ヤコウ,procedural-canvas,none,src/game.html DRAW.yakou + flatPainter/sprite(),,2026-11-18,yes
 utakata,ウタカタ,procedural-canvas,none,src/game.html DRAW.utakata + flatPainter/sprite(),,2026-11-18,yes
-harigane,ハリガネン,procedural-canvas,none,src/game.html DRAW.harigane + flatPainter/sprite(),,2026-11-18,yes
+harigane,ハリガネン,procedural-canvas,none,src/game.html DRAW.harigane (2026-11-19 描き直し: mfBand/mfCurve の手続き描画) + flatPainter/sprite(),,2026-11-19,yes
 koganetsubu,コガネツブ,procedural-canvas,none,src/game.html DRAW.koganetsubu + flatPainter/sprite(),,2026-11-18,yes
 tsuchinoko,ツチノコ,procedural-canvas,none,src/game.html DRAW.tsuchinoko + flatPainter/sprite(),,2026-11-18,yes
 raiju,ライジュウ,procedural-canvas,none,src/game.html DRAW.raiju + flatPainter/sprite(),,2026-11-18,yes
