@@ -21,9 +21,12 @@
     Math.random = function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   };
 
+  /* 天気は実際の日付で決まる。シミュレーションでは日付をずらして(S.dayOff)、時間帯が1周するたびに1日進める(1日に4時間帯ぶん遊ぶ、少なめの見積もり) */
+  S.dayOff = 0; const realNow = Date.now.bind(Date); Date.now = () => realNow() + S.dayOff * 864e5;
+  const advOrig = window.advanceTime; window.advanceTime = function () { advOrig(); if (state.time === 0) S.dayOff++; };
   S.newGame = function (starter, o = {}) {
     state = fresh(); migrate(); ui.dlg = null; B = null;
-    state.wxN = o.wx === undefined ? Math.floor(Math.random() * 1e6) : o.wx; /* 天気は日付で決まるので、ゲームごとに乱数でふる(天気の割合が実際のプレイと同じになる) */
+    S.dayOff = o.wx === undefined ? Math.floor(Math.random() * 1e6) : o.wx; /* 天気は日付+町+時間帯で決まるので、ゲームごとに日付を乱数でずらす(天気の割合が実際のプレイと同じになる) */
     H.starter({ id: starter }); ui.dlg = null;
     state.town = 'komorebi'; state.ow = { map: 'komorebi', ...MAPS.komorebi.station };
     const lead = state.party[0];
@@ -260,7 +263,7 @@
         区画の到達判定は本物の footInfo。歩ける・歩けないは footInfo と同じ規則。 */
   S.footTour = function (id) {
     const m = MAPS[id], fi = footInfo(id), R = m.rows.length, C = Math.max(...m.rows.map(r => r.length));
-    const ok = (x, y) => { const ch = (m.rows[y] || '')[x]; if (ch === undefined) return false; if (!OW_SOLID.includes(ch)) return true; return ((ch === '~' || ch === 'W') && (m.floats || m.ground === 'snow')) || (ch === 'O' && !!m.rocks) || ch === '+'; };
+    const ok = (x, y) => fi.ok(x, y) || (m.rows[y] || '')[x] === '+'; /* 通れるかは footInfo と同じ規則。線路(+)はトロッコ・カヌーで運ばれるので、歩いた距離の代わりに数える */
     const enc = m.enc || 'T'; let cur = m.spawn || m.station; if (!cur) return null;
     const blockOf = (x, y) => (y >> 2) * fi.bw + (x >> 2);
     const done = new Uint8Array(fi.nb); let left = fi.total, steps = 0, encSteps = 0;
@@ -287,7 +290,7 @@
     const t = TOWN[tid]; const places = t.fields.map(f => ({ f, max: f.max, cost: P.STEP_S * 9.2 + battleS + .1 * P.REST_S }));
     for (const id in MAPS) { const m = MAPS[id]; if (m.town === tid && m.fish && m.fish.table) places.push({ f: { table: m.fish.table, max: 1 }, max: 1, cost: 8 + battleS + .1 * P.REST_S }); }
     for (let g = 0; g < N; g++) {
-      state = fresh(); migrate(); state.town = tid; state.wxN = Math.floor(Math.random() * 1e6); state.time = Math.floor(Math.random() * 4);
+      state = fresh(); migrate(); state.town = tid; S.dayOff = Math.floor(Math.random() * 1e6); state.time = Math.floor(Math.random() * 4);
       const miss = new Set(need); let T = 0, enc = 0, stepsInPeriod = 0, periods = 0, wasted = 0;
       while (miss.size && T < 300 * 3600) {
         const wx = wxNow(tid);

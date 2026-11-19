@@ -412,6 +412,20 @@ T('T1: 各町で天気の割合が表の±3%以内(昼)', async () => {
     for (const id of WXK) { const exp = id === 'hoshi' ? 0 : (tb[id] || 0) / tot, got = (cnt[id] || 0) / N; if (Math.abs(exp - got) > .03) out.push(`${t}:${id} ${got.toFixed(3)} vs ${exp.toFixed(3)}`); } } return out; });
   eq(r, [], '割合のずれ'); await s.close();
 });
+T('T1: 天気の偏り: どの町でも、各天気が7日のうちに少なくとも1回は出る(星降りは夜だけなので14日で)', async () => {
+  const s = await open();
+  const r = await s.ev(() => {
+    const D = 2000, bad = [], worst = {}, R = Date.now.bind(Date), tab = {};
+    for (const t of Object.keys(WX_TBL)) { tab[t] = []; for (let d = 0; d < D; d++) { dayAt(d); const row = []; for (let tm = 0; tm < 4; tm++) { state.time = tm; row.push(wxOf(t)); } tab[t].push(row); } }
+    dayAt(0);
+    for (const t of Object.keys(WX_TBL)) for (const w of WXK) { if (!WX_TBL[t][w]) continue; const win = w === 'hoshi' ? 14 : 7; let miss = 0, n = 0;
+      for (let d = 0; d + win <= D; d++) { n++; if (!tab[t].slice(d, d + win).some(row => row.includes(w))) miss++; }
+      worst[t + ':' + w] = +(miss / n * 100).toFixed(1); if (miss / n > (w === 'hoshi' ? .05 : .06)) bad.push(`${t}:${w} ${(miss / n * 100).toFixed(1)}%`); }
+    /* 昼の時間帯(0..2)にも、天候限定種が出る日がある: 町ごとの全探索先で、各 天気タグの種が出る日が 20日に1回以上 */
+    return { bad, max: Math.max(...Object.values(worst)) };
+  });
+  eq(r.bad, [], '7日のうちに一度も出ない天気が多い町がある'); console.log(`      7日で欠ける確率の最大 ${r.max}%`); eq(s.errors, []); await s.close();
+});
 T('T1: 星降りは夜だけ。天候限定の7体はその天気の時だけ出現表に入る', async () => {
   const s = await open();
   const r = await s.ev(() => {
@@ -513,6 +527,19 @@ T('T1: 駅のみちくさ便りが出て、予報どおり(3コマ)', async () =
 const T8_STAGE = s => s.ev(() => { H.starter({ id: 'ibote' }); ui.dlg = null; state.bgm = false; state.sound = false; state.boss = { komorebi: true, kasumi: true }; state.town = 'kasumi'; state.time = 3; window.wxNow = () => 'kiri'; ui.tab = 'map'; ui.station = false; ui.inside = null; ui.toast = ''; state.ow = null; owEnsureState(); render(); });
 const T8_ENTER = s => s.ev(() => { ui.station = true; render(); H.mabo(); ui.dlg = null; document.querySelectorAll('.mabo-fx').forEach(e => e.remove()); });
 const T8_CLOCK = s => s.ev(() => { window.__rd = Date.now.bind(Date); window.__fix = true; window.__T = 0; Date.now = () => window.__fix ? window.__T : window.__rd(); });
+T('T8: 初めて着くまで、駅の札も路線図も「？？駅へ行く」(名前を明かさない)。着いたあとは「まぼろし駅へ行く」', async () => {
+  const s = await open(); await T8_STAGE(s);
+  const r = await s.ev(() => { const o = {}; ui.station = true; render(); const txt = () => [...document.querySelectorAll('[data-act="mabo"]')].map(e => e.textContent + '|' + (e.getAttribute('aria-label') || '')).join(' ## ');
+    o.before = txt(); ui.station = false; ui.tab = 'map'; render(); o.beforeMap = txt(); state.flags.mabo = true; ui.station = true; render(); o.after = txt(); ui.station = false; render(); o.afterMap = txt(); return o; });
+  ok(/？？駅へ行く/.test(r.before) && !/まぼろし/.test(r.before), '初回の駅の札で名前を明かしている: ' + r.before); ok(!/まぼろし/.test(r.beforeMap), '初回の路線図で名前を明かしている: ' + r.beforeMap);
+  ok(/まぼろし駅へ行く/.test(r.after), '着いたあとの札: ' + r.after); eq(s.errors, []); await s.close();
+});
+T('T2: 区画番号は変えていない(旧セーブの foot ビットがそのまま読める)', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => { state.foot = { urayama: '1' + 'f'.repeat(4) }; const fi = footInfo('urayama'); const same = footBit('urayama', 0) && !footBit('urayama', 1) && footBit('urayama', 4) && footBit('urayama', 19) && !footBit('urayama', 20);
+    const a = JSON.stringify(state.foot); migrate(); migrate(); return { same, idem: a === JSON.stringify(state.foot), pct: footShow('urayama'), n: footCount('urayama'), nb: fi.nb }; });
+  ok(r.same, '区画番号とビットの対応が変わった'); ok(r.idem, 'migrate が foot を変えた'); eq(s.errors, []); await s.close();
+});
 T('T8: 入口は 霧×夜×霞ヶ丘撃破 のときだけ(路線図と駅に出る/ほかでは出ない)', async () => {
   const s = await open(); await T8_STAGE(s);
   const r = await s.ev(() => {

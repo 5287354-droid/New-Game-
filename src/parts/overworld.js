@@ -2921,7 +2921,7 @@ function footInfo(id){
   const {seen,R,C}=footReach(id,ok);
   const nb=bw*bh,valid=new Uint8Array(nb),skip=FOOT_SKIP[id]||[];let total=0;
   for(let y=0;y<R;y++)for(let x=0;x<C;x++)if(seen[y*C+x]){const i=(y>>2)*bw+(x>>2);if(!valid[i]&&!skip.includes(i)){valid[i]=1;total++;}}
-  return FOOT_C[id]={bw,bh,nb,valid,total};
+  return FOOT_C[id]={bw,bh,nb,valid,total,ok};
 }
 function footBit(id,i){const s=state.foot&&state.foot[id];if(!s)return false;return !!(((parseInt(s[i>>2],16)||0)>>(i&3))&1);}
 function footSetBit(id,i,fi){let s=state.foot[id]||'';const n=Math.ceil(fi.nb/4);if(s.length<n)s=s.padEnd(n,'0');const k=i>>2,c=(parseInt(s[k],16)||0)|(1<<(i&3));state.foot[id]=s.slice(0,k)+c.toString(16)+s.slice(k+1);}
