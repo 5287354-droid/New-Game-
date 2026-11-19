@@ -1953,22 +1953,29 @@ const TOWN={};TOWNS.forEach(t=>TOWN[t.id]=t);
 let METAL_FLEE=.15,METAL_HIT=1;   /* メタル系: 1ターンごとに逃げる確率 / ふつうの攻撃が1ダメージ通る確率 */
 const TM={n:'夕方・夜',d:'朝・昼',R:'雨の日',F:'霧の日',S:'雪の日',A:'火山灰の日',C:'くもりの日',H:'晴れの日','*':'星降りの夜',nC:'くもりの夜',nR:'雨の夜',dR:'雨の昼'};
 const tagMark=tm=>{const w=[...(tm||'')].map(c=>WXT[c]).filter(Boolean);return w.length?WX[w[0]].s:tm==='n'?'夜':'昼';};
-/* ===== T1: 空もよう(天気)。天気は保存せず、実際の日付+町+時間帯(state.time)だけから毎回計算する。ベンチで休んでも振り直せない ===== */
+/* ===== T1: 空もよう(天気)。実際の日付+町+その日の旅の日数(state.wxDay.n, 0〜2)+時間帯(state.time)から計算する。1日に最大12コマで、振り直せない ===== */
 const WX={hare:{n:'晴れ',s:'晴',c:'#ffc94a',t:'H'},kumo:{n:'くもり',s:'曇',c:'#a7b1c4',t:'C'},ame:{n:'雨',s:'雨',c:'#5aa7ff',t:'R'},kiri:{n:'霧',s:'霧',c:'#c8d2da',t:'F'},yuki:{n:'雪',s:'雪',c:'#dff2ff',t:'S'},hai:{n:'火山灰',s:'灰',c:'#e0825a',t:'A'},hoshi:{n:'星降り',s:'星',c:'#ffe27a',t:'*'}};
 const WXK=Object.keys(WX),WXT={};WXK.forEach(k=>WXT[WX[k].t]=k);
 /* 町ごとの天気の重み(星は夜のあいだだけ足される)。どの天気も 12 以上にして、7日のうちに1度は出るようにしてある(テストで確認) */
 const WX_TBL={
-  komorebi:{hare:38,kumo:25,ame:25,kiri:12,hoshi:32},kasumi:{hare:32,kumo:31,ame:25,kiri:12,hoshi:32},shiomi:{hare:40,kumo:20,ame:25,kiri:15,hoshi:32},
-  tengu:{hare:25,kumo:23,ame:15,kiri:25,yuki:12,hoshi:32},mayoiga:{hare:20,kumo:25,ame:20,kiri:35,hoshi:32},ryuhyo:{hare:20,kumo:25,kiri:12,yuki:43,hoshi:32},
-  hinoshima:{hare:35,kumo:20,ame:15,hai:30,hoshi:32},sango:{hare:48,kumo:15,ame:25,kiri:12,hoshi:32},yomi:{hare:14,kumo:30,ame:15,kiri:36,hoshi:39}};
+  komorebi:{hare:38,kumo:25,ame:25,kiri:12,hoshi:48},kasumi:{hare:32,kumo:31,ame:25,kiri:12,hoshi:48},shiomi:{hare:40,kumo:20,ame:25,kiri:15,hoshi:48},
+  tengu:{hare:25,kumo:23,ame:15,kiri:25,yuki:12,hoshi:48},mayoiga:{hare:20,kumo:25,ame:20,kiri:35,hoshi:48},ryuhyo:{hare:20,kumo:25,kiri:12,yuki:43,hoshi:48},
+  hinoshima:{hare:35,kumo:20,ame:15,hai:30,hoshi:48},sango:{hare:48,kumo:15,ame:25,kiri:12,hoshi:48},yomi:{hare:14,kumo:30,ame:15,kiri:36,hoshi:55}};
 /* 家系ごとの出現補正 */
 const WX_MUL={hare:{bird:1.3,plant:1.3},kumo:{beast:1.2,bug:1.2},ame:{aqua:1.6,soft:1.6},kiri:{spirit:1.6,myst:1.3},yuki:{aqua:1.3,beast:1.3},hai:{dragon:1.5,metal:1.2},hoshi:{}};
 const wxMul=(fam,wx)=>(WX_MUL[wx]&&WX_MUL[wx][fam])||1;
 function hashF(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}h^=h>>>13;h=Math.imul(h,1274126177);h^=h>>>16;return (h>>>0)/4294967296;}
-/* k=0 はいま、k=1,2 は次・次の次の時間帯(予報)。k=-1 は直前 */
+/* その日の旅の日数 n(0〜2)。ゲームの中で夜→朝になるたびに1進み、実際の日付が変わると0に戻る。3日分を超えたら3日目の天気を繰り返す。
+   だから1日(実際の日付)に出る天気は、町ごとに最大 3日×4時間帯=12コマ。何度休んでも、12コマより多くは振り直せない */
+const WX_DAYS=3;
+const wxDn=()=>{const w=state&&state.wxDay;return w&&w.d===dayKey()?Math.max(0,Math.min(w.n|0,WX_DAYS-1)):0;};
+/* 霞ヶ丘は、夜に霧が出やすい(まぼろし駅に入りやすい)。夜(time 3)だけ霧の重みを上書きする */
+const WX_NIGHT={kasumi:{kiri:90}};
+/* k=0 はいま、k=1,2 は次・次の次の時間帯(予報)。k=-1 は直前。夜→朝をまたぐと、その日の旅の日数が1進んだものとして決める */
 function wxOf(town,k=0){
-  const tb=WX_TBL[town]||WX_TBL.komorebi,tm=(((state.time||0)+k)%4+4)%4,ws=WXK.map(id=>[id,(tb[id]||0)*(id==='hoshi'?(tm===3?1:0):1)]).filter(x=>x[1]>0);
-  const tot=ws.reduce((s,x)=>s+x[1],0);let r=hashF(dayKey()+':'+town+':'+tm)*tot;   /* 1日は時間帯ごとに4つの天気。ゲーム内の時間帯は何周しても、同じ日・同じ時間帯なら同じ天気 */
+  const ts=(state.time||0)+k,tm=((ts%4)+4)%4,dn=Math.max(-1,Math.min(wxDn()+Math.floor(ts/4),WX_DAYS-1));
+  const tb=Object.assign({},WX_TBL[town]||WX_TBL.komorebi,tm===3&&WX_NIGHT[town]),ws=WXK.map(id=>[id,(tb[id]||0)*(id==='hoshi'?(tm===3?1:0):1)]).filter(x=>x[1]>0);
+  const tot=ws.reduce((s,x)=>s+x[1],0);let r=hashF(dayKey()+':'+town+':'+dn+':'+tm)*tot;   /* 同じ実際の日付・旅の日数・時間帯なら同じ天気 */
   for(const [id,w] of ws){r-=w;if(r<0)return id;}return ws[ws.length-1][0];
 }
 /* 出現表のタグ: n/d=時間 R雨 F霧 S雪 A灰 *星降り C曇 H晴。時間と天気の両方があるときは AND(天気の文字どうしは OR) */
@@ -1993,7 +2000,7 @@ function wxPanel(){
 /* 初めて着くまでは、名前を明かさず「？？駅」 */
 const maboName=()=>state&&state.flags&&state.flags.mabo?'まぼろし駅':'？？駅';
 const maboOpen=()=>!!(state&&state.started&&!B&&state.boss&&state.boss.kasumi&&MAPS[state.town]&&state.time===3&&wxNow(state.town)==='kiri');
-function wxNow(town){town=town||state.town;const k=town+'|'+state.time+'|'+dayKey();if(wxNow.k!==k){wxNow.k=k;wxNow.v=wxOf(town);}
+function wxNow(town){town=town||state.town;const k=town+'|'+state.time+'|'+dayKey()+'|'+wxDn();if(wxNow.k!==k){wxNow.k=k;wxNow.v=wxOf(town);}
   if(state.wxLog&&!state.wxLog[wxNow.v])state.wxLog[wxNow.v]=true;return wxNow.v;}
 const HAB={};
 TOWNS.forEach(t=>t.fields.forEach(f=>f.table.forEach(([s,,tm])=>{(HAB[s]=HAB[s]||[]).push(t.name+'・'+f.name+(tm?`(${TM[tm]})`:''));})));
@@ -3871,6 +3878,8 @@ TOWN.mabo={id:'mabo',code:'??',name:'まぼろし駅',roma:'Maboroshi',kind:'隠
   fields:[{id:'mabo',name:'夢の野原',scene:'subway',lv:[20,20],max:3,dyn:true,
     table:[['amayadori',1],['kirigarasu',1],['nijimimizu',1],['yukiwata',1],['haikagura',1],['kumozumi',1],['hoshikuzume',1],['mabonokoshou',1.5]]}]};
 TOWN.mabo.fields[0].table.forEach(([s])=>{(HAB[s]=HAB[s]||[]).push('まぼろし駅・夢の野原(霧の夜だけ)');});
+/* 出現の表示: まぼろし駅には、初めて着く(flags.mabo)まで、名前を明かさず「？？？」と出す */
+const habOf=id=>(HAB[id]||[]).map(x=>x.startsWith('まぼろし駅')&&!(state&&state.flags&&state.flags.mabo)?'？？？':x);
 
 RIVALS.sango={team:[['oniitomaki',118,22],['kijimuna',119,22],['yukemuri',120,22]],reward:{yen:100000,items:{tenpu:2,kakusei:1}},
   pre:[['アオイ','見て見て、この島の海！ ……って、遊びに来たんじゃなかった。'],['アオイ','所長の昔のノート、わたしも少し読んだんだ。この島で、所長はいちど配合師をやめようとしたんだって。'],['アオイ','……だからこそ、ここで負けたくない！']],
@@ -4756,7 +4765,7 @@ const MAPS={
     "JJJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
     "JJJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
     "JJJJJMJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
-    "JJJJJMMMMMiJiiiiiJiiJiiiiiiJiJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJMMMMMiJiiiiiJiiJiiiiiiiiJJJJJJJJJJJJJJMJJJJ",
     "JJJJJJMJJiiiiiiiiiiiJiJiiiiiiJJJJJJJJJJJJJJMJJJJ",
     "JJJJJJMJJiiiiiiiiiiiiiJiiiiiJJJJJJJJJJJJJJJMJJJJ",
     "JMMMMMMJJiiiiJiiiiiiiiiiiJiiJJJJJJJJJJJJJJJMJJJJ",
@@ -6878,7 +6887,8 @@ const OW_STAMPS=[
   ['g:ghost','幽霊列車','まぼろし駅で、列車が走るあいだ、踏切の島で待つ'],
   ['g:fog','霧の足場','まぼろし駅で、霧の晴れ間に沼の足場をわたる']];
 /* 通れない区画の手動リスト {mapId:[区画番号...]}(自動の到達判定でも足りないとき用) */
-const FOOT_SKIP={};
+/* 歩けない区画(対象外): 雪の原生林は、左のふちの穴(O)の列と、クレバスの下のはしの穴が、穴だけの区画になっていて、岩2つでは埋まらない(飾りの穴) */
+const FOOT_SKIP={genseirin:[81,97,113,129,198]};
 const FOOT_IN={};let FOOT_IN_OK=false;
 const FOOT_C={};
 function footIn(){if(FOOT_IN_OK)return;FOOT_IN_OK=true;for(const id in MAPS){const w=MAPS[id].warps;if(w)for(const k in w){const v=w[k];(FOOT_IN[v.to]=FOOT_IN[v.to]||[]).push([v.x,v.y]);}}}
@@ -7265,7 +7275,7 @@ function wildCard(t){
 }
 function renderStationIn(){
   const h=renderMap(),cut=h.indexOf('<section class="town-grid">');const t=TOWN[state.town];
-  return `${h.slice(0,cut)}${wxPanel()}${maboOpen()?`<div class="panel stack mabo-note"><h3>${maboName()}</h3><p class="small">霧の向こうに、知らないホームが見える……</p><div><button class="btn primary" data-act="mabo">${maboName()}へ行く</button></div></div>`:''}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
+  return `${h.slice(0,cut)}${wxPanel()}${maboOpen()?`<div class="panel stack mabo-note"><h3>${maboName()}</h3><p class="small">霧の向こうに、知らないホームが見える……</p><div><button class="btn primary" data-act="mabo">${maboName()}へ行く</button></div></div>`:''}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ。歩いて探索できるのは、いままでに降りた町。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
 }
 /* 建物の中 */
 function renderInside(){
@@ -7344,7 +7354,7 @@ function randTalent(lo,hi){const t={};STATS.forEach(k=>t[k]=ri(lo,hi));return t;
 const KEY='michikusa-save-v1';
 let state=null, B=null, tempUid=-1;
 const ui={tab:'map',sel:null,bA:null,bB:null,bSlot:'A',inh:[],trs:[],toast:'',confirmRel:false,dexSel:null,result:null,confirmReset:false,dlg:null,renaming:false,cats:[]};
-function fresh(){return {v:1,started:false,yen:300,items:{bansoko:3,tea:1,drink:0,onigiri:2},party:[],box:[],uidN:1,seen:{},owned:{},boss:{},town:'komorebi',breeds:0,time:1,steps:0,reqDone:{},cups:{},rival:{},flags:{},shinySeen:{},dexClaim:{},sound:false,bgmVol:.75,seVol:.75,lure:0,daycare:[],wins:0,foot:{},mpt:0,mptAll:0,stamps:{},detour:0,detourN:0,dexReg:{},seenAt:{},wxN:0,wxLog:{},kirari:null,kirariDue:0};}
+function fresh(){return {v:1,started:false,yen:300,items:{bansoko:3,tea:1,drink:0,onigiri:2},party:[],box:[],uidN:1,seen:{},owned:{},boss:{},town:'komorebi',breeds:0,time:1,steps:0,reqDone:{},cups:{},rival:{},flags:{},shinySeen:{},dexClaim:{},sound:false,bgmVol:.75,seVol:.75,lure:0,daycare:[],wins:0,foot:{},mpt:0,mptAll:0,stamps:{},detour:0,detourN:0,dexReg:{},seenAt:{},wxN:0,wxLog:{},wxDay:{d:dayKey(),n:0},kirari:null,kirariDue:0};}
 function save(){if(state)state.savedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}cloudSchedule();}
 function load(){try{const s=localStorage.getItem(KEY);if(s){const o=JSON.parse(s);if(o&&o.v===1)return o;}}catch(e){}return null;}
 
@@ -7630,7 +7640,10 @@ function reqMatch(need){
 }
 const reqReadyCount=()=>REQUESTS.filter(r=>!state.reqDone[r.id]&&townOpen(TOWN[r.town])&&reqMatch(r.need)).length;
 const cupOpen=c=>townOpen(TOWN.kasumi)&&(!c.req||state.cups[c.req])&&(!c.reqBoss||state.boss[c.reqBoss]);
-function advanceTime(){state.time=(state.time+1)%4;state.steps=0;state.wxN=(state.wxN||0)+1;wxNow();}
+function advanceTime(){const t=state.time;state.time=(t+1)%4;state.steps=0;state.wxN=(state.wxN||0)+1;
+  /* 夜→朝: その日の旅の日数を1進める(最大 WX_DAYS 日分)。実際の日付が変わっていたら、0 に戻したところから数える(予報 wxOf と同じ規則) */
+  state.wxDay={d:dayKey(),n:Math.min(wxDn()+(t===3?1:0),WX_DAYS-1)};
+  wxNow();}
 
 function cupsPanel(alive){return `<div class="panel stack cups"><div class="row between"><h3>霞ヶ丘ドーム 配合杯</h3><span class="lv num">${Object.keys(state.cups).length}/${CUPS.length}</span></div>
     <p class="small muted">3試合を勝ち抜けば優勝。試合の合間にHPとMPは回復しない。スカウトはできない。</p>
@@ -7789,7 +7802,7 @@ function detail(m){
       <h4>特技 (${m.skills.length})</h4><div class="skgrid">${m.skills.map(id=>{const s=SK[id];return `<div class="skc el-${s.e||'none'}"><b>${s.n}</b><span class="small muted">MP${s.mp}${s.e?' ・ '+s.e+'属性':''}</span><span class="small">${s.d}</span></div>`;}).join('')}</div>
       ${future.length?`<p class="small muted">これから覚える: ${future.map(([lv,id])=>`${SK[id].n}(Lv${lv})`).join('・')}</p>`:''}`;
   }else{
-    body=`<p>${sp.desc}</p><h4>家系図</h4>${treeHTML(m)}${routesHTML(m)}<p class="small muted">${HAB[sp.id]?'出現: '+HAB[sp.id].join(' / '):sp.special?'特殊配合でのみ生まれる。':'野生では見つからない。'}</p>`;
+    body=`<p>${sp.desc}</p><h4>家系図</h4>${treeHTML(m)}${routesHTML(m)}<p class="small muted">${HAB[sp.id]?'出現: '+habOf(sp.id).join(' / '):sp.special?'特殊配合でのみ生まれる。':'野生では見つからない。'}</p>`;
   }
   return `<div class="panel status">
     <div class="row between only-m"><span class="eyebrow">ステータス</span><button class="btn sm" data-act="detailClose">とじる</button></div>
@@ -8122,7 +8135,7 @@ function renderDex(){
     const rec=RECIPES.filter(r=>r.out===sel.id&&state.owned[sel.id]);
     det=`<div class="panel stack"><div class="dhead">${seal(sel.id,'lg',true,false)}${state.shinySeen[sel.id]?seal(sel.id,'sm',true,true):''}<div class="stack tight"><span class="eyebrow">No.${String(SPL.indexOf(sel)+1).padStart(2,'0')} ・ ${FAM[sel.fam].n} ・ ${RANKS[sel.rank]}ランク</span><h2>${sel.name}</h2><span class="small muted">モチーフ: ${sel.motif}</span></div></div>
       ${ow?`<p>${sel.desc}</p><p class="small">特性: ${TR[sel.trait].n} ― ${TR[sel.trait].d}${TR[sel.trait].up?`(上位化すると「${TR[TR[sel.trait].up].n}」)`:''}</p><p class="small">覚える特技: ${sel.skills.map(([lv,id])=>`${SK[id].n}(Lv${lv})`).join('・')}</p>`:'<p class="small muted">見かけたことがある。なかまにすると詳しい記録が見られる。</p>'}
-      <p class="small muted">${HAB[sel.id]?'出現: '+HAB[sel.id].join(' / '):sel.special?'野生では見つからない。特殊配合でのみ生まれる。':'野生では見つからない。配合で生み出そう。'}</p>
+      <p class="small muted">${HAB[sel.id]?'出現: '+habOf(sel.id).join(' / '):sel.special?'野生では見つからない。特殊配合でのみ生まれる。':'野生では見つからない。配合で生み出そう。'}</p>
       <p class="small muted">${seenAtText(sel.id)}</p>
       ${rec.map(r=>`<p class="small" style="color:var(--good)">${recipeText(r)}</p>`).join('')}</div>`;
   }
@@ -8823,7 +8836,7 @@ document.addEventListener('submit',e=>{
 function migrate(){
   const fix=n=>n&&('par' in n)?{sp:n.sp,plus:0,sh:false,p:n.par?n.par.map(s=>({sp:s,plus:0,sh:false,p:null})):null}:n;
   allMons().forEach(m=>{if(m.parents)m.parents=m.parents.map(fix);if(m.gen==null)m.gen=m.parents?1:0;});
-  const d={time:1,steps:0,reqDone:{},cups:{},rival:{},flags:{},shinySeen:{},dexClaim:{},sound:false,lure:0,daycare:[],wins:0,wxN:0,wxLog:{},kirari:null,kirariDue:0};
+  const d={time:1,steps:0,reqDone:{},cups:{},rival:{},flags:{},shinySeen:{},dexClaim:{},sound:false,lure:0,daycare:[],wins:0,wxN:0,wxLog:{},wxDay:{d:dayKey(),n:0},kirari:null,kirariDue:0};
   if(state.bgm==null)state.bgm=true;
   /* 音量(0〜1 を5段階に丸める。むかしの値 .8 も .75 になる) */
   state.bgmVol=state.bgmVol==null?.75:Math.round(Math.max(0,Math.min(1,+state.bgmVol||0))*4)/4;

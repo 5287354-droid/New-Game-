@@ -758,7 +758,7 @@ const MAPS={
     "JJJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
     "JJJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
     "JJJJJMJJJMJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJMJJJJ",
-    "JJJJJMMMMMiJiiiiiJiiJiiiiiiJiJJJJJJJJJJJJJJMJJJJ",
+    "JJJJJMMMMMiJiiiiiJiiJiiiiiiiiJJJJJJJJJJJJJJMJJJJ",
     "JJJJJJMJJiiiiiiiiiiiJiJiiiiiiJJJJJJJJJJJJJJMJJJJ",
     "JJJJJJMJJiiiiiiiiiiiiiJiiiiiJJJJJJJJJJJJJJJMJJJJ",
     "JMMMMMMJJiiiiJiiiiiiiiiiiJiiJJJJJJJJJJJJJJJMJJJJ",
@@ -2880,7 +2880,8 @@ const OW_STAMPS=[
   ['g:ghost','幽霊列車','まぼろし駅で、列車が走るあいだ、踏切の島で待つ'],
   ['g:fog','霧の足場','まぼろし駅で、霧の晴れ間に沼の足場をわたる']];
 /* 通れない区画の手動リスト {mapId:[区画番号...]}(自動の到達判定でも足りないとき用) */
-const FOOT_SKIP={};
+/* 歩けない区画(対象外): 雪の原生林は、左のふちの穴(O)の列と、クレバスの下のはしの穴が、穴だけの区画になっていて、岩2つでは埋まらない(飾りの穴) */
+const FOOT_SKIP={genseirin:[81,97,113,129,198]};
 const FOOT_IN={};let FOOT_IN_OK=false;
 const FOOT_C={};
 function footIn(){if(FOOT_IN_OK)return;FOOT_IN_OK=true;for(const id in MAPS){const w=MAPS[id].warps;if(w)for(const k in w){const v=w[k];(FOOT_IN[v.to]=FOOT_IN[v.to]||[]).push([v.x,v.y]);}}}
@@ -3267,7 +3268,7 @@ function wildCard(t){
 }
 function renderStationIn(){
   const h=renderMap(),cut=h.indexOf('<section class="town-grid">');const t=TOWN[state.town];
-  return `${h.slice(0,cut)}${wxPanel()}${maboOpen()?`<div class="panel stack mabo-note"><h3>${maboName()}</h3><p class="small">霧の向こうに、知らないホームが見える……</p><div><button class="btn primary" data-act="mabo">${maboName()}へ行く</button></div></div>`:''}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
+  return `${h.slice(0,cut)}${wxPanel()}${maboOpen()?`<div class="panel stack mabo-note"><h3>${maboName()}</h3><p class="small">霧の向こうに、知らないホームが見える……</p><div><button class="btn primary" data-act="mabo">${maboName()}へ行く</button></div></div>`:''}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ。歩いて探索できるのは、いままでに降りた町。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
 }
 /* 建物の中 */
 function renderInside(){

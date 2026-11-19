@@ -21,12 +21,13 @@
     Math.random = function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   };
 
-  /* 天気は実際の日付で決まる。シミュレーションでは日付をずらして(S.dayOff)、時間帯が1周するたびに1日進める(1日に4時間帯ぶん遊ぶ、少なめの見積もり) */
-  S.dayOff = 0; const realNow = Date.now.bind(Date); Date.now = () => realNow() + S.dayOff * 864e5;
-  const advOrig = window.advanceTime; window.advanceTime = function () { advOrig(); if (state.time === 0) S.dayOff++; };
+  /* 天気は 実際の日付+町+その日の旅の日数(夜→朝で1進む・最大3日分)+時間帯 で決まる(本物の wxOf / advanceTime をそのまま使う)。
+     実際の日付は、ゲームの時間帯とは関係なく、現実の経過時間(シミュレーションの秒数 T)で進める。S.clock(T) で日付を進める(24時間ごとに1日) */
+  S.dayOff = 0; S.dayBase = 0; const realNow = Date.now.bind(Date); Date.now = () => realNow() + S.dayOff * 864e5;
+  S.hops = 0; S.clock = T => { S.dayOff = S.dayBase + S.hops + Math.floor(T / 86400); };   /* hops: その天気を待って、翌日にまた来た日数(寝ているあいだの時間は T に入れない) */
   S.newGame = function (starter, o = {}) {
     state = fresh(); migrate(); ui.dlg = null; B = null;
-    S.dayOff = o.wx === undefined ? Math.floor(Math.random() * 1e6) : o.wx; /* 天気は日付+町+時間帯で決まるので、ゲームごとに日付を乱数でずらす(天気の割合が実際のプレイと同じになる) */
+    S.dayBase = S.dayOff = o.wx === undefined ? Math.floor(Math.random() * 1e6) : o.wx; /* 天気は日付+町+時間帯で決まるので、ゲームごとに日付を乱数でずらす(天気の割合が実際のプレイと同じになる) */
     H.starter({ id: starter }); ui.dlg = null;
     state.town = 'komorebi'; state.ow = { map: 'komorebi', ...MAPS.komorebi.station };
     const lead = state.party[0];
@@ -242,20 +243,22 @@
     const f = TOWN[townId].fields.find(x => x.id === fieldId);
     MAPS[mapId].cold = 0; /* 寒さ・暑さの消耗は測らない(凍える・倒れる処理を切る。出会いの回数だけを見る) */
     for (let g = 0; g < N; g++) {
-      S.newGame('ibote', { time: Math.floor(Math.random() * 4) }); state.wins = 99; state.boss.komorebi = true; S.place(mapId); state.owSteps = Math.floor(Math.random() * 120);
-      let T = 0, enc = 0, found = false, waits = 0;
+      S.newGame('ibote', { time: Math.floor(Math.random() * 4) }); S.hops = 0; state.wins = 99; state.boss.komorebi = true; S.place(mapId); state.owSteps = Math.floor(Math.random() * 120);
+      let T = 0, enc = 0, found = false, waits = 0, slotsWaited = 0; S.clock(0);
       const here = () => wxTable(f.table, state.time, wxNow(townId)).some(x => x.s === sp);
       while (T < 6 * 3600 && !found) {
-        if (target && !here()) { /* 時間を送る: 草むらの外を歩く(残りの歩数ぶん) */
-          const rest = 120 - (state.owSteps || 0); T += rest * P.STEP_S; state.owSteps = 0; advanceTime(); waits++; continue; }
+        if (target && !here()) { /* 時間を送る: 草むらの外を歩く(残りの歩数ぶん)。その日の12コマを見終わっても出ないなら、翌日にまた来る(7日まで) */
+          if (slotsWaited >= 12) { slotsWaited = 0; if (++S.hops >= 7) break; S.clock(T); continue; }
+          const rest = 120 - (state.owSteps || 0); T += rest * P.STEP_S; state.owSteps = 0; advanceTime(); S.clock(T); waits++; slotsWaited++; continue; }
+        slotsWaited = 0;
         let i = 0; for (; i < 5000; i++) { owArrive(); if (B || OWC.omen) break; }
-        T += (i + 1) * P.STEP_S;
+        T += (i + 1) * P.STEP_S; S.clock(T);
         await S.settle();
         if (!B) { continue; }
         enc++; if (B.enemies.some(c => c.mon.sp === sp)) found = true;
         B = null; T += battleS + 0.1 * P.REST_S;
       }
-      out.push({ T, enc, found, waits });
+      out.push({ T, enc, found, waits, days: S.hops + 1 + Math.floor(T / 86400) });
     }
     return out;
   };
@@ -290,21 +293,23 @@
     const t = TOWN[tid]; const places = t.fields.map(f => ({ f, max: f.max, cost: P.STEP_S * 9.2 + battleS + .1 * P.REST_S }));
     for (const id in MAPS) { const m = MAPS[id]; if (m.town === tid && m.fish && m.fish.table) places.push({ f: { table: m.fish.table, max: 1 }, max: 1, cost: 8 + battleS + .1 * P.REST_S }); }
     for (let g = 0; g < N; g++) {
-      state = fresh(); migrate(); state.town = tid; S.dayOff = Math.floor(Math.random() * 1e6); state.time = Math.floor(Math.random() * 4);
-      const miss = new Set(need); let T = 0, enc = 0, stepsInPeriod = 0, periods = 0, wasted = 0;
+      state = fresh(); migrate(); state.town = tid; S.dayBase = S.dayOff = Math.floor(Math.random() * 1e6); state.time = Math.floor(Math.random() * 4);
+      S.hops = 0; const miss = new Set(need); let T = 0, enc = 0, stepsInPeriod = 0, periods = 0, wasted = 0, idleSlots = 0; S.clock(0);
       while (miss.size && T < 300 * 3600) {
         const wx = wxNow(tid);
         /* いまの時間・天気で、まだ足りない種の重みがいちばん多い場所 */
         let best = null, bw = 0;
         for (const pl of places) { const tb = wxTable(pl.f.table, state.time, wx), tot = tb.reduce((a, x) => a + x.w, 0); const w = tb.filter(x => miss.has(x.s)).reduce((a, x) => a + x.w, 0) / (tot || 1); if (w > bw) { bw = w; best = { pl, tb }; } }
-        if (!best) { advanceTime(); T += 120 * P.STEP_S; periods++; stepsInPeriod = 0; continue; } /* 出る種がいない時間帯: 草むらの外を120歩歩いて時間を送る */
+        if (!best) { if (++idleSlots >= 12) { idleSlots = 0; S.hops++; S.clock(T); continue; } /* その日の12コマを見終わっても出ない: 翌日にまた来る */
+          advanceTime(); T += 120 * P.STEP_S; S.clock(T); periods++; stepsInPeriod = 0; continue; }
+        idleSlots = 0; /* 出る種がいない時間帯: 草むらの外を120歩歩いて時間を送る */
         /* 時間帯は120歩で変わる。1戦ぶんの歩数を数えて進める */
         const { pl, tb } = best, n = Math.min(pl.max, wpick([{ w: 6, v: 1 }, { w: 3, v: 2 }, { w: 1, v: 3 }]).v);
         enc++; T += pl.cost; stepsInPeriod += 9.2;
         for (let i = 0; i < n; i++) { const sp = wpick(tb).s; if (miss.has(sp) && Math.random() < q) miss.delete(sp); else if (miss.has(sp)) wasted++; }
-        if (stepsInPeriod >= 120) { advanceTime(); stepsInPeriod = 0; periods++; }
+        S.clock(T); if (stepsInPeriod >= 120) { advanceTime(); stepsInPeriod = 0; periods++; }
       }
-      out.push({ T, enc, periods, left: miss.size });
+      out.push({ T, enc, periods, left: miss.size, days: S.hops + 1 + Math.floor(T / 86400) });
     }
     return { n: L.length, runs: out, list: L.map(x => x.s + (x.tm ? ':' + x.tm : '')) };
   };

@@ -100,7 +100,7 @@ const items = {
         const rows = await page.evaluate(([sp, tw, f, tg, n, seed, bs]) => SIM.wxFind(sp, tw, f, tg, n, seed, bs), [sp, tw, fld, tg, n, SEED, bs]);
         if (!rows) { o[label] = null; continue; }
         const T = rows.map(r => r.T / 60), f = rows.filter(r => r.found).length;
-        o[label] = { n: rows.length, found: f / rows.length, mle: f ? sum(T) / f : null /* 打ち切りを考えた平均(指数分布を仮定: 合計時間÷見つけた回数) */, mean: mean(T), p50: pct(T, .5), p90: pct(T, .9), enc: mean(rows.map(r => r.enc)), waits: mean(rows.map(r => r.waits)) };
+        o[label] = { n: rows.length, found: f / rows.length, mle: f ? sum(T) / f : null /* 打ち切りを考えた平均(指数分布を仮定: 合計時間÷見つけた回数) */, mean: mean(T), p50: pct(T, .5), p90: pct(T, .9), enc: mean(rows.map(r => r.enc)), waits: mean(rows.map(r => r.waits)), days: mean(rows.map(r => r.days)), d7: rows.filter(r => r.found && r.days <= 7).length / rows.length };
       }
       res[`${sp}@${tw}`] = { sp, town: tw, field: fld, ...o };
     }
@@ -165,7 +165,7 @@ const items = {
     for (const tid of order) {
       const r = await page.evaluate(([t, n, seed]) => SIM.regionTime(t, n, seed, .7, 18), [tid, n, SEED]);
       const T = r.runs.map(x => x.T / 60);
-      res[tid] = { species: r.n, list: r.list, p50: pct(T, .5), mean: mean(T), p90: pct(T, .9), enc: mean(r.runs.map(x => x.enc)), periods: mean(r.runs.map(x => x.periods)) };
+      res[tid] = { species: r.n, list: r.list, p50: pct(T, .5), mean: mean(T), p90: pct(T, .9), enc: mean(r.runs.map(x => x.enc)), periods: mean(r.runs.map(x => x.periods)), days: mean(r.runs.map(x => x.days)) };
     }
     return res;
   },
