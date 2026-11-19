@@ -23,6 +23,7 @@ async function open({ w = 390, h = 844 } = {}) {
   page.on('console', m => { if (m.type() === 'error') errors.push('[console] ' + m.text()); });
   await page.goto(`http://localhost:${port}/index.html`);
   await page.waitForFunction(() => typeof state !== 'undefined' && state);
+  await page.evaluate(() => { const R = Date.now.bind(Date); window.dayAt = i => { Date.now = () => R() + i * 864e5; }; });   /* 天気は実際の日付で決まるので、i 日後にずらす */
   await wait(500);
   return { page, ctx, errors, ev: (f, a) => page.evaluate(f, a), close: () => ctx.close() };
 }
@@ -221,11 +222,33 @@ T('T2: 区画の記録(同じ区画は1点だけ)・全区画で100%・金スタ
   eq(r2.pct, 100); eq(r2.stamp, 2); eq(r2.p80, 1, '80%で銀スタンプ'); eq(r2.stars, 3); eq(r2.again, [0, 3], '2回目に再付与された');
   eq(s.errors, []); await s.close();
 });
-T('T2: 全マップで踏破100%が到達可能(歩ける区画が1つ以上、区画に番号がつく)', async () => {
+T('T2: 全マップで、到達できる区画を全部踏むと踏破100%(実際の通行判定 owSolid で解く)', async () => {
   const s = await open(); await startGame(s);
-  const r = await s.ev(() => { const bad = [], skipped = []; for (const id in MAPS) { const m = MAPS[id], fi = footInfo(id); if (!fi.total) bad.push(id);
-      let any = 0; for (let y = 0; y < m.rows.length; y++) for (let x = 0; x < m.rows[y].length; x++) if (!OW_SOLID.includes(m.rows[y][x])) { const i = (y >> 2) * fi.bw + (x >> 2); if (!fi.valid[i]) any++; } if (any) skipped.push(id + ':' + any); } return { n: Object.keys(MAPS).length, bad, skipped }; });
-  eq(r.bad, [], '歩ける区画がないマップ'); console.log(`      ${r.n}マップ / 到達判定で外れたマスがあるマップ: ${r.skipped.length}件 ${r.skipped.slice(0, 8).join(' ')}`);
+  const r = await s.ev(() => {
+    /* ソルバー: しかけは全部解けるものとして(ぬしを倒し、旗が立ち、物は拾い、岩は穴に押し込み、流氷は全位置・潮と夜昼は全部・霧は晴れの時)、
+       入口から実際の owSolid で広げて、立てたマスの全部を踏む */
+    state.owFlags = new Proxy({}, { get: () => true }); TOWNS.forEach(t => state.boss[t.id] = true); state.owItems = new Proxy({}, { get: () => true });
+    const bad = [], rows = []; let n = 0;
+    for (const id in MAPS) {
+      const m = MAPS[id]; n++; state.foot = {}; state.stamps = {};
+      if (m.rocks) { const f = {}; m.rows.forEach((r, y) => [...r].forEach((c, x) => { if (c === 'O') f[x + ',' + y] = true; })); OWC.rk = { map: id, rocks: [], filled: f }; }
+      const orig = owFloatPos; let sel = -1; window.owFloatPos = f => { if (sel < 0) return orig(f); const t = owFloatTiles(f); return t[Math.min(sel, t.length - 1)]; };
+      const mx = Math.max(1, ...(m.floats || []).map(f => owFloatTiles(f).length));
+      state.ow = { map: id, x: m.spawn.x, y: m.spawn.y, dir: 'down' };
+      const okAny = (x, y) => { for (let t = 0; t < 4; t++) { state.time = t; for (sel = m.floats ? 0 : -1; sel < (m.floats ? mx : 0); sel++) if (!owSolid(m, x, y)) { sel = -1; return true; } } sel = -1; return false; };
+      const DN = Date.now; if (m.fogStone) Date.now = () => m.fogStone.per * 1000 + m.fogStone.on + 1;
+      const { seen, R, C } = footReach(id, okAny); Date.now = DN; window.owFloatPos = orig; OWC.rk = null;
+      const fi = footInfo(id), hit = new Set(), tiles = [];
+      for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) if (seen[y * C + x]) { tiles.push([x, y]); hit.add((y >> 2) * fi.bw + (x >> 2)); }
+      let extra = 0, lack = 0; for (let i = 0; i < fi.nb; i++) { if (hit.has(i) && !fi.valid[i]) extra++; if (!hit.has(i) && fi.valid[i]) lack++; }
+      for (const [x, y] of tiles) { state.ow = { map: id, x, y, dir: 'down' }; owFoot(); }
+      const pct = footShow(id);
+      if (!fi.total || pct !== 100 || extra || lack || state.stamps[id] !== 2) bad.push(`${id}:${pct}%(${footCount(id)}/${fi.total}) 数えすぎ${lack} 数え漏れ${extra}`);
+      rows.push(fi.total);
+    }
+    return { n, bad, tot: rows.reduce((a, b) => a + b, 0) };
+  });
+  eq(r.bad, [], '踏み尽くしても100%にならない/到達できない区画を分母に入れている'); console.log(`      ${r.n}マップ 全${r.tot}区画 すべて到達でき、踏むと100%`);
   eq(s.errors, []); await s.close();
 });
 T('T2: しかけスタンプ18種がすべて取れる(関数を呼ぶ + ソースにフックがある)', async () => {
@@ -363,28 +386,45 @@ T('T2/T4: foot・seenAt・stamps を全部埋めても 引き継ぎコード・�
 });
 
 /* ===== T1(空もよう)・T3(きらり) ===== */
-T('T1: 天気は日付+町+wxN で決まり(保存しない)、advanceTime で再抽選される', async () => {
+T('T1: 天気は日付+町+時間帯だけで決まり(保存しない)、ベンチで休んでも(wxNが進んでも)振り直せない', async () => {
   const s = await open(); await goMap(s, 'komorebi');
   const r = await s.ev(() => {
     const a = wxOf('komorebi'), b = wxOf('komorebi'), keys = JSON.parse(JSON.stringify(state));
-    const n0 = state.wxN; advanceTime(); const n1 = state.wxN;
-    const seq = []; for (let i = 0; i < 12; i++) { state.wxN = i; seq.push(wxOf('komorebi')); }
-    return { same: a === b, n0, n1, noSaved: !('wx' in keys) && !('weather' in keys), kinds: new Set(seq).size, f: [wxOf('komorebi', 1), (state.wxN++, state.time = (state.time + 3) % 4, wxOf('komorebi', 1))] };
+    const seq = []; for (let i = 0; i < 12; i++) { dayAt(i); seq.push(wxOf('komorebi')); } dayAt(0);
+    /* 同じ日・同じ時間帯なら、wxN をどれだけ動かしても同じ。4つ進めて(丸1日)から戻ると、次の日の同じ時間帯 */
+    const w0 = wxOf('komorebi'), t0 = state.time; let same = true; for (let i = 0; i < 50; i++) { state.wxN = i * 7; if (wxOf('komorebi') !== w0 || wxNow('komorebi') !== w0) same = false; }
+    const day = []; for (let k = 0; k < 4; k++) { state.time = k; day.push(wxOf('komorebi')); } state.time = t0;
+    const rest = []; for (let i = 0; i < 20; i++) { state.time = 1; const x = wxOf('komorebi'); advanceTime(); advanceTime(); advanceTime(); advanceTime(); rest.push(wxOf('komorebi') === x && state.time === 1); }
+    return { same: a === b && same, noSaved: !('wx' in keys) && !('weather' in keys), kinds: new Set(seq).size, day, rest };
   });
-  ok(r.same, '同じ状態で天気が変わる'); eq(r.n1, r.n0 + 1, 'advanceTime で wxN が進まない'); ok(r.noSaved, '天気を保存している');
-  ok(r.kinds >= 2, '天気が変化しない'); eq(s.errors, []); await s.close();
+  ok(r.same, '同じ状態で天気が変わる / wxN に左右される'); ok(r.noSaved, '天気を保存している'); ok(r.rest.every(x => x), '丸1日休むと(同じ日の)同じ時間帯の天気が変わった');
+  ok(r.kinds >= 2, '天気が変化しない'); eq(r.day.length, 4); eq(s.errors, []); await s.close();
 });
 T('T1: 予報(k=1,2)が、時間を進めたときの天気と一致する', async () => {
   const s = await open(); await goMap(s, 'tengu');
-  const r = await s.ev(() => { let bad = 0; for (let i = 0; i < 40; i++) { state.wxN = i * 3; state.time = i % 4; const f1 = wxOf('tengu', 1), f2 = wxOf('tengu', 2); advanceTime(); if (wxNow('tengu') !== f1) bad++; advanceTime(); if (wxNow('tengu') !== f2) bad++; } return bad; });
+  const r = await s.ev(() => { let bad = 0; for (let i = 0; i < 40; i++) { dayAt(i * 3); state.time = i % 4; const f1 = wxOf('tengu', 1), f2 = wxOf('tengu', 2); advanceTime(); if (wxNow('tengu') !== f1) bad++; advanceTime(); if (wxNow('tengu') !== f2) bad++; } return bad; });
   eq(r, 0, '予報が外れた'); eq(s.errors, []); await s.close();
 });
 T('T1: 各町で天気の割合が表の±3%以内(昼)', async () => {
   const s = await open();
   const r = await s.ev(() => { const out = []; state.time = 1; for (const t of Object.keys(WX_TBL)) { const tb = WX_TBL[t], tot = Object.values(tb).reduce((a, b) => a + b, 0) - (tb.hoshi || 0), N = 4000, cnt = {};
-    for (let i = 0; i < N; i++) { state.wxN = i; const w = wxOf(t); cnt[w] = (cnt[w] || 0) + 1; }
+    for (let i = 0; i < N; i++) { dayAt(i); const w = wxOf(t); cnt[w] = (cnt[w] || 0) + 1; }
     for (const id of WXK) { const exp = id === 'hoshi' ? 0 : (tb[id] || 0) / tot, got = (cnt[id] || 0) / N; if (Math.abs(exp - got) > .03) out.push(`${t}:${id} ${got.toFixed(3)} vs ${exp.toFixed(3)}`); } } return out; });
   eq(r, [], '割合のずれ'); await s.close();
+});
+T('T1: 天気の偏り: どの町でも、各天気が7日のうちに少なくとも1回は出る(星降りは夜だけなので14日で)', async () => {
+  const s = await open();
+  const r = await s.ev(() => {
+    const D = 2000, bad = [], worst = {}, R = Date.now.bind(Date), tab = {};
+    for (const t of Object.keys(WX_TBL)) { tab[t] = []; for (let d = 0; d < D; d++) { dayAt(d); const row = []; for (let tm = 0; tm < 4; tm++) { state.time = tm; row.push(wxOf(t)); } tab[t].push(row); } }
+    dayAt(0);
+    for (const t of Object.keys(WX_TBL)) for (const w of WXK) { if (!WX_TBL[t][w]) continue; const win = w === 'hoshi' ? 14 : 7; let miss = 0, n = 0;
+      for (let d = 0; d + win <= D; d++) { n++; if (!tab[t].slice(d, d + win).some(row => row.includes(w))) miss++; }
+      worst[t + ':' + w] = +(miss / n * 100).toFixed(1); if (miss / n > (w === 'hoshi' ? .05 : .06)) bad.push(`${t}:${w} ${(miss / n * 100).toFixed(1)}%`); }
+    /* 昼の時間帯(0..2)にも、天候限定種が出る日がある: 町ごとの全探索先で、各 天気タグの種が出る日が 20日に1回以上 */
+    return { bad, max: Math.max(...Object.values(worst)) };
+  });
+  eq(r.bad, [], '7日のうちに一度も出ない天気が多い町がある'); console.log(`      7日で欠ける確率の最大 ${r.max}%`); eq(s.errors, []); await s.close();
 });
 T('T1: 星降りは夜だけ。天候限定の7体はその天気の時だけ出現表に入る', async () => {
   const s = await open();
@@ -393,8 +433,8 @@ T('T1: 星降りは夜だけ。天候限定の7体はその天気の時だけ出
     const bad = [], hit = [];
     for (const [sp, [tw, fid, wx, nt]] of Object.entries(lim)) { const f = TOWN[tw].fields.find(x => x.id === fid);
       for (const w of WXK) for (let tm = 0; tm < 4; tm++) { const has = wxTable(f.table, tm, w).some(x => x.s === sp), want = w === wx && (sp === 'kumozumi' ? tm >= 2 : true); if (has !== want) bad.push(`${sp} ${w} t${tm} has=${has}`); if (has) hit.push(sp); } }
-    let star = 0; state.time = 0; for (let i = 0; i < 500; i++) { state.wxN = i; if (wxOf('komorebi') === 'hoshi') star++; }
-    let starN = 0; state.time = 3; for (let i = 0; i < 500; i++) { state.wxN = i; if (wxOf('komorebi') === 'hoshi') starN++; }
+    let star = 0; state.time = 0; for (let i = 0; i < 500; i++) { dayAt(i); if (wxOf('komorebi') === 'hoshi') star++; }
+    let starN = 0; state.time = 3; for (let i = 0; i < 500; i++) { dayAt(i); if (wxOf('komorebi') === 'hoshi') starN++; }
     return { bad, n: new Set(hit).size, star, starN, spl: SPL.slice(-8, -1).map(x => x.id), last: SPL[SPL.length - 1].id };
   });
   eq(r.bad, [], '出現のずれ'); eq(r.n, 7); eq(r.star, 0, '昼に星降り'); ok(r.starN > 0, '夜に星降りが出ない');
@@ -414,9 +454,9 @@ T('T1: 全7体の絵が描け、目が入っている(例外なし・透明で�
 T('T1: 屋外だけ画面効果、霧は5マスの見える範囲、雨は遭遇率1.15倍、音のフック', async () => {
   const s = await open(); await goMap(s, 'komorebi');
   const r = await s.ev(() => { const m = owMap(); const out = { outdoor: owWxOutdoor(m), indoor: owWxOutdoor({ ground: 'floor' }) || owWxOutdoor({ dim: 1 }) || owWxOutdoor({ cave: 1 }) };
-    state.wxN = 0; for (let i = 0; i < 200; i++) { state.wxN = i; if (wxNow('komorebi') === 'kiri') break; } out.kiri = wxNow('komorebi') === 'kiri'; out.limK = owTapLimit(m);
-    for (let i = 0; i < 200; i++) { state.wxN = i; if (wxNow('komorebi') === 'hare') break; } out.limH = owTapLimit(m);
-    for (let i = 0; i < 200; i++) { state.wxN = i; if (wxNow('komorebi') === 'ame') break; }
+    state.wxN = 0; for (let i = 0; i < 200; i++) { dayAt(i); if (wxNow('komorebi') === 'kiri') break; } out.kiri = wxNow('komorebi') === 'kiri'; out.limK = owTapLimit(m);
+    for (let i = 0; i < 200; i++) { dayAt(i); if (wxNow('komorebi') === 'hare') break; } out.limH = owTapLimit(m);
+    for (let i = 0; i < 200; i++) { dayAt(i); if (wxNow('komorebi') === 'ame') break; }
     const a = []; window.ambStart = n => a.push('amb:' + n); window.ambStop = () => a.push('stop'); window.bgmSetMood = o => a.push(JSON.stringify(o)); OWC.wxAk = null; owWxAudio(true); out.audio = a; return out; });
   ok(r.outdoor && !r.indoor, '屋外判定'); ok(r.kiri, '霧が見つからない'); eq(r.limK, 5); eq(r.limH, 99);
   ok(r.audio.includes('amb:rain') && r.audio.some(x => x.includes('"rain":true')), '雨の音: ' + r.audio.join(','));
@@ -448,7 +488,7 @@ T('T3: きらりは遭遇タイルに1つだけ(6〜14マス)・90歩で消え�
 });
 T('T3: きらりの1体目の配分(1万回): 50/30/20 ±2%、色違い率 通常1/150・きらり1/30・星降りきらり1/15', async () => {
   const s = await open(); await goMap(s, 'komorebi');
-  const r = await s.ev(() => { const f = TOWN.komorebi.fields.find(x => x.id === 'aze'); state.time = 3; let wxn = 0; for (let i = 0; i < 500; i++) { state.wxN = i; if (wxNow('komorebi') === 'ame') { wxn = i; break; } }
+  const r = await s.ev(() => { const f = TOWN.komorebi.fields.find(x => x.id === 'aze'); state.time = 3; let wxn = 0; for (let i = 0; i < 500; i++) { dayAt(i); if (wxNow('komorebi') === 'ame') { wxn = i; break; } }
     state.wxN = wxn; const c = { low: 0, metal: 0, wx: 0 }, N = 10000; for (let i = 0; i < N; i++) c[owKirariFoe(f, 'ame', 0, Math.random())[2]]++;
     const hit = (p, n) => { let k = 0; for (let i = 0; i < n; i++) if (Math.random() < p) k++; return k / n; };
     return { low: c.low / N, metal: c.metal / N, wx: c.wx / N, n: hit(owShinyP('hare', false), 60000), k: hit(owShinyP('hare', true), 30000), h: hit(owShinyP('hoshi', true), 20000), p: [owShinyP('hare', false), owShinyP('hare', true), owShinyP('hoshi', true)] }; });
@@ -487,6 +527,19 @@ T('T1: 駅のみちくさ便りが出て、予報どおり(3コマ)', async () =
 const T8_STAGE = s => s.ev(() => { H.starter({ id: 'ibote' }); ui.dlg = null; state.bgm = false; state.sound = false; state.boss = { komorebi: true, kasumi: true }; state.town = 'kasumi'; state.time = 3; window.wxNow = () => 'kiri'; ui.tab = 'map'; ui.station = false; ui.inside = null; ui.toast = ''; state.ow = null; owEnsureState(); render(); });
 const T8_ENTER = s => s.ev(() => { ui.station = true; render(); H.mabo(); ui.dlg = null; document.querySelectorAll('.mabo-fx').forEach(e => e.remove()); });
 const T8_CLOCK = s => s.ev(() => { window.__rd = Date.now.bind(Date); window.__fix = true; window.__T = 0; Date.now = () => window.__fix ? window.__T : window.__rd(); });
+T('T8: 初めて着くまで、駅の札も路線図も「？？駅へ行く」(名前を明かさない)。着いたあとは「まぼろし駅へ行く」', async () => {
+  const s = await open(); await T8_STAGE(s);
+  const r = await s.ev(() => { const o = {}; ui.station = true; render(); const txt = () => [...document.querySelectorAll('[data-act="mabo"]')].map(e => e.textContent + '|' + (e.getAttribute('aria-label') || '')).join(' ## ');
+    o.before = txt(); ui.station = false; ui.tab = 'map'; render(); o.beforeMap = txt(); state.flags.mabo = true; ui.station = true; render(); o.after = txt(); ui.station = false; render(); o.afterMap = txt(); return o; });
+  ok(/？？駅へ行く/.test(r.before) && !/まぼろし/.test(r.before), '初回の駅の札で名前を明かしている: ' + r.before); ok(!/まぼろし/.test(r.beforeMap), '初回の路線図で名前を明かしている: ' + r.beforeMap);
+  ok(/まぼろし駅へ行く/.test(r.after), '着いたあとの札: ' + r.after); eq(s.errors, []); await s.close();
+});
+T('T2: 区画番号は変えていない(旧セーブの foot ビットがそのまま読める)', async () => {
+  const s = await open(); await startGame(s);
+  const r = await s.ev(() => { state.foot = { urayama: '1' + 'f'.repeat(4) }; const fi = footInfo('urayama'); const same = footBit('urayama', 0) && !footBit('urayama', 1) && footBit('urayama', 4) && footBit('urayama', 19) && !footBit('urayama', 20);
+    const a = JSON.stringify(state.foot); migrate(); migrate(); return { same, idem: a === JSON.stringify(state.foot), pct: footShow('urayama'), n: footCount('urayama'), nb: fi.nb }; });
+  ok(r.same, '区画番号とビットの対応が変わった'); ok(r.idem, 'migrate が foot を変えた'); eq(s.errors, []); await s.close();
+});
 T('T8: 入口は 霧×夜×霞ヶ丘撃破 のときだけ(路線図と駅に出る/ほかでは出ない)', async () => {
   const s = await open(); await T8_STAGE(s);
   const r = await s.ev(() => {

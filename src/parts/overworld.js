@@ -2885,21 +2885,43 @@ const FOOT_IN={};let FOOT_IN_OK=false;
 const FOOT_C={};
 function footIn(){if(FOOT_IN_OK)return;FOOT_IN_OK=true;for(const id in MAPS){const w=MAPS[id].warps;if(w)for(const k in w){const v=w[k];(FOOT_IN[v.to]=FOOT_IN[v.to]||[]).push([v.x,v.y]);}}}
 /* 4x4マスの区画に分け、スポーン・入口から歩いて行ける区画だけを数える(結果はキャッシュ) */
-function footInfo(id){
-  if(FOOT_C[id])return FOOT_C[id];
-  const m=MAPS[id],R=m.rows.length,C=Math.max(...m.rows.map(r=>r.length)),bw=Math.ceil(C/4),bh=Math.ceil(R/4);footIn();
+/* 歩いて行ける所を数える: 入口・輪・間欠泉の行き先などから、ok(x,y) が真のマスを広げていく。ok を差しかえれば、実際の通行判定でも同じ数え方ができる(テスト用) */
+function footReach(id,ok){
+  const m=MAPS[id],R=m.rows.length,C=Math.max(...m.rows.map(r=>r.length));footIn();
   const seen=new Uint8Array(R*C),st=[];
-  const ok=(x,y)=>{const ch=(m.rows[y]||'')[x];if(ch===undefined)return false;if(!OW_SOLID.includes(ch))return true;return((ch==='~'||ch==='W')&&(m.floats||m.ground==='snow'))||(ch==='O'&&!!m.rocks)||ch==='+';};
   const add=(x,y)=>{if(x>=0&&y>=0&&x<C&&y<R&&!seen[y*C+x]&&ok(x,y)){seen[y*C+x]=1;st.push(x,y);}};
   if(m.spawn)add(m.spawn.x,m.spawn.y);if(m.station)add(m.station.x,m.station.y);
   (FOOT_IN[id]||[]).forEach(([x,y])=>add(x,y));
   (m.rings||[]).forEach(r=>{add(r[0],r[1]);add(r[2],r[3]);});
   Object.values(m.jumps||{}).forEach(j=>add(j[0],j[1]));
   [m.fallTo,m.tideSafe].forEach(p=>{if(p)add(p.x,p.y);});
-  while(st.length){const y=st.pop(),x=st.pop();add(x+1,y);add(x-1,y);add(x,y+1);add(x,y-1);}
+  const flood=()=>{while(st.length){const y=st.pop(),x=st.pop();add(x+1,y);add(x-1,y);add(x,y+1);add(x,y-1);}};
+  flood();
+  /* トロッコ・カヌー: 線路(+)でつながった乗り場(c)へ運ばれる。線路そのものには立てない。分かれ道は、切りかえで全部行けるものとして数える */
+  if(m.rows.some(r=>r.includes('+'))){for(let again=true;again;){again=false;
+    const rs=new Uint8Array(R*C);
+    for(let y=0;y<R;y++)for(let x=0;x<C;x++)if(seen[y*C+x]&&(m.rows[y]||'')[x]==='c'&&!rs[y*C+x]){const q=[x,y];rs[y*C+x]=1;
+      while(q.length){const cy=q.pop(),cx=q.pop();for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=cx+dx,ny=cy+dy,ch=(m.rows[ny]||'')[nx];
+        if((ch==='+'||ch==='c')&&!rs[ny*C+nx]){rs[ny*C+nx]=1;q.push(nx,ny);if(ch==='c'&&!seen[ny*C+nx]){add(nx,ny);again=true;}}}}}
+    flood();}}
+  return {seen,R,C};
+}
+/* 床の文字・しかけ(流氷・押す岩・トロッコの線路)・建物を見て、しかけが全部解けたときに立てるマスだけを数える(結果はキャッシュ)。区画番号は今までと同じ(4x4マス、左上から) */
+function footInfo(id){
+  if(FOOT_C[id])return FOOT_C[id];
+  const m=MAPS[id],bw=Math.ceil(Math.max(...m.rows.map(r=>r.length))/4),bh=Math.ceil(m.rows.length/4);
+  const fl=new Set();(m.floats||[]).forEach(f=>owFloatTiles(f).forEach(([px,py])=>{for(let i=0;i<(f.w||1);i++)for(let j=0;j<(f.h||1);j++)fl.add((px+i)+','+(py+j));}));
+  const ok=(x,y)=>{const ch=(m.rows[y]||'')[x];if(ch===undefined)return false;
+    if(ch==='O'&&m.rocks){}else if((ch==='~'||ch==='W')&&fl.has(x+','+y)){}else if(OW_SOLID.includes(ch))return false;
+    for(const o of m.objs||[]){const [k,ox,oy,w=1,h=1]=o;   /* しかけ・ぬしで開く物は、開いたものとして数える */
+      if(k==='manhole'||k==='ladder'||k==='shell'||k==='cave'||k==='ring'||k==='fusuma'||k==='shutter'||k==='hyouheki'||k==='coin')continue;
+      if(k==='torii'||k==='barrier'){if(y===oy&&(x===ox||x===ox+w-1))return false;continue;}
+      if(x>=ox&&x<ox+w&&y>=oy&&y<oy+h)return false;}
+    return true;};
+  const {seen,R,C}=footReach(id,ok);
   const nb=bw*bh,valid=new Uint8Array(nb),skip=FOOT_SKIP[id]||[];let total=0;
   for(let y=0;y<R;y++)for(let x=0;x<C;x++)if(seen[y*C+x]){const i=(y>>2)*bw+(x>>2);if(!valid[i]&&!skip.includes(i)){valid[i]=1;total++;}}
-  return FOOT_C[id]={bw,bh,nb,valid,total};
+  return FOOT_C[id]={bw,bh,nb,valid,total,ok};
 }
 function footBit(id,i){const s=state.foot&&state.foot[id];if(!s)return false;return !!(((parseInt(s[i>>2],16)||0)>>(i&3))&1);}
 function footSetBit(id,i,fi){let s=state.foot[id]||'';const n=Math.ceil(fi.nb/4);if(s.length<n)s=s.padEnd(n,'0');const k=i>>2,c=(parseInt(s[k],16)||0)|(1<<(i&3));state.foot[id]=s.slice(0,k)+c.toString(16)+s.slice(k+1);}
@@ -3245,7 +3267,7 @@ function wildCard(t){
 }
 function renderStationIn(){
   const h=renderMap(),cut=h.indexOf('<section class="town-grid">');const t=TOWN[state.town];
-  return `${h.slice(0,cut)}${wxPanel()}${maboOpen()?`<div class="panel stack mabo-note"><h3>？？駅</h3><p class="small">霧の向こうに、知らないホームが見える……</p><div><button class="btn primary" data-act="mabo">まぼろし駅へ行く</button></div></div>`:''}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
+  return `${h.slice(0,cut)}${wxPanel()}${maboOpen()?`<div class="panel stack mabo-note"><h3>${maboName()}</h3><p class="small">霧の向こうに、知らないホームが見える……</p><div><button class="btn primary" data-act="mabo">${maboName()}へ行く</button></div></div>`:''}<div class="panel stack"><h3>${t.name}駅</h3><p class="small muted">電車でほかの駅へ移動できる。歩いて探索できるのは、いまは${TOWNS.filter(x=>MAPS[x.id]).map(x=>x.name).join('・')}(試作)。</p><div class="row"><button class="btn primary" data-act="owExit">駅を出る</button><button class="btn" data-act="mchi">みちくさ帳 <b class="num">${state.mpt||0}点</b></button>${t.id==='komorebi'?`<button class="btn" data-act="sento" ${state.yen>=t.sentoP?'':'disabled'}>${t.sento}(${t.sentoP}円)で回復</button>`:''}</div></div>${wildCard(t)}${reqBoard(t)}`;
 }
 /* 建物の中 */
 function renderInside(){
