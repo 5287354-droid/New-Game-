@@ -147,7 +147,7 @@ const items = {
     const tours = [];
     for (const m of maps) tours.push(await page.evaluate(id => SIM.footTour(id), m.id));
     const order = await page.evaluate(() => TOWNS.map(t => t.id));
-    const BS = 18, rows = tours.filter(Boolean).sort((a, b) => order.indexOf(a.town) - order.indexOf(b.town)).map(t => {
+    const BS = 18, rows = tours.filter(Boolean).sort((a, b) => (order.indexOf(a.town) + 1 || 99) - (order.indexOf(b.town) + 1 || 99))   /* まぼろし駅(town '*')は最後 */.map(t => {
       const sec = params.TOUR_X * (t.steps * params.STEP_S + t.encSteps * t.rate * (BS + .1 * params.REST_S));
       const pts = t.blocks + 10 + 20; /* 区画 +1、80%で+10、100%で+20 */
       return { ...t, sec, pts, stars: 3 };
