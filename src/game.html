@@ -1158,7 +1158,7 @@ function flatPainter(x,o={}){
   const rec=(c,area)=>{if(o.rec)o.rec.push([c,area]);};
   const near=(cx,cy,r)=>o.sup&&o.sup.some(q=>Math.hypot(q[0]-cx,q[1]-cy)<r*U);
   const vol=(make,c0,big,bb,round)=>{rec(c0,(bb[2]-bb[0])*(bb[3]-bb[1]));const c=boost(col(c0));make();
-    if(!big||!hex6(c)){x.fillStyle=c;x.fill();return;}
+    if(o.fast||!big||!hex6(c)){x.fillStyle=c;x.fill();return;}
     const w=bb[2]-bb[0],h=bb[3]-bb[1],cx=(bb[0]+bb[2])/2,cy=(bb[1]+bb[3])/2;let g;
     if(round){const R=Math.max(w,h)*.78;g=x.createRadialGradient(cx-w*.2,cy-h*.26,R*.04,cx-w*.06,cy-h*.08,R);
       g.addColorStop(0,mixc(c,HI,.34));g.addColorStop(.3,mixc(c,HI,.1));g.addColorStop(.62,c);g.addColorStop(.86,mixc(c,SH,.34));g.addColorStop(1,mixc(c,SH,.56));}
@@ -1178,7 +1178,7 @@ function flatPainter(x,o={}){
     l(a,b,c2,d,c,w=1){rec(c,Math.hypot(c2-a,d-b)*w);x.beginPath();x.moveTo(a,b);x.lineTo(c2,d);x.strokeStyle=boost(col(c));x.lineWidth=w;x.lineCap='round';x.stroke();},
     path(pts,c,w=1){x.beginPath();pts.forEach(([a,b],i)=>i?x.lineTo(a,b):x.moveTo(a,b));x.strokeStyle=boost(col(c));x.lineWidth=w;x.lineCap='round';x.lineJoin='round';x.stroke();},
     /* 目: 中心 (cx,cy)・大きさ sz・型 type(系統の型)・dir=1/-1(まぶたの向き。省略時は絵の左右の位置から) */
-    eyeC(cx,cy,sz=1,type,dir,iris){eyes++;if(sz>maxEye)maxEye=sz;const k=st.eyeK*sz*U,ic=o.shiny?'#ffe9a0':(iris||o.iris||'#ffd23a'),t=type||o.eyeType||'slit',D='#0a0c1c';
+    eyeC(cx,cy,sz=1,type,dir,iris){eyes++;if(sz>maxEye)maxEye=sz;if(o.fast){const k=st.eyeK*sz*U,sg=dir||(cx<(o.mid||24*U)?1:-1);x.save();x.translate(cx,cy);x.scale(sg*k/(o.kh||1),k/(o.kv||1));x.fillStyle='#000';x.beginPath();x.ellipse(0,0,2.75,2.3,0,0,7);x.fill();x.beginPath();x.moveTo(-2.4,-.5);x.lineTo(2.3,-1.9);x.lineTo(2.2,-2.6);x.lineTo(-1.6,-1.6);x.fill();x.restore();return;}const k=st.eyeK*sz*U,ic=o.shiny?'#ffe9a0':(iris||o.iris||'#ffd23a'),t=type||o.eyeType||'slit',D='#0a0c1c';
       const s=dir||(cx<(o.mid||24*U)?1:-1);
       let ring=null;try{const m=x.getTransform(),px=Math.round(m.a*cx+m.c*cy+m.e),py=Math.round(m.b*cx+m.d*cy+m.f);const d=x.getImageData(px,py,1,1).data;
         if(d[3]>100&&.2126*d[0]+.7152*d[1]+.0722*d[2]<84)ring=mixc('#'+((1<<24)|(d[0]<<16)|(d[1]<<8)|d[2]).toString(16).slice(1),'#ffffff',.62);}catch(e){}
@@ -1213,32 +1213,42 @@ function flatPainter(x,o={}){
 const SPRC={},ARTINFO={};
 const ASZ=192,ASAFE=12,AFOOT=ASZ-14;
 /* 描く: DRAW を 2 回描いて外形を測り、左右中央・足もとをそろえて自動フィットする */
-function artRender(id,shiny,stg){
+/* 外形の測定は「そうじゅんの絵(グラデ・目なし)」で行い、結果(倍率と位置)は種ごとに覚える。通常形・色違い・影絵で使い回す。
+   ジェネレータにして、段の切れ目で一度止められる(図鑑のスクロール中に長い処理を出さないため) */
+const FITC={};
+function* artRenderGen(id,shiny,stg){
   const N=ASZ,st=ART_STYLE,fam=SP[id]?SP[id].fam:'beast';
   const a=document.createElement('canvas');a.width=a.height=N;const ax=a.getContext('2d',{willReadFrequently:true});
   const is96=!!DRAW96[id],fn=is96?DRAW96[id]:DRAW[id],eyl=EYES[id];
   const opt={min:is96?1.8:1,u:is96?2:1,mid:is96?48:24,iris:IRIS[fam]||'#ffd23a',eyeType:EYET[fam],sup:eyl&&eyl.map(q=>[q[0],q[1]]),shiny,shinyMap:SHINY[id]};
   if(shiny){const tn=SHT[fam]&&SHT[fam][SHREC[id]]||Object.values(SHT[fam]||SHT.beast)[0];opt.recipe=tn;opt.mainH=mainHue(id);}
   let g,err=0;
-  const draw=(s,tx,ty,kh,kv)=>{ax.setTransform(1,0,0,1,0,0);ax.clearRect(0,0,N,N);ax.setTransform(s,0,0,s,tx,ty);ax.translate(N*.05,N*.05);ax.scale(.9,.9);ax.scale(is96?2:4,is96?2:4);ax.scale(kh,kv);
-    opt.kh=kh;opt.kv=kv;g=flatPainter(ax,opt);
+  const draw=(s,tx,ty,kh,kv,fast)=>{ax.setTransform(1,0,0,1,0,0);ax.clearRect(0,0,N,N);ax.setTransform(s,0,0,s,tx,ty);ax.translate(N*.05,N*.05);ax.scale(.9,.9);ax.scale(is96?2:4,is96?2:4);ax.scale(kh,kv);
+    opt.kh=kh;opt.kv=kv;opt.fast=!!fast;g=flatPainter(ax,opt);
     try{const ex=EXTRA[id];if(ex&&ex.back)ex.back(g,stg||0);fn(g,stg||0);if(ex)(typeof ex==="function"?ex:ex.front||(()=>{}))(g,stg||0);if(!g.eyes&&eyl)eyl.forEach(q=>g.eyeC(q[0],q[1],q[2]||1,q[3],q[4],q[5]));}catch(e){err++;}
-    ax.setTransform(1,0,0,1,0,0);artFatten(ax,fat);};
-  const box=()=>{const d=ax.getImageData(0,0,N,N).data;let x0=N,y0=N,x1=0,y1=0;for(let i=0;i<N*N;i++)if(d[i*4+3]>8){const X=i%N,Y=i/N|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}
-    return x1<x0?[0,0,N-1,N-1]:[x0,y0,x1,y1];};
+    ax.setTransform(1,0,0,1,0,0);if(!fast)artFatten(ax,fat);};
+  const box=(fast)=>{const d=ax.getImageData(0,0,N,N).data;let x0=N,y0=N,x1=0,y1=0;for(let i=0;i<N*N;i++)if(d[i*4+3]>8){const X=i%N,Y=i/N|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}
+    return x1<x0?[0,0,N-1,N-1]:fast?[x0-fat,y0-fat,x1+fat,y1+fat]:[x0,y0,x1,y1];};
   const fat=FATX[id]??ART_FAT,M=ASAFE+st.line+fat+1,BOT=AFOOT-st.line-1;
-  /* 1 回目: 半分の大きさで描き、はみ出しても外形を測る。細長い種は縦(横)にふくらませて枠をうめる */
-  draw(.5,N/4,N/4,1,1);let [x0,y0,x1,y1]=box();
-  const asp=(x1-x0+1)/(y1-y0+1),kh=asp<1/1.25?Math.min(ART_STRETCH,1/asp/1.25):1,kv=asp>1.25?Math.min(ART_STRETCH,asp/1.25):1;
-  let sc=.5,tx=N/4,ty=N/4;
-  /* 2〜3 回目: 外形を測って、左右中央・足もと(下端)・余白に合わせて倍率と位置を詰める */
-  for(let it=0;it<3;it++){
-    draw(sc,tx,ty,kh,kv);[x0,y0,x1,y1]=box();
-    const w=x1-x0+1,h=y1-y0+1,ns=Math.min(1.15,sc*Math.min((N-2*M)/w,(BOT-M)/h));
-    tx=N/2-ns*((x0+x1)/2-tx)/sc;ty=BOT-ns*(y1-ty)/sc;sc=ns;}
-  draw(sc,tx,ty,kh,kv);
-  return {a,ax,g,err,sc};
+  let F=FITC[id];
+  if(!F){
+    /* 1 回目: 半分の大きさで描き、はみ出しても外形を測る。細長い種は縦(横)にふくらませて枠をうめる */
+    draw(.5,N/4,N/4,1,1,1);let [x0,y0,x1,y1]=box(1);yield;
+    const asp=(x1-x0+1)/(y1-y0+1),kh=asp<1/1.25?Math.min(ART_STRETCH,1/asp/1.25):1,kv=asp>1.25?Math.min(ART_STRETCH,asp/1.25):1;
+    let sc=.5,tx=N/4,ty=N/4;
+    /* 2〜4 回目: 外形を測って、左右中央・足もと(下端)・余白に合わせて倍率と位置を詰める(動かなくなったら止める) */
+    for(let it=0;it<3;it++){
+      draw(sc,tx,ty,kh,kv,1);[x0,y0,x1,y1]=box(1);
+      const w=x1-x0+1,h=y1-y0+1,ns=Math.min(1.15,sc*Math.min((N-2*M)/w,(BOT-M)/h)),
+        ntx=N/2-ns*((x0+x1)/2-tx)/sc,nty=BOT-ns*(y1-ty)/sc,ok=Math.abs(ns/sc-1)<.004&&Math.abs(ntx-tx)<.5&&Math.abs(nty-ty)<.5;
+      sc=ns;tx=ntx;ty=nty;if(ok)break;yield;}
+    F=FITC[id]={sc,tx,ty,kh,kv};
+    yield;
+  }
+  draw(F.sc,F.tx,F.ty,F.kh,F.kv,0);
+  return {a,ax,g,err,sc:F.sc};
 }
+function artRender(id,shiny,stg){const it=artRenderGen(id,shiny,stg);for(;;){const n=it.next();if(n.done)return n.value;}}
 /* ふくらませ: 細い脚・触角を太らせ、トイ人形のぽってりした外形にする(体の内側は変えず、外ふちの内側へ色を広げる) */
 const ART_FAT=3,ART_STRETCH=1.6;
 function artFatten(ax,FAT){const N=ASZ,t=document.createElement('canvas');t.width=t.height=N;t.getContext('2d').drawImage(ax.canvas,0,0);
@@ -1252,24 +1262,26 @@ function mainHue(id){
   let best=null,bv=0;for(const k in m)if(m[k]>bv){bv=m[k];best=k;}
   const hh=best?hsl(best)[0]:200;MAINC[id]={h:hh,c:best};return hh;
 }
-function sprite(id,sil,shiny){
+function* spriteGen(id,sil,shiny){
   const k=id+(sil?'_s':'')+(shiny&&!sil?'_x':'');
   if(SPRC[k])return SPRC[k];
   if(!DRAW[id]&&!DRAW96[id])return '';
   const N=ASZ,st=ART_STYLE;
-  const r=artRender(id,!!shiny&&!sil,SP[id]&&SP[id].stg||0),a=r.a;
+  const r=yield* artRenderGen(id,!!shiny&&!sil,SP[id]&&SP[id].stg||0),a=r.a;
   const cv=document.createElement('canvas');cv.width=cv.height=N;const ctx=cv.getContext('2d');
   if(sil){const R=4;for(let q=0;q<20;q++)ctx.drawImage(a,Math.cos(q/20*Math.PI*2)*R,Math.sin(q/20*Math.PI*2)*R);
     ctx.globalCompositeOperation='source-in';ctx.fillStyle='#6e7a96';ctx.fillRect(0,0,N,N);ctx.globalCompositeOperation='source-over';
     const b=document.createElement('canvas');b.width=b.height=N;const bx=b.getContext('2d');bx.drawImage(a,0,0);bx.globalCompositeOperation='source-in';bx.fillStyle='#262e42';bx.fillRect(0,0,N,N);ctx.drawImage(b,0,0);
     return SPRC[k]=cv.toDataURL();}
-  artLight(r.ax,st,shiny?RIM_S:RIM_N);
+  yield;artLight(r.ax,st,shiny?RIM_S:RIM_N);yield;
   const out=artOutline(a,st.line,st.lineC,st.inner);
   if(shiny)artShinyFx(out,a);
   ARTINFO[k]={eyes:r.g.eyes,maxEye:r.g.maxEye,fit:r.sc,err:r.err,rim:shiny?"gold":"blue"};
   window.__artCv&&(window.__artCv[k]=out);
+  yield;
   return SPRC[k]=out.toDataURL();
 }
+function sprite(id,sil,shiny){const it=spriteGen(id,sil,shiny);for(;;){const n=it.next();if(n.done)return n.value;}}
 function artLight(ax,st,RC){
   const N=ASZ,im=ax.getImageData(0,0,N,N),d=im.data,H=new Float32Array(N*N),T=new Float32Array(N*N);
   for(let i=0;i<N*N;i++)H[i]=d[i*4+3]/255;
@@ -7446,18 +7458,36 @@ const TLC={komorebi:'#62c46e',kasumi:'#9aa8c4',shiomi:'#35a8e6',tengu:'#c8964a',
 /* 図鑑など数が多い一覧は、絵を「見える順」に遅れて作る(全種そろっても最初の表示が止まらない) */
 const LZPH='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const sprCached=(id,sil,sh)=>!!SPRC[id+(sil?'_s':'')+(sh&&!sil?'_x':'')];
+/* 絵づくりは、1回に約6msぶんだけ進めて、次の回に回す(スクロールや入力を止めない)。見えているものを先に、残りはひまなときに */
+const LZQ={hi:[],lo:[],cur:null,busy:false};
+function lzTick(){
+  const t0=performance.now();
+  while(performance.now()-t0<6){
+    if(!LZQ.cur){
+      let im=null;while(!im&&(LZQ.hi.length||LZQ.lo.length)){const c=LZQ.hi.length?LZQ.hi.pop():LZQ.lo.shift();if(c.isConnected&&c.hasAttribute('data-lz'))im=c;}
+      if(!im){LZQ.busy=false;return;}
+      const [id,sil,sh]=im.getAttribute('data-lz').split('|');im.removeAttribute('data-lz');
+      LZQ.cur={im,gen:spriteGen(id,sil==='1',sh==='1')};
+    }
+    const n=LZQ.cur.gen.next();
+    if(n.done){const c=LZQ.cur;LZQ.cur=null;if(c.im.isConnected)c.im.src=n.value;}
+    else break;
+  }
+  setTimeout(lzTick,4);
+}
+function lzKick(){if(!LZQ.busy){LZQ.busy=true;setTimeout(lzTick,0);}}
 function lazyFill(){
   const list=[...document.querySelectorAll('img[data-lz]')];if(!list.length)return;
-  const fill=im=>{const v=im.getAttribute('data-lz');if(!v||!im.isConnected)return;const [id,sil,sh]=v.split('|');im.removeAttribute('data-lz');im.src=sprite(id,sil==='1',sh==='1');};
+  const fillNow=im=>{const v=im.getAttribute('data-lz');if(!v)return false;const [id,sil,sh]=v.split('|');if(!sprCached(id,sil==='1',sh==='1'))return false;im.removeAttribute('data-lz');im.src=sprite(id,sil==='1',sh==='1');return true;};
   if(lazyFill.io)lazyFill.io.disconnect();
+  LZQ.hi.length=0;LZQ.lo.length=0;
   if(typeof IntersectionObserver==='function'){
-    const io=lazyFill.io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fill(e.target);}}),{rootMargin:'200px'});
+    const io=lazyFill.io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);if(!fillNow(e.target))LZQ.hi.push(e.target);}});lzKick();},{rootMargin:'200px'});
     list.forEach(im=>io.observe(im));
   }
-  /* 見えていないぶんも、ひまなときに1枚ずつ作っておく */
-  let i=0;const tok=lazyFill.tok=(lazyFill.tok||0)+1;
-  const step=()=>{if(lazyFill.tok!==tok)return;let n=0;while(i<list.length&&n<1){const im=list[i++];if(im.isConnected&&im.hasAttribute('data-lz')){fill(im);n++;}}if(i<list.length)setTimeout(step,16);};
-  setTimeout(step,300);
+  /* 見えていないぶんも、ひまなときに作っておく */
+  list.forEach(im=>{if(!fillNow(im))LZQ.lo.push(im);});
+  setTimeout(lzKick,300);
 }
 /* ========== 描画パーツ ========== */
 function seal(spId,size='',known=true,shiny=false,lazy=false){

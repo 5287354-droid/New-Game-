@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DotGothic16&family=Zen+Antique&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
 <style>html,body{margin:0;padding:0}body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
-<script>window.JG_APP=true;window.JG_VER="52b8f6043d";</script>
+<script>window.JG_APP=true;window.JG_VER="300f6c83f9";</script>
 </head><body>
 <style>
 /* Layout: 夜のローカル線。上に路線図、その下に駅名標つきの情景、町の施設と探索先をカードで並べる。戦闘と会話は白い二重枠のRPGウィンドウ */
@@ -1172,7 +1172,7 @@ function flatPainter(x,o={}){
   const rec=(c,area)=>{if(o.rec)o.rec.push([c,area]);};
   const near=(cx,cy,r)=>o.sup&&o.sup.some(q=>Math.hypot(q[0]-cx,q[1]-cy)<r*U);
   const vol=(make,c0,big,bb,round)=>{rec(c0,(bb[2]-bb[0])*(bb[3]-bb[1]));const c=boost(col(c0));make();
-    if(!big||!hex6(c)){x.fillStyle=c;x.fill();return;}
+    if(o.fast||!big||!hex6(c)){x.fillStyle=c;x.fill();return;}
     const w=bb[2]-bb[0],h=bb[3]-bb[1],cx=(bb[0]+bb[2])/2,cy=(bb[1]+bb[3])/2;let g;
     if(round){const R=Math.max(w,h)*.78;g=x.createRadialGradient(cx-w*.2,cy-h*.26,R*.04,cx-w*.06,cy-h*.08,R);
       g.addColorStop(0,mixc(c,HI,.34));g.addColorStop(.3,mixc(c,HI,.1));g.addColorStop(.62,c);g.addColorStop(.86,mixc(c,SH,.34));g.addColorStop(1,mixc(c,SH,.56));}
@@ -1192,7 +1192,7 @@ function flatPainter(x,o={}){
     l(a,b,c2,d,c,w=1){rec(c,Math.hypot(c2-a,d-b)*w);x.beginPath();x.moveTo(a,b);x.lineTo(c2,d);x.strokeStyle=boost(col(c));x.lineWidth=w;x.lineCap='round';x.stroke();},
     path(pts,c,w=1){x.beginPath();pts.forEach(([a,b],i)=>i?x.lineTo(a,b):x.moveTo(a,b));x.strokeStyle=boost(col(c));x.lineWidth=w;x.lineCap='round';x.lineJoin='round';x.stroke();},
     /* 目: 中心 (cx,cy)・大きさ sz・型 type(系統の型)・dir=1/-1(まぶたの向き。省略時は絵の左右の位置から) */
-    eyeC(cx,cy,sz=1,type,dir,iris){eyes++;if(sz>maxEye)maxEye=sz;const k=st.eyeK*sz*U,ic=o.shiny?'#ffe9a0':(iris||o.iris||'#ffd23a'),t=type||o.eyeType||'slit',D='#0a0c1c';
+    eyeC(cx,cy,sz=1,type,dir,iris){eyes++;if(sz>maxEye)maxEye=sz;if(o.fast){const k=st.eyeK*sz*U,sg=dir||(cx<(o.mid||24*U)?1:-1);x.save();x.translate(cx,cy);x.scale(sg*k/(o.kh||1),k/(o.kv||1));x.fillStyle='#000';x.beginPath();x.ellipse(0,0,2.75,2.3,0,0,7);x.fill();x.beginPath();x.moveTo(-2.4,-.5);x.lineTo(2.3,-1.9);x.lineTo(2.2,-2.6);x.lineTo(-1.6,-1.6);x.fill();x.restore();return;}const k=st.eyeK*sz*U,ic=o.shiny?'#ffe9a0':(iris||o.iris||'#ffd23a'),t=type||o.eyeType||'slit',D='#0a0c1c';
       const s=dir||(cx<(o.mid||24*U)?1:-1);
       let ring=null;try{const m=x.getTransform(),px=Math.round(m.a*cx+m.c*cy+m.e),py=Math.round(m.b*cx+m.d*cy+m.f);const d=x.getImageData(px,py,1,1).data;
         if(d[3]>100&&.2126*d[0]+.7152*d[1]+.0722*d[2]<84)ring=mixc('#'+((1<<24)|(d[0]<<16)|(d[1]<<8)|d[2]).toString(16).slice(1),'#ffffff',.62);}catch(e){}
@@ -1227,32 +1227,42 @@ function flatPainter(x,o={}){
 const SPRC={},ARTINFO={};
 const ASZ=192,ASAFE=12,AFOOT=ASZ-14;
 /* 描く: DRAW を 2 回描いて外形を測り、左右中央・足もとをそろえて自動フィットする */
-function artRender(id,shiny,stg){
+/* 外形の測定は「そうじゅんの絵(グラデ・目なし)」で行い、結果(倍率と位置)は種ごとに覚える。通常形・色違い・影絵で使い回す。
+   ジェネレータにして、段の切れ目で一度止められる(図鑑のスクロール中に長い処理を出さないため) */
+const FITC={};
+function* artRenderGen(id,shiny,stg){
   const N=ASZ,st=ART_STYLE,fam=SP[id]?SP[id].fam:'beast';
   const a=document.createElement('canvas');a.width=a.height=N;const ax=a.getContext('2d',{willReadFrequently:true});
   const is96=!!DRAW96[id],fn=is96?DRAW96[id]:DRAW[id],eyl=EYES[id];
   const opt={min:is96?1.8:1,u:is96?2:1,mid:is96?48:24,iris:IRIS[fam]||'#ffd23a',eyeType:EYET[fam],sup:eyl&&eyl.map(q=>[q[0],q[1]]),shiny,shinyMap:SHINY[id]};
   if(shiny){const tn=SHT[fam]&&SHT[fam][SHREC[id]]||Object.values(SHT[fam]||SHT.beast)[0];opt.recipe=tn;opt.mainH=mainHue(id);}
   let g,err=0;
-  const draw=(s,tx,ty,kh,kv)=>{ax.setTransform(1,0,0,1,0,0);ax.clearRect(0,0,N,N);ax.setTransform(s,0,0,s,tx,ty);ax.translate(N*.05,N*.05);ax.scale(.9,.9);ax.scale(is96?2:4,is96?2:4);ax.scale(kh,kv);
-    opt.kh=kh;opt.kv=kv;g=flatPainter(ax,opt);
+  const draw=(s,tx,ty,kh,kv,fast)=>{ax.setTransform(1,0,0,1,0,0);ax.clearRect(0,0,N,N);ax.setTransform(s,0,0,s,tx,ty);ax.translate(N*.05,N*.05);ax.scale(.9,.9);ax.scale(is96?2:4,is96?2:4);ax.scale(kh,kv);
+    opt.kh=kh;opt.kv=kv;opt.fast=!!fast;g=flatPainter(ax,opt);
     try{const ex=EXTRA[id];if(ex&&ex.back)ex.back(g,stg||0);fn(g,stg||0);if(ex)(typeof ex==="function"?ex:ex.front||(()=>{}))(g,stg||0);if(!g.eyes&&eyl)eyl.forEach(q=>g.eyeC(q[0],q[1],q[2]||1,q[3],q[4],q[5]));}catch(e){err++;}
-    ax.setTransform(1,0,0,1,0,0);artFatten(ax,fat);};
-  const box=()=>{const d=ax.getImageData(0,0,N,N).data;let x0=N,y0=N,x1=0,y1=0;for(let i=0;i<N*N;i++)if(d[i*4+3]>8){const X=i%N,Y=i/N|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}
-    return x1<x0?[0,0,N-1,N-1]:[x0,y0,x1,y1];};
+    ax.setTransform(1,0,0,1,0,0);if(!fast)artFatten(ax,fat);};
+  const box=(fast)=>{const d=ax.getImageData(0,0,N,N).data;let x0=N,y0=N,x1=0,y1=0;for(let i=0;i<N*N;i++)if(d[i*4+3]>8){const X=i%N,Y=i/N|0;if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y;}
+    return x1<x0?[0,0,N-1,N-1]:fast?[x0-fat,y0-fat,x1+fat,y1+fat]:[x0,y0,x1,y1];};
   const fat=FATX[id]??ART_FAT,M=ASAFE+st.line+fat+1,BOT=AFOOT-st.line-1;
-  /* 1 回目: 半分の大きさで描き、はみ出しても外形を測る。細長い種は縦(横)にふくらませて枠をうめる */
-  draw(.5,N/4,N/4,1,1);let [x0,y0,x1,y1]=box();
-  const asp=(x1-x0+1)/(y1-y0+1),kh=asp<1/1.25?Math.min(ART_STRETCH,1/asp/1.25):1,kv=asp>1.25?Math.min(ART_STRETCH,asp/1.25):1;
-  let sc=.5,tx=N/4,ty=N/4;
-  /* 2〜3 回目: 外形を測って、左右中央・足もと(下端)・余白に合わせて倍率と位置を詰める */
-  for(let it=0;it<3;it++){
-    draw(sc,tx,ty,kh,kv);[x0,y0,x1,y1]=box();
-    const w=x1-x0+1,h=y1-y0+1,ns=Math.min(1.15,sc*Math.min((N-2*M)/w,(BOT-M)/h));
-    tx=N/2-ns*((x0+x1)/2-tx)/sc;ty=BOT-ns*(y1-ty)/sc;sc=ns;}
-  draw(sc,tx,ty,kh,kv);
-  return {a,ax,g,err,sc};
+  let F=FITC[id];
+  if(!F){
+    /* 1 回目: 半分の大きさで描き、はみ出しても外形を測る。細長い種は縦(横)にふくらませて枠をうめる */
+    draw(.5,N/4,N/4,1,1,1);let [x0,y0,x1,y1]=box(1);yield;
+    const asp=(x1-x0+1)/(y1-y0+1),kh=asp<1/1.25?Math.min(ART_STRETCH,1/asp/1.25):1,kv=asp>1.25?Math.min(ART_STRETCH,asp/1.25):1;
+    let sc=.5,tx=N/4,ty=N/4;
+    /* 2〜4 回目: 外形を測って、左右中央・足もと(下端)・余白に合わせて倍率と位置を詰める(動かなくなったら止める) */
+    for(let it=0;it<3;it++){
+      draw(sc,tx,ty,kh,kv,1);[x0,y0,x1,y1]=box(1);
+      const w=x1-x0+1,h=y1-y0+1,ns=Math.min(1.15,sc*Math.min((N-2*M)/w,(BOT-M)/h)),
+        ntx=N/2-ns*((x0+x1)/2-tx)/sc,nty=BOT-ns*(y1-ty)/sc,ok=Math.abs(ns/sc-1)<.004&&Math.abs(ntx-tx)<.5&&Math.abs(nty-ty)<.5;
+      sc=ns;tx=ntx;ty=nty;if(ok)break;yield;}
+    F=FITC[id]={sc,tx,ty,kh,kv};
+    yield;
+  }
+  draw(F.sc,F.tx,F.ty,F.kh,F.kv,0);
+  return {a,ax,g,err,sc:F.sc};
 }
+function artRender(id,shiny,stg){const it=artRenderGen(id,shiny,stg);for(;;){const n=it.next();if(n.done)return n.value;}}
 /* ふくらませ: 細い脚・触角を太らせ、トイ人形のぽってりした外形にする(体の内側は変えず、外ふちの内側へ色を広げる) */
 const ART_FAT=3,ART_STRETCH=1.6;
 function artFatten(ax,FAT){const N=ASZ,t=document.createElement('canvas');t.width=t.height=N;t.getContext('2d').drawImage(ax.canvas,0,0);
@@ -1266,24 +1276,26 @@ function mainHue(id){
   let best=null,bv=0;for(const k in m)if(m[k]>bv){bv=m[k];best=k;}
   const hh=best?hsl(best)[0]:200;MAINC[id]={h:hh,c:best};return hh;
 }
-function sprite(id,sil,shiny){
+function* spriteGen(id,sil,shiny){
   const k=id+(sil?'_s':'')+(shiny&&!sil?'_x':'');
   if(SPRC[k])return SPRC[k];
   if(!DRAW[id]&&!DRAW96[id])return '';
   const N=ASZ,st=ART_STYLE;
-  const r=artRender(id,!!shiny&&!sil,SP[id]&&SP[id].stg||0),a=r.a;
+  const r=yield* artRenderGen(id,!!shiny&&!sil,SP[id]&&SP[id].stg||0),a=r.a;
   const cv=document.createElement('canvas');cv.width=cv.height=N;const ctx=cv.getContext('2d');
   if(sil){const R=4;for(let q=0;q<20;q++)ctx.drawImage(a,Math.cos(q/20*Math.PI*2)*R,Math.sin(q/20*Math.PI*2)*R);
     ctx.globalCompositeOperation='source-in';ctx.fillStyle='#6e7a96';ctx.fillRect(0,0,N,N);ctx.globalCompositeOperation='source-over';
     const b=document.createElement('canvas');b.width=b.height=N;const bx=b.getContext('2d');bx.drawImage(a,0,0);bx.globalCompositeOperation='source-in';bx.fillStyle='#262e42';bx.fillRect(0,0,N,N);ctx.drawImage(b,0,0);
     return SPRC[k]=cv.toDataURL();}
-  artLight(r.ax,st,shiny?RIM_S:RIM_N);
+  yield;artLight(r.ax,st,shiny?RIM_S:RIM_N);yield;
   const out=artOutline(a,st.line,st.lineC,st.inner);
   if(shiny)artShinyFx(out,a);
   ARTINFO[k]={eyes:r.g.eyes,maxEye:r.g.maxEye,fit:r.sc,err:r.err,rim:shiny?"gold":"blue"};
   window.__artCv&&(window.__artCv[k]=out);
+  yield;
   return SPRC[k]=out.toDataURL();
 }
+function sprite(id,sil,shiny){const it=spriteGen(id,sil,shiny);for(;;){const n=it.next();if(n.done)return n.value;}}
 function artLight(ax,st,RC){
   const N=ASZ,im=ax.getImageData(0,0,N,N),d=im.data,H=new Float32Array(N*N),T=new Float32Array(N*N);
   for(let i=0;i<N*N;i++)H[i]=d[i*4+3]/255;
@@ -3111,6 +3123,184 @@ Object.assign(DRAW,{
 });
 ['harigane','gorodango','umibouzu'].forEach(k=>delete EXTRA[k]);
 ['gintachi','harigane','gorodango','yatsumata','kooriyuurei','tenagaou','hitodama','sagiri','mukadeou','houou','kokonobi','umibouzu'].forEach(k=>delete EYES[k]);
+['gorodango','tenagaou','suzaku','byakko','raiju','tenryu','shinsuzaku','shinbyakko'].forEach(k=>delete EYES[k]);
+['gorodango','tenagaou','suzaku','byakko','raiju','tenryu','shinsuzaku','shinbyakko'].forEach(k=>delete EYES[k]);
+['gorodango','tenagaou','suzaku','byakko','raiju','tenryu','shinsuzaku','shinbyakko'].forEach(k=>delete EYES[k]);
+['gorodango','tenagaou','suzaku','byakko','raiju','tenryu','shinsuzaku','shinbyakko'].forEach(k=>delete EYES[k]);
+['gorodango','tenagaou','suzaku','byakko','raiju','tenryu','shinsuzaku','shinbyakko'].forEach(k=>delete EYES[k]);
+/*A2-START*/
+/* 監査 第2回の作り直し(96px): ゴロダンゴ・テナガオウ・四神(スザク・ビャッコ)・ライジュウ・テンリュウ。
+   真(覚醒)の形は、通常形と同じ関数に stg=1 を渡して育てる(ART_BIBLE 5-3) */
+(()=>{
+const bl=(g,x,y,a,L,w,c)=>{const dx=Math.cos(a),dy=Math.sin(a),px=-dy,py=dx;
+  g.p([[x+px*w*.35,y+py*w*.35],[x+dx*L*.5+px*w,y+dy*L*.5+py*w],[x+dx*L,y+dy*L],[x+dx*L*.5-px*w*.8,y+dy*L*.5-py*w*.8],[x-px*w*.35,y-py*w*.35]],c);};
+const tipbl=(g,x,y,a,L,w,c)=>bl(g,x+Math.cos(a)*L*.46,y+Math.sin(a)*L*.46,a,L*.54,w*.8,c);
+const pince=(g,x,y,a,L,w,o,c,c2)=>{const dx=Math.cos(a),dy=Math.sin(a),P=(u,v)=>[x+dx*u-dy*v,y+dy*u+dx*v];
+  g.e(x,y,w*1.25,w*1.25,c);
+  mfBand(g,[P(0,-w*.6),P(L*.5,-w*1.55),P(L,-w*.9)],w*.9,w*.22,c);
+  mfBand(g,[P(0,w*.6),P(L*.5,w*1.3),P(L*.95,w*.7)],w*.85,w*.2,c2);};
+const bar=(g,s,t,k,c,w)=>{const q=mfAt(s,t);g.l(q.x-q.ty*k,q.y+q.tx*k,q.x+q.ty*k,q.y-q.tx*k,c,w);};
+
+/* ゴロダンゴ: 丸まりかけのダンゴムシ。放射状にかさなる八枚の甲、小さな頭に大きな複眼と短い触角、琥珀色の脚と尾角 */
+DRAW96.gorodango=g=>{
+  const S1='#b4bed2',S2='#8c97ae',D='#2c3144',Am='#e8aa4c',Am2='#b87a2c',H='#eef2fa',Bl='#6a738c';
+  const G=84,top=x=>{const u=(x-52)/(x<52?40:46);return G-54*Math.pow(Math.max(0,1-u*u),x<52?.5:.62);};
+  [22,31,40,49,58,67,76].forEach((x,i)=>{g.l(x,78,x-4+i*.5,92,Am2,3.6);g.e(x-4+i*.5,92,2.6,1.8,D);});
+  g.e(56,82,40,8,Bl);
+  const N=8,xs=Array.from({length:N+1},(_,i)=>12+i*(92-12)/N);
+  for(let i=N-1;i>=0;i--){const xl=xs[i],xr=xs[i+1]+3.2,m=(xl+xr)/2,col=i%2?S1:S2,tp=x=>top(x)-1.4-(i<N-1?0:0);
+    const up=[];for(let k=0;k<=4;k++){const x=xl+(xr-xl)*k/4;up.push([x,tp(x)-Math.sin(k/4*Math.PI)*1.6]);}
+    const lo=[[xr+.8,G-6],[xr-1,G+2],[m,G+4.5],[xl+1,G+2],[xl-.4,G-6]];
+    g.p([[xl-.6,G-14]].concat(up,[[xr+.4,G-12]],lo),col);
+    g.path(up.map(([x,y])=>[x,y+1.8]),i<6?H:S1,1.5);
+    g.path([[xr+.4,tp(xr)],[xr+.8,G-6],[xr-1,G+2]],D,1.8);}
+  g.p([[96,G-34],[104,G-8],[94,G-4]],S2);
+  g.p([[92,G-8],[103,G+2],[92,G+1]],Am2);g.p([[88,G-2],[96,G+9],[86,G+4]],Am);
+  [[13,74],[20,78],[27,80]].forEach(([x,y],i)=>{g.l(x,y,x-5,y+13-i,Am,3.8);g.e(x-5,y+13-i,2.8,1.9,D);});
+  g.e(17,68,15,12.5,S1);g.e(14,63,8,5,H,-.3);
+  g.p([[3,70],[10,66],[12,76],[6,77]],S2);
+  g.p([[2,74],[8,73],[7,80],[2,79]],D);g.p([[5,73],[7.5,73],[6.5,77]],H);
+  g.path([[13,57],[8,46],[10,36],[18,32]],Am,2.6);g.e(18.5,32,2.6,2.6,Am2);
+  g.path([[20,56],[24,46],[32,42],[39,45]],Am,2.6);g.e(39.5,45.3,2.6,2.6,Am2);
+  g.eyeC(12,64,1.05,'compound',1,'#d8f04a');
+};
+
+/* テナガオウ: 王冠の角をいただき、金の関節の剛腕で大きなはさみを振りかざす巨大な甲虫 */
+DRAW96.tenagaou=g=>{
+  const G='#2a8a52',G2='#6adc96',G3='#17583a',Au='#eab92c',Au2='#a87a1a',Aw='#fff0a8',K='#4a3418';
+  LEGS(g,[[56,76,48,92],[68,78,68,94],[80,74,90,90]],K,5);[[47,92],[68,94],[90,90]].forEach(([x,y])=>g.e(x,y,3.6,2.4,K));
+  mfBand(g,[[44,52],[40,36],[32,22],[30,10]],7,5,Au2);g.e(38,34,7.5,7.5,Au2);
+  pince(g,30,8,-1.7,28,5.2,.6,Au2,'#7a5812');
+  g.e(66,58,30,24,G);g.e(58,44,17,8,G2,-.35);g.l(66,35,68,80,G3,1.8);g.l(52,38,50,78,G3,1.3);g.l(80,38,82,78,G3,1.3);
+  g.path([[38,62],[50,78],[70,82],[90,72],[95,56]],Au,2.6);
+  g.p([[84,40],[96,34],[92,50]],Au);
+  g.e(42,52,15,14,'#238048');g.e(38,45,8,5,G2,-.3);
+  g.path([[29,50],[34,63],[48,66],[56,58]],Au,2.8);
+  g.e(24,58,12.5,10.5,G);g.p([[12,58],[6,66],[14,66],[20,62]],Au2);
+  g.p([[28,46],[22,30],[33,42]],Au);g.p([[34,44],[36,22],[44,44]],Au);g.p([[42,44],[54,28],[52,48]],Au);
+  g.p([[35,42],[37,28],[41,42]],Aw);g.e(38,46,2.8,2.8,'#e8302a');
+  mfBand(g,[[42,64],[28,80],[10,74],[6,52]],8.4,6,Au);
+  mfBand(g,[[40,63],[29,76],[12,70]],1.3,1,Aw,8,-2.4);
+  g.e(26,78,8,8,Au2);g.e(25,77,3.8,3.8,Au);
+  pince(g,6,48,-1.6,38,6.4,.6,Au,Au2);
+  g.eyeC(19,55,1.05,'compound',1,'#d8f04a');
+};
+
+/* 羽根の束: 根もとから扇状に重ねる。tips で先の色を変える */
+const fan=(g,x,y,a0,a1,n,L0,L1,w,cols,tips)=>{for(let i=n-1;i>=0;i--){const t=n>1?i/(n-1):0,a=a0+(a1-a0)*t,L=L0+(L1-L0)*t,c=cols[i%cols.length];
+  bl(g,x,y,a,L,w,c);if(tips)tipbl(g,x,y,a,L,w,tips[i%tips.length]);}};
+
+/* スザク/真・スザク: 長い尾羽を流し、翼を高く広げる朱の鳥。stg=1 で翼が二段になり、冠羽と尾羽が増え、背に金の輪を負う */
+const suzaku=(g,s)=>{
+  const R1='#d8281e',R2='#f2541e',O='#ff9a2a',Y='#ffd84a',M='#9c1238',Au='#f2b72a';
+  if(s)g.path(Array.from({length:21},(_,i)=>{const a=-2.95+i*.13;return [52+Math.cos(a)*50,40+Math.sin(a)*50];}),Au,3.4);
+  const tails=s?[[[50,56],[70,66],[84,82],[86,100]],[[50,56],[64,74],[68,92],[60,106]],[[50,56],[78,60],[98,70],[104,88]],[[50,56],[56,78],[44,96],[30,104]],[[50,56],[82,52],[104,50],[112,60]]]:[[[50,56],[68,66],[80,82],[82,96]],[[50,56],[62,72],[62,90],[54,100]],[[50,56],[76,60],[92,68],[98,82]]];
+  tails.forEach((P,i)=>{const c=[R2,O,R1,Y,M][i%5];const sg=mfBand(g,P,5.4,1.1,c);const e=P[P.length-1],q=mfAt(sg,.98),a=Math.atan2(q.ty,q.tx);bl(g,e[0]-Math.cos(a)*9,e[1]-Math.sin(a)*9,a,16,5,Y);});
+  const wing=(sx,sy,wx,wy,a0,a1,n,L,w,cols,tips,sec)=>{
+    fan(g,(sx+wx)/2,(sy+wy)/2,sec[0],sec[1],4,sec[2],sec[2]*.7,w*.9,cols,tips);
+    fan(g,wx,wy,a0,a1,n,L,L*.78,w,cols,tips);
+    mfBand(g,[[sx,sy],[(sx+wx)/2-4,(sy+wy)/2],[wx,wy]],7,5,cols[1]);};
+  wing(46,42,36,2,-2.5,-1.55,s?6:5,s?44:36,s?9:8,[M,R1],[R2,O],[-1.9,-1.1,26]);
+  g.l(46,60,50,76,Au,3.2);g.l(54,60,60,74,Au,3.2);[[50,76],[60,74]].forEach(([x,y])=>{g.p([[x-3,y],[x+4,y-1],[x+8,y+5],[x+2,y+4]],'#fff0a8');});
+  g.e(46,48,19,14.5,R1,-.3);g.e(40,54,11,8,O);g.e(38,56,6,4,Y);
+  mfBand(g,[[38,44],[30,36],[26,30]],8,5.6,R1);
+  g.e(24,27,11,9.5,R2,-.2);g.e(21,23,5,3,O,-.3);
+  g.p([[17,22],[-2,28],[17,35]],'#ff6a2a');g.p([[17,22],[2,27],[17,28]],'#ffb04a');g.l(2,28,17,29,'#a8301a',1.8);
+  const cr=s?[[-1.25,32,5],[-.95,28,5],[-.65,24,4.5],[-.35,20,4.2],[-.05,16,3.8],[-1.55,26,4.5]]:[[-1.15,24,4.5],[-.8,22,4.2],[-.45,19,4]];
+  cr.forEach(([a,L,w],i)=>{bl(g,30,19,a,L,w,[Y,O,R2][i%3]);});
+  if(s){g.p([[24,17],[26,6],[30,16],[34,4],[35,18]],Au);g.e(30,18,2.6,2.6,'#ff4a6a');}
+  wing(52,44,80,6,-1.95,.1,s?9:7,s?58:48,s?10:9,[R1,R2,O],[O,Y,Y],[.2,1.2,s?40:32]);
+  if(s)wing(54,46,96,34,-1.3,.5,6,40,8,[M,R1],[R2,O],[.6,1.3,20]);
+  g.e(52,44,10,8,R2,-.2);g.e(50,42,6,4,O,-.3);
+  g.eyeC(20,25,1.05,'round',1,'#ffe04a');
+};
+DRAW96.suzaku=g=>suzaku(g,0);DRAW96.shinsuzaku=g=>suzaku(g,1);
+
+/* ビャッコ/真・ビャッコ: たてがみを逆立てる白い獣。深いかみ跡の青い縞、長い牙。stg=1 でたてがみが背へ流れ、肩に風の翼、額に金の角 */
+const byakko=(g,s)=>{
+  const W='#f4f6fb',W2='#c4d0e6',Bl='#2f6ee0',B2='#8ad0ff',Dk='#8794b4',Au='#f2c53a';
+  const tl=[[84,50],[94,40],[93,24],[82,16]];
+  const tsg=mfBand(g,tl,5.6,3.2,W);[.25,.5,.75].forEach(t=>bar(g,tsg,t,5,Bl,2.4));
+  bl(g,82,16,-2.6,14,5,B2);
+  if(s){const t2=[[84,52],[96,56],[102,70],[96,84]];mfBand(g,t2,5,2.6,W2);bl(g,96,84,2.2,14,5,B2);}
+  [[32,58,34,72,28,89],[72,58,82,72,78,89]].forEach(([a,b,c,d,e,f])=>{mfBand(g,[[a,b],[c,d],[e,f]],6,4.2,Dk);g.e(e-2,f+1.5,6.5,3.6,Dk);});
+  mfBand(g,[[26,54],[44,48],[62,48],[78,52]],t=>14-3*Math.sin(t*Math.PI)+(t>.6?2:0),0,W);
+  g.e(50,62,22,7,W2);
+  [[40,41,7],[49,40,9],[58,40,9],[67,41,8],[75,44,8]].forEach(([x,y,h])=>g.p([[x,y],[x+6.4,y+.5],[x+2,y+h+6]],Bl));
+  [[74,52,10],[80,56,10],[84,62,8]].forEach(([x,y,h])=>g.p([[x,y],[x+4,y],[x+1,y+h]],Bl));
+  g.e(73,62,14,16,W);mfBand(g,[[74,72],[84,82],[78,91]],6.6,4.6,W);g.e(75,92,8.5,4,W);
+  [[70,92],[75,92],[80,92]].forEach(([x,y])=>g.p([[x-1.2,y],[x+1.8,y],[x,y+4]],B2));
+  g.e(36,60,13,15,W);mfBand(g,[[36,68],[30,80],[25,91]],7,5.4,W);g.e(22,92,8.5,4,W);
+  [[17,92],[22,92],[27,92]].forEach(([x,y])=>g.p([[x-1.2,y],[x+1.8,y],[x,y+4]],B2));
+  const cx=32,cy=46,n=s?15:11;
+  for(let i=0;i<n;i++){const a=-2.85+i*(4.5/(n-1)),L=(s?30:24)+((i%2)*7)+(s&&i<6?8:0);bl(g,cx,cy,a,L,s?9:8,i%2?'#5a9cf0':B2);}
+  if(s){fan(g,44,38,-.3,-.95,5,48,32,9,[W,B2],[B2,W]);bl(g,36,34,-2.3,24,7,W2);bl(g,60,34,-1.1,40,8,B2);bl(g,66,36,-.75,34,7,W);}
+  for(let i=0;i<(s?7:6);i++){const a=-2.4+i*(s?.6:.7);bl(g,cx+4,cy+2,a,(s?19:15)+(i%2)*4,6,i%2?W2:W);}
+  g.e(22,48,16,14,W);g.e(8,55,10,7.2,W);g.e(1.5,53,3.4,2.6,'#e87a8a');g.e(18,58,11,5,W2);
+  g.p([[12,38],[8,20],[24,35]],W);g.p([[13,35],[11,25],[20,34]],B2);
+  g.p([[5,58],[7,68],[11,58]],'#ffffff');g.p([[12,59],[14,67],[17,58]],'#ffffff');
+  g.path([[27,40],[22,45],[24,54]],Bl,2.4);g.path([[14,41],[9,45]],Bl,2);
+  if(s){g.p([[19,36],[17,20],[24,34]],Au);g.p([[20,33],[19,24],[22,33]],'#fff0a8');}
+  g.eyeC(15,44,1.1,'slit',1,'#ffc23a');
+};
+DRAW96.byakko=g=>byakko(g,0);DRAW96.shinbyakko=g=>byakko(g,1);
+
+/* ライジュウ: 稲妻をまとって空をかける長い胴の獣。背のぎざぎざ、白い面の筋、大きな稲妻の尾 */
+DRAW96.raiju=g=>{
+  const N='#3c4c7c',N2='#252f58',N3='#6a7cb4',Y='#ffe04a',Y2='#ffa82a',Wh='#f6f8ff';
+  const z=[[74,44],[90,34],[82,28],[98,14],[90,14],[96,0]];
+  for(let i=0;i<z.length-1;i++){g.l(z[i][0],z[i][1],z[i+1][0],z[i+1][1],Y2,9);}
+  for(let i=0;i<z.length-1;i++){g.l(z[i][0],z[i][1],z[i+1][0],z[i+1][1],Y,5.4);}
+  for(let i=0;i<z.length-1;i++){g.l(z[i][0],z[i][1],z[i+1][0],z[i+1][1],Wh,1.8);}
+  mfBand(g,[[68,52],[78,64],[92,70]],5.4,3.4,N2);mfBand(g,[[62,54],[68,68],[82,78]],5.8,3.6,N);
+  [[92,70],[82,78]].forEach(([x,y])=>{g.p([[x,y-3],[x+8,y],[x,y+3]],Y);});
+  const B=[[30,46],[44,56],[60,54],[76,42]];
+  const sg=mfBand(g,B,t=>11-3*t,0,N);
+  mfBand(g,[[32,50],[44,59],[58,57]],3,2,N3,8,-3.4);
+  for(let t=.1;t<.95;t+=.1){const q=mfAt(sg,t),w=11-3*t;g.p([[q.x-q.tx*3+q.ty*w,q.y-q.ty*3-q.tx*w],[q.x+q.tx*2.4+q.ty*(w+8),q.y+q.ty*2.4-q.tx*(w+8)],[q.x+q.tx*3+q.ty*w,q.y+q.ty*3-q.tx*w]],t>.5?Y:Y2);}
+  mfBand(g,[[40,58],[30,70],[16,76]],5.6,3.6,N2);mfBand(g,[[34,56],[26,66],[10,68]],6,3.8,N);
+  [[10,68],[16,76]].forEach(([x,y])=>{g.p([[x+2,y-3],[x-7,y],[x+2,y+3]],Y);});
+  [[-2.6,22],[-2.2,26],[-1.8,24],[-1.45,22]].forEach(([a,L],i)=>bl(g,36,40,a,L,6,i%2?Y2:Y));
+  g.e(28,42,14,11.5,N,-.2);g.e(14,47,8,5.6,N3,.15);g.e(7,48,2.6,2.2,'#101426');
+  g.p([[24,32],[22,16],[34,30]],N);g.p([[25,30],[24,21],[30,30]],Y2);
+  g.p([[34,36],[44,26],[40,40]],N2);
+  mfBand(g,[[30,32],[22,38],[12,44]],3.4,1.6,Wh);
+  g.p([[28,50],[22,62],[36,54]],Y);g.p([[34,52],[32,64],[42,56]],Y2);
+  g.l(8,52,16,52,'#101426',1.8);g.p([[10,52],[11,56],[13,52]],Wh);
+  g.eyeC(20,40,1.1,'glow',1,'#ffe27a');
+};
+
+/* テンリュウ: 長い胴をうねらせて雷雲をかける竜。骨ばった大きな翼、二本の角、ひげ、先が稲妻になったしっぽ */
+DRAW96.tenryu=g=>{
+  const B='#2e4a9a',B2='#5a7ae0',B3='#1a2866',Cy='#3ac8ff',Y='#ffe04a',Bn='#ece0b0',Mb='#3a52b0';
+  const wing=(sx,sy,wx,wy,tips,c,cm)=>{
+    g.p([[sx,sy],[wx,wy]].concat(tips).concat([[sx+(wx-sx)*.1,sy+22]]),cm);
+    tips.forEach(([x,y])=>{g.l(wx,wy,x,y,c,2.8);});
+    mfBand(g,[[sx,sy],[(sx+wx)/2-6,(sy+wy)/2-2],[wx,wy]],5,3.4,c);g.e(wx,wy,4.4,4.4,Bn);};
+  wing(54,58,58,6,[[38,2],[34,24],[44,44]],B3,'#2a3c8a');
+  const P=[[14,22],[18,38],[32,52],[52,62],[72,68],[88,82],[96,96]];
+  const wd=t=>t<.2?7+t*10:Math.max(1.5,10-t*9.5);
+  const sg=mfBand(g,P,wd,0,B);
+  mfBand(g,[[17,28],[21,41],[34,55],[53,66]],1.8,1.4,B2,8,-3.4);
+  for(let t=.14;t<.82;t+=.07){const q=mfAt(sg,t),w=Math.max(2,wd(t));g.l(q.x-q.ty*w*.85,q.y+q.tx*w*.85,q.x+q.ty*w*.85,q.y-q.tx*w*.85,Bn,1.8);}
+  for(let t=.08;t<.6;t+=.085){const q=mfAt(sg,t),w=wd(t);g.p([[q.x+q.ty*w-q.tx*2.6,q.y-q.tx*w-q.ty*2.6],[q.x+q.ty*(w+8)+q.tx*3,q.y-q.tx*(w+8)+q.ty*3],[q.x+q.ty*w+q.tx*3.4,q.y-q.tx*w+q.ty*3.4]],Cy);}
+  const z=[[96,96],[88,90],[96,84],[90,76]];
+  bl(g,94,98,.4,12,6,Y);
+  mfBand(g,[[30,52],[22,66],[12,74]],5.4,3.6,B3);g.p([[14,71],[4,75],[14,78]],Y);
+  mfBand(g,[[66,66],[74,80],[64,88]],5.8,3.8,B);g.p([[64,85],[54,89],[64,92]],Y);
+  wing(66,60,90,12,[[98,22],[98,44],[88,56]],B,Mb);
+  g.p([[66,60],[90,12],[94,40]],'#5a7ae0');
+  mfBand(g,[[26,10],[36,4],[46,0]],3.2,.8,Bn);mfBand(g,[[22,12],[28,0],[38,-6]],3.2,.8,Bn);
+  g.p([[24,22],[14,6],[28,16]],Cy);
+  g.e(18,24,13,10.5,B2,.15);g.e(7,31,8,5,B2);g.e(2,31,2.2,2,'#101426');
+  g.p([[4,35],[7,44],[10,35]],'#ffffff');
+  mfBand(g,[[7,33],[-1,40],[-5,50]],2,1.1,Cy);mfBand(g,[[11,35],[6,44],[3,54]],2,1.1,Cy);
+  g.l(9,32,17,30,B3,1.8);
+  g.eyeC(15,21,1.1,'slit',1,'#ff6a3a');
+};
+})();
+/*A2-END*/
+['gorodango','tenagaou','suzaku','byakko','raiju','tenryu','shinsuzaku','shinbyakko'].forEach(k=>delete EYES[k]);
 /*MF-END*/
 /* 色違いの配色の型(tools/art_assign.js が系統ごとに3種をめぐらせて割り当てた) */
 Object.assign(SHREC,{
@@ -7282,18 +7472,36 @@ const TLC={komorebi:'#62c46e',kasumi:'#9aa8c4',shiomi:'#35a8e6',tengu:'#c8964a',
 /* 図鑑など数が多い一覧は、絵を「見える順」に遅れて作る(全種そろっても最初の表示が止まらない) */
 const LZPH='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 const sprCached=(id,sil,sh)=>!!SPRC[id+(sil?'_s':'')+(sh&&!sil?'_x':'')];
+/* 絵づくりは、1回に約6msぶんだけ進めて、次の回に回す(スクロールや入力を止めない)。見えているものを先に、残りはひまなときに */
+const LZQ={hi:[],lo:[],cur:null,busy:false};
+function lzTick(){
+  const t0=performance.now();
+  while(performance.now()-t0<6){
+    if(!LZQ.cur){
+      let im=null;while(!im&&(LZQ.hi.length||LZQ.lo.length)){const c=LZQ.hi.length?LZQ.hi.pop():LZQ.lo.shift();if(c.isConnected&&c.hasAttribute('data-lz'))im=c;}
+      if(!im){LZQ.busy=false;return;}
+      const [id,sil,sh]=im.getAttribute('data-lz').split('|');im.removeAttribute('data-lz');
+      LZQ.cur={im,gen:spriteGen(id,sil==='1',sh==='1')};
+    }
+    const n=LZQ.cur.gen.next();
+    if(n.done){const c=LZQ.cur;LZQ.cur=null;if(c.im.isConnected)c.im.src=n.value;}
+    else break;
+  }
+  setTimeout(lzTick,4);
+}
+function lzKick(){if(!LZQ.busy){LZQ.busy=true;setTimeout(lzTick,0);}}
 function lazyFill(){
   const list=[...document.querySelectorAll('img[data-lz]')];if(!list.length)return;
-  const fill=im=>{const v=im.getAttribute('data-lz');if(!v||!im.isConnected)return;const [id,sil,sh]=v.split('|');im.removeAttribute('data-lz');im.src=sprite(id,sil==='1',sh==='1');};
+  const fillNow=im=>{const v=im.getAttribute('data-lz');if(!v)return false;const [id,sil,sh]=v.split('|');if(!sprCached(id,sil==='1',sh==='1'))return false;im.removeAttribute('data-lz');im.src=sprite(id,sil==='1',sh==='1');return true;};
   if(lazyFill.io)lazyFill.io.disconnect();
+  LZQ.hi.length=0;LZQ.lo.length=0;
   if(typeof IntersectionObserver==='function'){
-    const io=lazyFill.io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fill(e.target);}}),{rootMargin:'200px'});
+    const io=lazyFill.io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);if(!fillNow(e.target))LZQ.hi.push(e.target);}});lzKick();},{rootMargin:'200px'});
     list.forEach(im=>io.observe(im));
   }
-  /* 見えていないぶんも、ひまなときに1枚ずつ作っておく */
-  let i=0;const tok=lazyFill.tok=(lazyFill.tok||0)+1;
-  const step=()=>{if(lazyFill.tok!==tok)return;let n=0;while(i<list.length&&n<1){const im=list[i++];if(im.isConnected&&im.hasAttribute('data-lz')){fill(im);n++;}}if(i<list.length)setTimeout(step,16);};
-  setTimeout(step,300);
+  /* 見えていないぶんも、ひまなときに作っておく */
+  list.forEach(im=>{if(!fillNow(im))LZQ.lo.push(im);});
+  setTimeout(lzKick,300);
 }
 /* ========== 描画パーツ ========== */
 function seal(spId,size='',known=true,shiny=false,lazy=false){
