@@ -767,6 +767,11 @@ body.bshake2 .battle{animation:bshk2 .42s linear}
 .rwn1 b{font:700 38px/1 var(--f-num);color:var(--ink);--n:var(--to);counter-reset:n var(--n);animation:cntup calc(.7s*var(--k,1)) ease-out both;animation-delay:calc(var(--d) - var(--el))}
 .rwn1 b::after{content:counter(n)}
 .rwn1.yenc b{color:var(--accent)}.rwn1.yenc b::after{content:counter(n) "円";font-size:.6em}
+.rwgoal{display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--line2);padding-top:8px;animation:rwin calc(.3s*var(--k,1)) ease-out both;animation-delay:calc(var(--d) - var(--el))}
+.rwgoal h4{margin:0;font:700 12px var(--f-disp);letter-spacing:.14em;color:var(--tl)}
+.rwg{display:flex;gap:8px;align-items:baseline;font:700 13px/1.4 var(--f-disp);color:var(--ink)}
+.rwg em{flex:none;min-width:4.6em;font:700 11px var(--f-disp);font-style:normal;background:var(--panel2);padding:2px 6px;border-radius:2px;color:var(--muted);text-align:center}
+.rwg b{color:var(--accent);font-size:15px}
 @keyframes cntup{from{--n:0}to{--n:var(--to)}}
 .bonus{align-self:center;background:var(--tl);color:#111;font-size:14px;padding:3px 9px;border-radius:3px;animation:lvpop .4s both;animation-delay:calc(var(--d) - var(--el))}
 .rwcards{display:flex;flex-direction:column;gap:6px}
@@ -7927,7 +7932,8 @@ function win(){
   if(fledOnly&&!B.boss&&!B.cup&&!B.tower&&!B.rival&&!B.trainer&&!state.kirari)state.kirariDue=30;   /* メタルに逃げられた救済: 30歩以内にきらりが出る */
   let exp=0,yen=0;
   for(const c of def){const r=SP[c.mon.sp].rank,lv=c.mon.lv;exp+=Math.floor(3.5*Math.pow(lv,1.5)*(1+.25*r)*(c.boss?3:B.trainer?1.5:1)*(SP[c.mon.sp].expx||1));yen+=Math.floor(lv*2.5*(1+.3*r))+ri(0,5);}
-  const dm=def.length?detourMul():1;if(dm>1){exp=Math.floor(exp*dm);yen=Math.floor(yen*dm);}
+  const dm=def.length?detourMul():1,exp0=exp,yen0=yen;if(dm>1){exp=Math.floor(exp*dm);yen=Math.floor(yen*dm);}
+  const bonusX={exp:exp-exp0,yen:yen-yen0,wild:!B.boss&&!B.cup&&!B.tower&&!B.rival&&!B.trainer};
   const BB=B.boss?(B.ura?TOWN[B.town].ura:TOWN[B.town].boss):null;
   if(BB)yen+=B.wild?Math.floor(BB.reward*(1+.5*B.wild)):BB.reward;
   syncAllies();
@@ -7976,7 +7982,7 @@ function win(){
   const news=[];for(const c of B.enemies){const id=c.mon.sp;if(news.some(n=>n.id===id))continue;const no=SPL.indexOf(SP[id])+1;
     if(!B.seen0[id])news.push({id,no,own:!!state.owned[id]});else if(!B.own0[id]&&state.owned[id])news.push({id,no,own:true,again:true});}
   const head=!def.length?(B.enemies.some(c=>c.fled)?'逃げられた……':'スカウト成功！'):'勝利！';
-  const rw={head,exp:def.length?exp:0,yen,bonus:dm>1?Math.round((dm-1)*100):0,drops:rwDrops,news,mem,stars:(state.stars||0)-B.stars0};
+  const rw={head,exp:def.length?exp:0,yen,bonus:dm>1?Math.round((dm-1)*100):0,bonusX,drops:rwDrops,news,mem,stars:(state.stars||0)-B.stars0};
   B.result={win:!fledOnly,flee:fledOnly,lines,rw};save();
   const up=mem.some(x=>x.lv1>x.lv0);if(!fledOnly)jingle('win');
   if(up)rwSfx(rwPlan(rw).up,'lvup');
@@ -7984,6 +7990,19 @@ function win(){
 }
 /* 結果画面の演出の時間割(ms, はやさに合わせて縮む)。rwPlan は画面と音の両方が使う */
 const bspdK=()=>BSPD[state.bspd==null?1:state.bspd];
+/* 結果画面の「次の目標」: 数値は変えず、報酬が何につながるかを見せる */
+function rwGoals(rw,st){
+  const g=[],own=dexList().filter(x=>state.owned[x.id]).length;
+  const ms=DEX_MS.filter(x=>!state.dexClaim[dexKey(x)]).sort((a,b)=>a.n-b.n)[0];
+  if(ms)g.push(['図鑑',own>=ms.n?`記念品を受け取れる（${ms.n}種）。図鑑タブへ`:`記念品まで あと <b class="num">${ms.n-own}</b>種（${own}/${ms.n}種）`]);
+  const t=TOWN[state.town];
+  if(t&&!(state.dexReg&&state.dexReg[state.town])){try{const rs=regStat(state.town);if(rs.all>0)g.push(['地域',`${t.name}の図鑑コンプまで あと <b class="num">${rs.all-rs.own}</b>種（${rs.own}/${rs.all}種）`]);}catch(e){}}
+  const mp=state.mpt||0,mx=MEX.filter(x=>mexLeft(x)&&x.pt>mp).sort((a,b)=>a.pt-b.pt)[0];
+  g.push(['みちくさ点',`<b class="num">${mp}</b>点`+(mx?` ・ 「${mx.n}」まで あと <b class="num">${mx.pt-mp}</b>点`:'')]);
+  if(rw.bonusX&&rw.bonusX.wild){const d=Math.min(5,state.detour||0);
+    g.push(['寄り道',d>=5?'<b class="num">5</b>段（最大）。野生戦の経験値と円が +50%':`<b class="num">${d}</b>段 ・ あと <b class="num">${(d+1)*10-(state.detourN||0)}</b>区画で ${d+1}段。野生戦の経験値と円が +${(d+1)*10}%に。町にもどると 0段`]);}
+  return `<div class="rwgoal" ${st}><h4>次の目標</h4>${g.map(([k,v])=>`<div class="rwg"><em>${k}</em><span>${v}</span></div>`).join('')}</div>`;
+}
 function rwPlan(rw){
   const cards=(rw.drops||[]).length+(rw.news||[]).length+(rw.stars>0?1:0),C0=1750,GAP=420;
   return {bar:300,up:950,yen:1000,c0:C0,gap:GAP,total:C0+GAP*cards+300};
@@ -8045,7 +8064,7 @@ function rwPanel(){
     return `<div class="rwm ${up?'up':''}" ${S(t)}>${seal(m.sp,'sm',true,m.shiny)}<div class="rwi"><div class="rwn"><b>${esc(m.name)}</b><span class="num">Lv${m.lv0}</span>${up?`<span class="lvup num" ${S(P.up+i*120)}>LEVEL UP Lv${m.lv1}</span>`:''}</div>
       <div class="xpbar"><i class="${up?'xu':'xa'}" ${S(t+120,`--a:${m.p0}%;--b:${m.p1}%`)}></i></div>
       ${m.sk.length?`<div class="rwsk" ${S(P.up+300)}>${m.sk.map(n=>`「${esc(n)}」を覚えた`).join(' ・ ')}</div>`:''}</div></div>`;}).join('');
-  const nums=`<div class="rwnums">${rw.exp>0?`<div class="rwn1"><small>経験値</small><b class="cnt num" ${S(P.bar+100,`--to:${rw.exp}`)}> </b></div>`:''}<div class="rwn1 yenc"><small>円</small><b class="cnt num" ${S(P.yen,`--to:${rw.yen}`)}> </b></div>${rw.bonus>0?`<span class="bonus num" ${S(P.yen+500)}>寄り道 +${rw.bonus}%</span>`:''}</div>`;
+  const nums=`<div class="rwnums">${rw.exp>0?`<div class="rwn1"><small>経験値</small><b class="cnt num" ${S(P.bar+100,`--to:${rw.exp}`)}> </b></div>`:''}<div class="rwn1 yenc"><small>円</small><b class="cnt num" ${S(P.yen,`--to:${rw.yen}`)}> </b></div>${rw.bonus>0?`<span class="bonus num" ${S(P.yen+500)}>寄り道 +${rw.bonus}%（${rw.bonusX&&rw.bonusX.exp>0?`経験値+${rw.bonusX.exp}・`:''}+${rw.bonusX?rw.bonusX.yen:0}円）</span>`:''}</div>`;
   let i=0;const cards=[];
   const card=(cls,tag,txt)=>cards.push(`<div class="rwc ${cls}" ${S(P.c0+P.gap*(i++))}><em>${tag}</em><span>${txt}</span></div>`);
   for(const n of rw.news)card('news',n.again?'なかま':'図鑑 NEW',`No.${String(n.no).padStart(2,'0')} ${esc(SP[n.id].name)}${n.again?' をなかまにした':' 新登録！'}`);
@@ -8055,7 +8074,7 @@ function rwPanel(){
     rw.news.forEach((n,j)=>rwSfx(P.c0+P.gap*j,'newdex'));
     rw.drops.forEach((d,j)=>rwSfx(P.c0+P.gap*(rw.news.length+j),'kirari'));}
   const btn=B.next?(B.next.tower?`${B.next.tower}階へ進む`:`第${B.next.round}試合へ進む`):'もどる';
-  return `<div class="rw" data-act="rwskip"><h3 class="rwh hl" ${S(0)}>${esc(rw.head)}</h3>${mem}${nums}<div class="rwcards">${cards.join('')}</div>${r.lines.filter(l=>/優勝|試合|踏破|荒ぶる|認めて|研究所|アオイ|賞|医務室/.test(l)).map(l=>`<p class="small rwl">${esc(l)}</p>`).join('')}</div>
+  return `<div class="rw" data-act="rwskip"><h3 class="rwh hl" ${S(0)}>${esc(rw.head)}</h3>${mem}${nums}<div class="rwcards">${cards.join('')}</div>${B.next?'':rwGoals(rw,S(P.c0+P.gap*cards.length))}${r.lines.filter(l=>/優勝|試合|踏破|荒ぶる|認めて|研究所|アオイ|賞|医務室/.test(l)).map(l=>`<p class="small rwl">${esc(l)}</p>`).join('')}</div>
     <div class="row rwbtn"><button class="btn primary big" data-act="bend" autofocus>${btn}</button>${B.next&&B.next.tower?'<button class="btn" data-act="bendStop">塔を出る</button>':''}</div>`;
 }
 function cmdPanel(){
