@@ -1,0 +1,5 @@
+{
+  "type": "module",
+  "main": "run_all.mjs",
+  "description": "node --test tests/ でこのフォルダの *.test.mjs を全部流すための入口(node 22 はフォルダを直接ひらけないので main で run_all.mjs を読む)"
+}

@@ -1,0 +1,31 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { db } from './_db.mjs';
+import { makeCoreDebug } from '../src/core/debug.js';
+import { newSave, createStore, memoryStorage } from '../src/core/save.js';
+import { createBattle } from '../src/core/battle.js';
+
+test('window.__debug の中身(core の部分)で通しの近道ができる', () => {
+  let save = newSave(); let battle = null;
+  const store = createStore(memoryStorage());
+  const d = makeCoreDebug({ db, getSave: () => save, setSave: (s) => { save = s; }, store, getBattle: () => battle });
+  d.skipTo('forest');
+  assert.equal(save.flags.openForest, true);
+  assert.equal(d.goal().id, 'forest');
+  const a = d.addMon('nejiko', 5).uid, b = d.addMon('matchbo', 5).uid;
+  d.setLv(a, 10); d.setLv(b, 10);
+  assert.equal(save.monsters[a].lv, 10);
+  const r = d.breed(a, b, { parts: [{ from: 'a', slot: 'back' }] });
+  assert.equal(r.child.sp, 'nuihebi');
+  d.give('patch', 3); d.gold(50);
+  battle = createBattle(db, { allies: save.party.map((u) => save.monsters[u]), enemies: [{ ...save.monsters[save.party[0]], hp: undefined }], seed: 1 });
+  d.winBattle();
+  assert.equal(battle.result.outcome, 'win');
+  d.save('manual');
+  const t = d.exportText();
+  save = newSave();
+  assert.equal(d.load('manual'), true);
+  assert.equal(save.flags.openForest, true);
+  assert.equal(d.importText(t), true);
+  assert.deepEqual(d.validate(), []);
+});
