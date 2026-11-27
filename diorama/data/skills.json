@@ -1,41 +1,58 @@
 {
-  "_note": "kind: phys=こうげき依存 / mag=かしこさ依存 / heal / buff / debuff。range: melee は後列に届かない。target: one / all / self / ally / allies",
+  "_note": "式は docs/DESIGN.md §4。kind: phys=こうげき対まもり / mag=かしこさ対(まもり+かしこさ)/2 / heal / buff / debuff / status / guard / cure。range: melee=前列からだけ出せて、前列にだけ届く / ranged=どこからでも、どこへでも。acc=命中(%)、なければ phys 95・それ以外 100。eff: 当たったあとに起きること(stat は能力の倍率、status は状態異常)。prio: 1 なら、すばやさに関係なく先に動く。part: パーツわざ(おさがりパーツについてくる)",
+  "statuses": {
+    "sleep": { "name": "ねむり", "turns": [2, 4], "desc": "動けない。ダメージを受けると半分の確率で起きる。スカウト×1.3" },
+    "burn": { "name": "こげ", "turns": [5, 5], "desc": "ターンの終わりに最大HPの1/12へる。こうげき×0.85。火の魔物はならない" },
+    "stain": { "name": "しみ", "turns": [4, 4], "desc": "命中×0.75。水の魔物はならない" },
+    "rust": { "name": "さび", "turns": [4, 4], "desc": "すばやさ×0.5。ブリキの魔物は、かかる確率が2倍" }
+  },
   "skills": [
     { "id": "tackle", "name": "たいあたり", "el": "none", "kind": "phys", "pow": 30, "mp": 0, "target": "one", "range": "melee", "desc": "体ごとぶつかる" },
-    { "id": "bite", "name": "かみつく", "el": "none", "kind": "phys", "pow": 38, "mp": 0, "target": "one", "range": "melee", "desc": "がぶりとかむ" },
-    { "id": "roll", "name": "ころがる", "el": "stone", "kind": "phys", "pow": 46, "mp": 2, "target": "one", "range": "melee", "desc": "転がって体当たり" },
-    { "id": "spark", "name": "ひのこ", "el": "fire", "kind": "mag", "pow": 36, "mp": 3, "target": "one", "range": "ranged", "desc": "小さな火をとばす" },
-    { "id": "flame", "name": "かえんぐるま", "el": "fire", "kind": "phys", "pow": 62, "mp": 5, "target": "one", "range": "melee", "desc": "炎をまとって回る" },
-    { "id": "blaze", "name": "おおかえん", "el": "fire", "kind": "mag", "pow": 56, "mp": 10, "target": "all", "range": "ranged", "desc": "敵みんなを焼く" },
+    { "id": "bite", "name": "かみつく", "el": "none", "kind": "phys", "pow": 38, "mp": 0, "acc": 90, "target": "one", "range": "melee", "desc": "がぶりとかむ" },
+
     { "id": "splash", "name": "みずでっぽう", "el": "water", "kind": "mag", "pow": 36, "mp": 3, "target": "one", "range": "ranged", "desc": "水をふきかける" },
-    { "id": "inkshot", "name": "インクしぶき", "el": "water", "kind": "mag", "pow": 44, "mp": 4, "target": "one", "range": "ranged", "eff": { "stat": "atk", "mul": 0.85, "chance": 0.4 }, "desc": "インクで目かくし。こうげきが下がることも" },
+    { "id": "inkshot", "name": "インクしぶき", "el": "water", "kind": "mag", "pow": 42, "mp": 4, "target": "one", "range": "ranged", "eff": { "status": "stain", "chance": 0.4 }, "desc": "インクで目かくし。しみにすることも" },
+    { "id": "rustrain", "name": "さびのあめ", "el": "water", "kind": "mag", "pow": 22, "mp": 7, "target": "all", "range": "ranged", "eff": { "status": "rust", "chance": 0.35 }, "desc": "敵みんなに、さびる雨。ブリキによくきく" },
     { "id": "wave", "name": "おおなみ", "el": "water", "kind": "mag", "pow": 54, "mp": 10, "target": "all", "range": "ranged", "desc": "敵みんなに波" },
+
+    { "id": "spark", "name": "ひのこ", "el": "fire", "kind": "mag", "pow": 36, "mp": 3, "target": "one", "range": "ranged", "eff": { "status": "burn", "chance": 0.15 }, "desc": "小さな火をとばす。こげることも" },
+    { "id": "flame", "name": "かえんぐるま", "el": "fire", "kind": "phys", "pow": 62, "mp": 5, "target": "one", "range": "melee", "eff": { "status": "burn", "chance": 0.2 }, "desc": "炎をまとって回る" },
+    { "id": "blaze", "name": "おおかえん", "el": "fire", "kind": "mag", "pow": 56, "mp": 10, "target": "all", "range": "ranged", "eff": { "status": "burn", "chance": 0.1 }, "desc": "敵みんなを焼く" },
+    { "id": "temper", "name": "やきいれ", "el": "fire", "kind": "buff", "stat": "atk", "mul": 1.3, "mp": 4, "target": "self", "also": "cureSelf", "desc": "体を焼いてきたえる。こうげきが上がり、自分の状態異常も直る" },
+
     { "id": "papercut", "name": "かみきり", "el": "paper", "kind": "phys", "pow": 40, "mp": 2, "target": "one", "range": "melee", "desc": "紙のふちで切る" },
     { "id": "fold", "name": "おりたたみ", "el": "paper", "kind": "phys", "pow": 58, "mp": 4, "target": "one", "range": "melee", "desc": "相手をたたむ" },
     { "id": "confetti", "name": "かみふぶき", "el": "paper", "kind": "mag", "pow": 50, "mp": 8, "target": "all", "range": "ranged", "desc": "紙の吹雪" },
+    { "id": "papershield", "name": "おりがみのたて", "el": "paper", "kind": "buff", "stat": "shield", "mul": 0.5, "mp": 4, "target": "ally", "desc": "なかま1体に紙の盾。次に受けるダメージが半分" },
+
+    { "id": "roll", "name": "ころがる", "el": "stone", "kind": "phys", "pow": 46, "mp": 2, "target": "one", "range": "melee", "desc": "転がって体当たり" },
     { "id": "pebble", "name": "つぶて", "el": "stone", "kind": "phys", "pow": 36, "mp": 2, "target": "one", "range": "ranged", "desc": "小石を投げる。後ろにも届く" },
-    { "id": "quake", "name": "じならし", "el": "stone", "kind": "phys", "pow": 52, "mp": 9, "target": "all", "range": "ranged", "desc": "台をゆらす" },
+    { "id": "quake", "name": "じならし", "el": "stone", "kind": "phys", "pow": 50, "mp": 9, "target": "all", "range": "ranged", "desc": "対戦台をゆらす" },
     { "id": "stoneskin", "name": "いしはだ", "el": "stone", "kind": "buff", "stat": "def", "mul": 1.4, "mp": 4, "target": "self", "desc": "まもりが上がる" },
+
     { "id": "tinpunch", "name": "ブリキパンチ", "el": "tin", "kind": "phys", "pow": 44, "mp": 2, "target": "one", "range": "melee", "desc": "かたい拳" },
     { "id": "gearsaw", "name": "はぐるまのこ", "el": "tin", "kind": "phys", "pow": 66, "mp": 6, "target": "one", "range": "melee", "desc": "回る歯車で切る" },
     { "id": "windup", "name": "ねじまき", "el": "tin", "kind": "buff", "stat": "spd", "mul": 1.5, "mp": 3, "target": "self", "desc": "ねじを巻いて速くなる" },
     { "id": "clang", "name": "がらんがらん", "el": "tin", "kind": "mag", "pow": 50, "mp": 8, "target": "all", "range": "ranged", "desc": "ブリキの大音響" },
+    { "id": "knightcharge", "name": "きしのとつげき", "el": "tin", "kind": "phys", "pow": 84, "mp": 10, "acc": 90, "target": "one", "range": "ranged", "desc": "後ろにも届く突撃" },
+    { "id": "chime", "name": "じこくのかね", "el": "tin", "kind": "mag", "pow": 64, "mp": 12, "target": "all", "range": "ranged", "desc": "正時の鐘がひびく(トケイモリ専用)" },
+
     { "id": "stitch", "name": "ぬいつけ", "el": "cloth", "kind": "phys", "pow": 38, "mp": 3, "target": "one", "range": "melee", "eff": { "stat": "spd", "mul": 0.75, "chance": 0.5 }, "desc": "縫いつけて動きをにぶらせる" },
     { "id": "wrap", "name": "くるみこむ", "el": "cloth", "kind": "phys", "pow": 56, "mp": 5, "target": "one", "range": "melee", "desc": "布でくるんでしめる" },
     { "id": "fluff", "name": "わたぼこり", "el": "cloth", "kind": "mag", "pow": 48, "mp": 8, "target": "all", "range": "ranged", "desc": "綿のほこりを舞わせる" },
     { "id": "drain", "name": "すいとり", "el": "cloth", "kind": "mag", "pow": 44, "mp": 5, "target": "one", "range": "ranged", "drain": 0.5, "desc": "与えた分の半分を回復" },
+
     { "id": "heal", "name": "つくろい", "el": "none", "kind": "heal", "pow": 40, "mp": 4, "target": "ally", "desc": "なかま1体のHPを直す" },
     { "id": "healall", "name": "おおつくろい", "el": "none", "kind": "heal", "pow": 28, "mp": 9, "target": "allies", "desc": "なかまみんなのHPを直す" },
+    { "id": "mend", "name": "ほころびなおし", "el": "none", "kind": "cure", "mp": 3, "target": "ally", "desc": "なかま1体の状態異常を直す" },
     { "id": "varnish", "name": "ニスぬり", "el": "none", "kind": "buff", "stat": "def", "mul": 1.35, "mp": 4, "target": "ally", "desc": "なかまのまもりを上げる" },
-    { "id": "glue", "name": "のりづけ", "el": "none", "kind": "debuff", "stat": "spd", "mul": 0.6, "mp": 3, "target": "one", "desc": "相手の足をのりで止める" },
-    { "id": "shadowstep", "name": "かげふみ", "el": "none", "kind": "phys", "pow": 48, "mp": 4, "target": "one", "range": "ranged", "desc": "影をつたって後ろにも届く" },
-    { "id": "flash", "name": "ひかりのつぶ", "el": "none", "kind": "mag", "pow": 40, "mp": 4, "target": "one", "range": "ranged", "desc": "光の粒をぶつける" },
     { "id": "encourage", "name": "がんばれ", "el": "none", "kind": "buff", "stat": "atk", "mul": 1.3, "mp": 6, "target": "allies", "desc": "なかまみんなのこうげきを上げる" },
     { "id": "sharpen", "name": "とぐ", "el": "none", "kind": "buff", "stat": "atk", "mul": 1.5, "mp": 3, "target": "self", "desc": "自分のこうげきを上げる" },
-    { "id": "tickle", "name": "くすぐる", "el": "none", "kind": "debuff", "stat": "atk", "mul": 0.7, "mp": 2, "target": "one", "desc": "相手のこうげきを下げる" },
-    { "id": "lullaby", "name": "オルゴール", "el": "none", "kind": "debuff", "status": "sleep", "chance": 0.55, "mp": 5, "target": "one", "desc": "眠りの曲。ねむると動けない" },
-    { "id": "chime", "name": "じこくのかね", "el": "tin", "kind": "mag", "pow": 64, "mp": 12, "target": "all", "range": "ranged", "desc": "正時の鐘がひびく" },
-    { "id": "shadowcloak", "name": "かげのマント", "el": "none", "kind": "buff", "stat": "eva", "mul": 1.0, "mp": 6, "target": "self", "desc": "影にかくれる。物理わざがよけやすくなる" },
-    { "id": "knightcharge", "name": "きしのとつげき", "el": "tin", "kind": "phys", "pow": 84, "mp": 10, "target": "one", "range": "ranged", "desc": "後ろにも届く突撃" }
+    { "id": "cover", "name": "かばう", "el": "none", "kind": "guard", "mp": 2, "prio": 1, "target": "ally", "desc": "そのターン、なかま1体への単体わざをかわりに受ける(まもり×1.2で受ける)" },
+    { "id": "glue", "name": "のりづけ", "el": "none", "kind": "debuff", "stat": "spd", "mul": 0.6, "mp": 3, "acc": 90, "target": "one", "desc": "相手の足をのりで止める" },
+    { "id": "lullaby", "name": "オルゴール", "el": "none", "kind": "status", "status": "sleep", "chance": 0.55, "mp": 5, "target": "one", "desc": "眠りの曲。ねむると動けない" },
+    { "id": "shadowstep", "name": "かげふみ", "el": "none", "kind": "phys", "pow": 48, "mp": 4, "target": "one", "range": "ranged", "desc": "影をつたって後ろにも届く" },
+    { "id": "flash", "name": "ひかりのつぶ", "el": "none", "kind": "mag", "pow": 40, "mp": 4, "target": "one", "range": "ranged", "also": "forceLight", "desc": "光の粒をぶつける。影のターンを、次のターンだけ光にする" },
+    { "id": "shadowcloak", "name": "かげのマント", "el": "none", "kind": "buff", "stat": "eva", "mul": 1.5, "mp": 6, "target": "self", "desc": "影にかくれる。3ターン、物理わざの命中が×0.5になる" }
   ]
 }

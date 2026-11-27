@@ -1,13 +1,18 @@
 {
+  "_note": "回復は hp / hpAll / mp / rev / cure で書く。scout はスカウトの倍率、escape は必ずにげる。breed は配合のときに使う道具(docs/DESIGN.md §5)。open:'エリアid' をつけると、そのエリアをクリアするまで よろず屋に並ばない。price 0 は売っていない(宝箱・ごほうびだけ)",
   "items": [
     { "id": "patch", "name": "ばんそうこう", "price": 20, "hp": 45, "desc": "なかま1体のHPを45直す" },
-    { "id": "bigpatch", "name": "大きなばんそうこう", "price": 70, "hp": 140, "desc": "なかま1体のHPを140直す" },
+    { "id": "bigpatch", "name": "大きなばんそうこう", "price": 70, "hp": 140, "open": "forest", "desc": "なかま1体のHPを140直す" },
     { "id": "paint", "name": "絵の具チューブ", "price": 60, "mp": 20, "desc": "なかま1体のMPを20もどす" },
+    { "id": "thread", "name": "ほころび糸", "price": 25, "cure": true, "desc": "なかま1体の状態異常(ねむり・こげ・しみ・さび)を直す" },
     { "id": "oil", "name": "ぜんまいオイル", "price": 120, "rev": 0.5, "desc": "たおれたなかまを、HP半分で起こす" },
-    { "id": "spray", "name": "まるごとスプレー", "price": 160, "hpAll": 80, "desc": "なかまみんなのHPを80直す" },
+    { "id": "spray", "name": "まるごとスプレー", "price": 160, "hpAll": 80, "open": "forest", "desc": "なかまみんなのHPを80直す" },
     { "id": "varnish", "name": "つやだしニス", "price": 50, "scout": 1.6, "desc": "スカウトが成功しやすくなる(戦闘中に使う)" },
-    { "id": "smoke", "name": "けむり玉", "price": 30, "escape": true, "desc": "戦闘からかならずにげる" },
+    { "id": "smoke", "name": "けむり玉", "price": 30, "escape": true, "desc": "戦闘からかならずにげる(ぬし・ボスはだめ)" },
+    { "id": "screw", "name": "つなぎネジ", "price": 0, "breed": { "extraPart": 1 }, "desc": "配合のとき使うと、おさがりパーツを2か所受けつげる" },
+    { "id": "goldscrew", "name": "金のつなぎネジ", "price": 0, "breed": { "extraPart": 2 }, "desc": "配合のとき使うと、おさがりパーツを3か所すべて受けつげる" },
+    { "id": "kirarinis", "name": "きらりニス", "price": 0, "breed": { "keepShiny": true }, "desc": "配合のとき使うと、子が親の『きらり』の色を受けつぐ" },
     { "id": "gearpin", "name": "金のピン", "price": 0, "sell": 200, "desc": "売るとお金になる、きれいなピン" }
   ],
-  "shop": ["patch", "bigpatch", "paint", "oil", "varnish", "smoke", "spray"]
+  "shop": ["patch", "bigpatch", "paint", "thread", "oil", "varnish", "smoke", "spray"]
 }
