@@ -45,3 +45,11 @@ test('時計塔: 1階2手・2〜3階3手・大きい歯車の付けかえが必�
   assert.equal(r.mustRemove, true);
   assert.equal(r.no.reached.tw_up2, undefined);
 });
+
+test('抜け道なし: つみき野の積み木は台Dを回さないと届かない / 塔5階の段は5階の積み木と4階の歯車のあとだけ', () => {
+  const ts = results.tsumiki || checkArea('tsumiki');
+  assert.ok(ts.mustUse.every((m) => m.ok), JSON.stringify(ts.mustUse));
+  const tw = results.tower || checkArea('tower');
+  assert.ok(tw.mustUse.every((m) => m.ok), JSON.stringify(tw.mustUse));
+  assert.ok(tw.yes.reached.tw_chest_treasure.ops > tw.yes.reached.tw_up4.ops);
+});

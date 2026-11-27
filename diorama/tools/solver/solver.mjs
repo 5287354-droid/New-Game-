@@ -190,6 +190,7 @@ export function solveArea(area, opts = {}) {
   const abilities = opts.abilities || {};
   const flags = opts.flags || {};
   const forbidTake = new Set(opts.forbidTake || []);
+  const forbidUse = new Set(opts.forbidUse || []);
   const maxStates = opts.maxStates || 6e6;
   const codec = makeCodec(area);
   const W = makeWalker(area, codec);
@@ -245,6 +246,7 @@ export function solveArea(area, opts = {}) {
     // ギミックを動かす
     for (let oi = 0; oi < gimmicks.length; oi++) {
       const o = gimmicks[oi];
+      if (forbidUse.has(o.id)) continue;
       if (o.type !== 'socket' && !G.isPresent(area, gs, o)) continue;
       if (o.type === 'socket' && forbidTake.has(o.id) && !gs.held && G.socketContent(gs, o.id)) continue;
       const cells = G.interactCells(area, gs, o).filter((c) => inC(...c));
@@ -362,9 +364,10 @@ export function replayPlan(area, plan, abilities = { tweezers: true }) {
 // ---------------------------------------------------------------- エリアごとの約束と合否
 export const EXPECT = {
   village: { flags: { wokeUp: true, gotStarter: true } },
-  tsumiki: { goal: 'ts_goal', goalOps: 6 },
+  tsumiki: { goal: 'ts_goal', goalOps: 6, mustUse: [{ use: ['D_h21_21'], target: 'ts_chest_ledge', why: '台Dを回さないと積み木に届かない' }] },
   forest: { goal: 'fo_boss', goalOps: 8 },
-  tower: { goal: 'tw_boss', noTweezersUnreached: ['tw_up2'], mustRemove: { socket: 'tw_axle4', target: 'tw_up4' } },
+  tower: { goal: 'tw_boss', noTweezersUnreached: ['tw_up2'], mustRemove: { socket: 'tw_axle4', target: 'tw_up4' },
+    mustUse: [{ use: ['tw_block5'], target: 'tw_chest_treasure', why: '5階の段は5階のアーチの積み木でしか登れない' }, { use: ['tw_axle4'], target: 'tw_chest_treasure', why: '5階の宝は4階の歯車で5階をそろえたあと' }] },
 };
 
 export function checkArea(id, { log = () => {} } = {}) {
@@ -392,7 +395,14 @@ export function checkArea(id, { log = () => {} } = {}) {
     mustRemove = !r.reached[ex.mustRemove.target];
     if (!mustRemove) errors.push(`${ex.mustRemove.socket} を外さなくても ${ex.mustRemove.target} に届く(付けかえが必須でない)`);
   }
-  return { id, ok: errors.length === 0, errors, yes, no, mustRemove };
+  const mustUse = [];
+  for (const m of ex.mustUse || []) {
+    const r = solveArea(loadArea(id), { abilities: { tweezers: true }, forbidUse: m.use });
+    const ok = !r.reached[m.target];
+    mustUse.push({ ...m, ok });
+    if (!ok) errors.push(`${m.use} を使わなくても ${m.target} に届く(${m.why})`);
+  }
+  return { id, ok: errors.length === 0, errors, yes, no, mustRemove, mustUse };
 }
 
 export function writePlans(res) {

@@ -228,9 +228,10 @@ function tsumiki() {
   disc(b, 'C', 46, 24, ['N', 'E'], { start: 1, handles: [[44, 31], [39, 22]], stage: '試す→組む' });
   disc(b, 'D', 30, 24, ['W', 'N', 'E'], { start: 2, handles: [[21, 21]], stage: '組む' });
   disc(b, 'E', 30, 11, ['N', 'S'], { start: 1, handles: [[38, 9]], stage: '組む' });
-  // 台Dの上の積み木(北の腕の根もと横の台座。向き0で (31,21))
-  b.set(0, 31, 21, 'k', 1);
-  b.o('item', 0, 31, 21, { item: 'ts_block', kind: 'block', name: '積み木', note: '回転台Dの上。台といっしょに回る' });
+  // 台Dの上の積み木: 腕のない向き(向き0で南)のはしの台座 (30,28)。腕からは届かず、台のはしが橋に向いたときだけ、
+  // その橋の陸からつまめる。はじめ(向き2)は北の橋(R6)を向いている → D を回して自分の陸(R3・R4・R5)へ向ける
+  b.set(0, 30, 28, 'k', 1);
+  b.o('item', 0, 30, 28, { item: 'ts_block', kind: 'block', name: '積み木', note: '回転台Dのはしの台座。台といっしょに回る。橋の側からつまむ' });
   // 宝箱(11個)
   const chest = (id, x, z, item, qty, extra = {}) => b.o('chest', 0, x, z, { id, item, qty, ...extra });
   chest('ts_chest_start', 15, 46, 'patch', 2);
@@ -490,8 +491,8 @@ function tower() {
   const led1 = arcCells(236, 258);
   raise(b, 0, led1, 3);
   chest(0, 247, 10, 'tw_room1', 'bigpatch', 2, { needs: ['tweezers'], note: '1階 西の高い段' });
-  put('socket', 0, besideOf(b, 0, led1, 262), { id: 'tw_sock1', kind: 'block', h: 2, name: '段のくぼみ', flag: 'tw_room1' });
-  put('item', 0, rim(100, 10), { item: 'tw_block1', kind: 'block', name: '積み木' });
+  put('socket', 0, besideOf(b, 0, led1, 262), { id: 'tw_sock1', kind: 'block', h: 2, accepts: ['tw_block1'], name: '段のくぼみ', flag: 'tw_room1' });
+  put('item', 0, rim(100, 10), { item: 'tw_block1', kind: 'block', shape: 'square', name: '四角い積み木' });
   chest(0, 80, 10, 'tw_chest_0_90', 'patch', 3);
   chest(0, 270, 10, 'tw_chest_0_270', 'paint', 1);
   b.o('sign', 0, 14, 21, { id: 'tw_sign1', text: '文字盤を調べると、針が進んで外周の床が90°回る' });
@@ -517,6 +518,8 @@ function tower() {
   // ---- 4階: 大きい歯車 → 西の回廊の軸(輪の外側の歯にかみ合う。r3 を2回で r4 が1回)。振り子。宝の部屋 = 南の奥(くさびで振り子を止める)
   put('item', 3, rim(282, 10), { item: 'tw_gear_large', kind: 'gear', size: 'large', name: '大きい歯車' });
   put('socket', 3, rim(300, 9), { id: 'tw_axle4', kind: 'gear', size: 'large', link: { from: 'r3', to: 'r4' }, name: '4階の歯車の軸(→5階・半分回す)' });
+  // 外した大きい歯車の置き台(どこにもつながっていない)。東の階段のそば。持ったままだと5階の積み木をつまめないため
+  put('socket', 3, rim(110, 10), { id: 'tw_gear_rest', kind: 'gear', size: 'large', name: '歯車の置き台' });
   for (const [deg, ph] of [[20, 0], [70, 2], [250, 3]]) put('pendulum', 3, rim(deg, 10), { id: `tw_pend_${deg}`, period: 4, phase: ph, cells: lineCells(deg) });
   put('pendulum', 3, rim(200, 10), { id: 'tw_pend_200', period: 4, phase: 1, cells: lineCells(200), jamSocket: 'tw_sock4' });
   put('socket', 3, rim(190, 10), { id: 'tw_sock4', kind: 'wedge', h: 2, name: '振り子の下のくぼみ', flag: 'tw_room4' });
@@ -529,8 +532,8 @@ function tower() {
   const led5 = arcCells(102, 122);
   raise(b, 4, led5, 3);
   chest(4, 112, 10, 'tw_chest_treasure', 'gearpin', 3, { needs: ['tweezers'], book: 'b_notebook', note: '5階 東の高い段(本「模型師の手帳」)' });
-  put('socket', 4, besideOf(b, 4, led5, 98), { id: 'tw_sock5', kind: 'block', h: 2, name: '段のくぼみ', flag: 'tw_room5' });
-  put('item', 4, rim(25, 10), { item: 'tw_block5', kind: 'block', name: '積み木' });
+  put('socket', 4, besideOf(b, 4, led5, 98), { id: 'tw_sock5', kind: 'block', h: 2, accepts: ['tw_block5'], name: '段のくぼみ', flag: 'tw_room5' });
+  put('item', 4, rim(25, 10), { item: 'tw_block5', kind: 'block', shape: 'arch', name: 'アーチの積み木' });
   chest(4, 340, 10, 'tw_chest_4_340', 'bigpatch', 2);
   b.o('sign', 4, 20, 8, { id: 'tw_sign5', text: '歯車を外せば、下の階だけ回せる' });
 
