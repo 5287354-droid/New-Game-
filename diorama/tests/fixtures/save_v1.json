@@ -1,0 +1,41 @@
+{
+  "v": 1,
+  "savedAt": "2026-11-28T10:00:00Z", "playMs": 3600000,
+  "player": { "name": "ピン", "area": "tsumiki", "l": 0, "x": 30, "z": 45, "dir": 2 },
+  "clock": 615,
+  "lastInn": "village",
+  "flags": { "named": true, "wokeUp": true, "gotStarter": true, "metChief": true, "openTsumiki": true, "clearTsumiki": true, "openForest": true, "breedUnlocked": true, "firstBreed": true },
+  "abilities": { "tweezers": false },
+  "gold": 320,
+  "bag": { "patch": 3, "varnish": 1, "screw": 1 },
+  "party": ["m1", "m4", "m7"],
+  "box": ["m2", "m3"],
+  "monsters": {
+    "m1": { "sp": "nejiko", "nick": "ネジ", "lv": 11, "xp": 400, "hp": 50, "mp": 20, "skills": ["tackle", "windup", "tinpunch", "sharpen"], "status": null, "shiny": false, "gen": 0, "bonus": 0, "parts": { "head": null, "back": null, "tail": null }, "parents": null, "born": "starter" },
+    "m2": { "sp": "perari", "nick": null, "lv": 4, "xp": 30, "hp": 30, "mp": 25, "skills": ["tackle", "papercut"], "status": null, "shiny": false, "gen": 0, "bonus": 0, "parts": { "head": null, "back": null, "tail": null }, "parents": null, "born": "scout" },
+    "m3": { "sp": "koroishi", "nick": null, "lv": 6, "xp": 90, "hp": 0, "mp": 8, "skills": ["tackle", "roll"], "status": "burn", "shiny": true, "gen": 0, "bonus": 0, "parts": { "head": null, "back": null, "tail": null }, "parents": null, "born": "scout" },
+    "m4": { "sp": "watabou", "nick": null, "lv": 9, "xp": 250, "hp": 40, "mp": 20, "skills": ["tackle", "stitch", "fluff"], "status": null, "shiny": false, "gen": 0, "bonus": 0, "parts": { "head": null, "back": null, "tail": null }, "parents": null, "born": "scout" },
+    "m7": {
+      "sp": "nuihebi", "nick": null, "lv": 12, "xp": 402, "hp": 61, "mp": 22,
+      "skills": ["bite", "wrap", "spark", "drain"],
+      "status": null, "shiny": false,
+      "gen": 1, "bonus": 0.1,
+      "parts": {
+        "head": null,
+        "back": { "from": "nejiko", "slot": "back", "star": 1, "shiny": false, "history": ["nejiko"] },
+        "tail": null
+      },
+      "parents": ["nejiko", "matchbo"], "born": "breed"
+    }
+  },
+  "dex": { "seen": { "nejiko": 1, "perari": 1, "koroishi": 1, "watabou": 1, "matchbo": 1, "nuihebi": 1 }, "caught": { "nejiko": 1, "perari": 1, "koroishi": 1, "watabou": 1, "matchbo": 1, "nuihebi": 1 }, "parts": { "nejiko.back": 1 } },
+  "rewards": {},
+  "areas": {
+    "tsumiki": { "gs": { "disc": { "A": 0, "B": 1 }, "items": { "ts_plank": "ts_sock_plank", "ts_ladder": "home" }, "held": "ts_ladder" }, "opened": ["ts_chest_w"] },
+    "forest":  { "gs": { "lamp": 2, "items": {} }, "opened": [] },
+    "tower":   { "gs": { "ring": { "r0": 2 }, "gp": {}, "items": {} }, "opened": [] },
+    "village": { "gs": { "items": { "v_gear": "v_tower_axle" } }, "opened": ["v_home_shelf"] }
+  },
+  "books": ["b_turn"],
+  "stats": { "battles": 41, "scouts": 9, "breeds": 1 }
+}
