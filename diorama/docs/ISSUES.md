@@ -7,3 +7,6 @@
 - engineer へ: くぼみに置いたときの旗は `applyInteract` の戻り値 `flag`(openTower など)。立てるのはゲーム側
 - game-designer へ(DESIGN.md §6・tower.md の申し送り): ピンセットの規則に「くぼみには形があり、合う物だけはまる(`socket.accepts`)」を足してほしい。塔の積み木は1階=四角・5階=アーチ。4階に歯車の置き台を足した。つみき野③の積み木は台Dのはしの台座(腕からは届かない)
 - monster-forge / tech-artist へ: 積み木の形 `item.shape`(square / arch)と、くぼみの点線の形を合わせて描く
+- engineer へ: `src/core/save.js` の `resetHeld` は `gs.items[gs.held] == null` のときだけ 'home' に戻すが、grid.js では持っている物は `items[名前] = 'held'`。そのため 'held' が残り、`held` だけ null になる(食いちがい)。`grid.resetLooseItems(gs)` を使うか、`items[k] === 'held'` を 'home' に戻すよう直してほしい。field の `leave()` が返す state は正しい形
+- engineer へ: field の出来事 `exit` / `lost` の `state` を `save.areas[id]` に入れる。`flag` / `place.flag` は storyEvent('place', {id}) などで旗にする。`encounter.first` を戦闘の先制に
+- tech-artist / ui-fx へ: field の出来事の表(INTERFACES「field」)。render の節ができたら、名前を合わせる
