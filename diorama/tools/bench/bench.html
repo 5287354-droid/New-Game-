@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:,">
+<title>ジオラマ魔物記 Phase0 計測</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #2b2724; overflow: hidden; }
+  canvas { display: block; }
+  #hud {
+    position: fixed; left: 8px; top: 8px; max-width: calc(100% - 16px);
+    background: #F4F1EA; color: #111; border: 2px solid #111; border-radius: 2px;
+    font: 700 11px/1.35 system-ui, sans-serif; padding: 6px 8px; white-space: pre; pointer-events: none;
+  }
+  #hud b { font-variant-numeric: tabular-nums; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "../../vendor/three/three.module.js",
+  "three/addons/": "../../vendor/three/addons/"
+} }
+</script>
+</head>
+<body>
+<div id="hud">読みこみ中…</div>
+<script type="module" src="./bench.js"></script>
+</body>
+</html>
