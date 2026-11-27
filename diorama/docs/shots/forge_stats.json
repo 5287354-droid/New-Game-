@@ -1,0 +1,180 @@
+{
+ "errors": [],
+ "forge_A_nejiko": {
+  "rows": [
+   {
+    "label": "通常",
+    "triangles": 3172
+   },
+   {
+    "label": "きらり",
+    "triangles": 3172
+   },
+   {
+    "label": "おさがり ★1",
+    "triangles": 2466
+   },
+   {
+    "label": "おさがり ★2・★3",
+    "triangles": 2676
+   },
+   {
+    "label": "きらりの親から",
+    "triangles": 2724
+   }
+  ]
+ },
+ "forge_A_perari": {
+  "rows": [
+   {
+    "label": "通常",
+    "triangles": 1630
+   },
+   {
+    "label": "きらり",
+    "triangles": 1630
+   },
+   {
+    "label": "おさがり ★1",
+    "triangles": 1958
+   },
+   {
+    "label": "おさがり ★2・★3",
+    "triangles": 1504
+   },
+   {
+    "label": "きらりの親から",
+    "triangles": 2038
+   }
+  ]
+ },
+ "forge_A_koroishi": {
+  "rows": [
+   {
+    "label": "通常",
+    "triangles": 1572
+   },
+   {
+    "label": "きらり",
+    "triangles": 1572
+   },
+   {
+    "label": "おさがり ★1",
+    "triangles": 1952
+   },
+   {
+    "label": "おさがり ★2・★3",
+    "triangles": 1778
+   },
+   {
+    "label": "きらりの親から",
+    "triangles": 1592
+   }
+  ]
+ },
+ "forge_B_nejiko": {
+  "rows": [
+   {
+    "label": "通常",
+    "triangles": 3172
+   },
+   {
+    "label": "きらり",
+    "triangles": 3172
+   },
+   {
+    "label": "おさがり ★1",
+    "triangles": 2466
+   },
+   {
+    "label": "おさがり ★2・★3",
+    "triangles": 2676
+   },
+   {
+    "label": "きらりの親から",
+    "triangles": 2724
+   }
+  ]
+ },
+ "forge_B_perari": {
+  "rows": [
+   {
+    "label": "通常",
+    "triangles": 1630
+   },
+   {
+    "label": "きらり",
+    "triangles": 1630
+   },
+   {
+    "label": "おさがり ★1",
+    "triangles": 1958
+   },
+   {
+    "label": "おさがり ★2・★3",
+    "triangles": 1504
+   },
+   {
+    "label": "きらりの親から",
+    "triangles": 2038
+   }
+  ]
+ },
+ "forge_B_koroishi": {
+  "rows": [
+   {
+    "label": "通常",
+    "triangles": 1572
+   },
+   {
+    "label": "きらり",
+    "triangles": 1572
+   },
+   {
+    "label": "おさがり ★1",
+    "triangles": 1952
+   },
+   {
+    "label": "おさがり ★2・★3",
+    "triangles": 1778
+   },
+   {
+    "label": "きらりの親から",
+    "triangles": 1592
+   }
+  ]
+ },
+ "triangles": {
+  "perSpecies": {
+   "nejiko": 3172,
+   "perari": 1630,
+   "inky": 2426,
+   "koroishi": 1572,
+   "watabou": 2858,
+   "matchbo": 2414,
+   "origarasu": 1066,
+   "jarihebi": 1778,
+   "felton": 2282,
+   "hotarubin": 2148,
+   "zenmainu": 2372,
+   "rousokun": 2604,
+   "tsumiking": 1712,
+   "kamishibai": 1900,
+   "haribote": 2276,
+   "hibachineko": 2202,
+   "nuihebi": 1940,
+   "burikishi": 1956,
+   "kageboushi": 1898,
+   "tokeimori": 3112
+  },
+  "worstCombo": {
+   "maru": 3386,
+   "shizuku": 3330,
+   "yotsuashi": 3418,
+   "tori": 3102,
+   "hebi": 3410,
+   "ningyo": 3166
+  },
+  "partCount": 66
+ }
+}

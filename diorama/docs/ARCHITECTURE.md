@@ -13,7 +13,7 @@
 | `src/ui/` `css/` | ui-fx | 組立説明書調の UI・戦闘と配合の演出 |
 | `src/audio/` | sound-lab | WebAudio の曲と効果音 |
 | `data/*.json`(areas 以外) | game-designer(数値は balancer が提案) | 魔物・わざ・配合・道具 |
-| `tests/` | 各班が自分の持ち場のテストを置く。`node --test tests/` で全部流れる | |
+| `tests/` | 各班が自分の持ち場のテストを置く。`node tests/run_all.mjs` で全部流れる | |
 
 - ほかの班の持ち場のファイルを直したいときは、直さずに報告に書く(総司令官が割りふる)
 - 班どうしのつなぎ目(関数の形)は `docs/INTERFACES.md` に書く。作った班が書き、使う班が読む
