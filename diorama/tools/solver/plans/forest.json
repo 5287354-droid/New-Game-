@@ -1,0 +1,807 @@
+{
+ "area": "forest",
+ "note": "最少の操作手順。walk = そのマスまで歩く [階,x,z]、use = その物を調べる、exit = 出口から出て入りなおす。ops = ギミックの操作の回数",
+ "states": 45,
+ "targets": {
+  "fo_chest_nw": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      4,
+      3
+     ]
+    },
+    {
+     "use": "fo_chest_nw"
+    }
+   ]
+  },
+  "fo_chest_w": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      3,
+      22
+     ]
+    },
+    {
+     "use": "fo_chest_w"
+    }
+   ]
+  },
+  "fo_chest_hollow": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      23,
+      44
+     ]
+    },
+    {
+     "use": "fo_chest_hollow"
+    }
+   ]
+  },
+  "fo_chest_n1": {
+   "ops": 2,
+   "steps": [
+    {
+     "walk": [
+      0,
+      8,
+      34
+     ]
+    },
+    {
+     "use": "fo_lamp_f0"
+    },
+    {
+     "walk": [
+      0,
+      22,
+      27
+     ]
+    },
+    {
+     "use": "fo_lamp_f1s"
+    },
+    {
+     "walk": [
+      0,
+      21,
+      4
+     ]
+    },
+    {
+     "use": "fo_chest_n1"
+    }
+   ]
+  },
+  "fo_chest_pillar": {
+   "ops": 4,
+   "steps": [
+    {
+     "walk": [
+      0,
+      8,
+      34
+     ]
+    },
+    {
+     "use": "fo_lamp_f0"
+    },
+    {
+     "walk": [
+      0,
+      22,
+      27
+     ]
+    },
+    {
+     "use": "fo_lamp_f1s"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      31,
+      23
+     ]
+    },
+    {
+     "use": "fo_chest_pillar"
+    }
+   ]
+  },
+  "fo_chest_f2": {
+   "ops": 6,
+   "steps": [
+    {
+     "walk": [
+      0,
+      8,
+      34
+     ]
+    },
+    {
+     "use": "fo_lamp_f0"
+    },
+    {
+     "walk": [
+      0,
+      22,
+      27
+     ]
+    },
+    {
+     "use": "fo_lamp_f1s"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      39,
+      40
+     ]
+    },
+    {
+     "use": "fo_chest_f2"
+    }
+   ]
+  },
+  "fo_chest_i3": {
+   "ops": 7,
+   "steps": [
+    {
+     "walk": [
+      0,
+      8,
+      34
+     ]
+    },
+    {
+     "use": "fo_lamp_f0"
+    },
+    {
+     "walk": [
+      0,
+      22,
+      27
+     ]
+    },
+    {
+     "use": "fo_lamp_f1s"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      43,
+      28
+     ]
+    },
+    {
+     "use": "fo_lamp_i1"
+    },
+    {
+     "walk": [
+      0,
+      44,
+      32
+     ]
+    },
+    {
+     "use": "fo_chest_i3"
+    }
+   ]
+  },
+  "fo_chest_se": {
+   "ops": 8,
+   "steps": [
+    {
+     "walk": [
+      0,
+      8,
+      34
+     ]
+    },
+    {
+     "use": "fo_lamp_f0"
+    },
+    {
+     "walk": [
+      0,
+      22,
+      27
+     ]
+    },
+    {
+     "use": "fo_lamp_f1s"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      43,
+      28
+     ]
+    },
+    {
+     "use": "fo_lamp_i1"
+    },
+    {
+     "walk": [
+      0,
+      43,
+      28
+     ]
+    },
+    {
+     "use": "fo_lamp_i1"
+    },
+    {
+     "walk": [
+      0,
+      53,
+      44
+     ]
+    },
+    {
+     "use": "fo_chest_se"
+    }
+   ]
+  },
+  "fo_chest_f3": {
+   "ops": 8,
+   "steps": [
+    {
+     "walk": [
+      0,
+      8,
+      34
+     ]
+    },
+    {
+     "use": "fo_lamp_f0"
+    },
+    {
+     "walk": [
+      0,
+      22,
+      27
+     ]
+    },
+    {
+     "use": "fo_lamp_f1s"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      43,
+      28
+     ]
+    },
+    {
+     "use": "fo_lamp_i1"
+    },
+    {
+     "walk": [
+      0,
+      43,
+      28
+     ]
+    },
+    {
+     "use": "fo_lamp_i1"
+    },
+    {
+     "walk": [
+      0,
+      51,
+      40
+     ]
+    },
+    {
+     "use": "fo_chest_f3"
+    }
+   ]
+  },
+  "fo_chest_nest": {
+   "ops": 8,
+   "steps": [
+    {
+     "walk": [
+      0,
+      8,
+      34
+     ]
+    },
+    {
+     "use": "fo_lamp_f0"
+    },
+    {
+     "walk": [
+      0,
+      6,
+      6
+     ]
+    },
+    {
+     "use": "fo_cutout"
+    },
+    {
+     "walk": [
+      0,
+      22,
+      27
+     ]
+    },
+    {
+     "use": "fo_lamp_f1s"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      41,
+      3
+     ]
+    },
+    {
+     "use": "fo_sock_cutout"
+    },
+    {
+     "walk": [
+      0,
+      53,
+      2
+     ]
+    },
+    {
+     "use": "fo_chest_nest"
+    }
+   ]
+  },
+  "fo_boss": {
+   "ops": 8,
+   "steps": [
+    {
+     "walk": [
+      0,
+      8,
+      34
+     ]
+    },
+    {
+     "use": "fo_lamp_f0"
+    },
+    {
+     "walk": [
+      0,
+      22,
+      27
+     ]
+    },
+    {
+     "use": "fo_lamp_f1s"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      43,
+      28
+     ]
+    },
+    {
+     "use": "fo_lamp_i1"
+    },
+    {
+     "walk": [
+      0,
+      43,
+      28
+     ]
+    },
+    {
+     "use": "fo_lamp_i1"
+    },
+    {
+     "walk": [
+      0,
+      51,
+      12
+     ]
+    },
+    {
+     "use": "fo_boss"
+    }
+   ]
+  },
+  "fo_exit_6": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      6,
+      47
+     ]
+    },
+    {
+     "use": "fo_exit_6"
+    }
+   ]
+  },
+  "fo_exit_7": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      7,
+      47
+     ]
+    },
+    {
+     "use": "fo_exit_7"
+    }
+   ]
+  },
+  "fo_rare_nest": {
+   "ops": 8,
+   "steps": [
+    {
+     "walk": [
+      0,
+      8,
+      34
+     ]
+    },
+    {
+     "use": "fo_lamp_f0"
+    },
+    {
+     "walk": [
+      0,
+      6,
+      6
+     ]
+    },
+    {
+     "use": "fo_cutout"
+    },
+    {
+     "walk": [
+      0,
+      22,
+      27
+     ]
+    },
+    {
+     "use": "fo_lamp_f1s"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "fo_lamp_f1n"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      30,
+      21
+     ]
+    },
+    {
+     "use": "fo_lamp_pillar"
+    },
+    {
+     "walk": [
+      0,
+      41,
+      3
+     ]
+    },
+    {
+     "use": "fo_sock_cutout"
+    },
+    {
+     "walk": [
+      0,
+      50,
+      2
+     ]
+    },
+    {
+     "reach": "fo_rare_nest"
+    }
+   ]
+  }
+ }
+}
