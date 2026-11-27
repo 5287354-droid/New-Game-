@@ -5,3 +5,5 @@
 - tech-artist へ: 新しい地面の文字 `e`(村の外周の柵)と `v`(塔の床の穴)の色・形。物 `arch` `clockface` `pendulum` `socket` `item` の見た目。回転台の腕は `discs[].arms`、軸のまわり8マスも板(INTERFACES.md「マップ JSON」)
 - (済)テストの入口は `node tests/run_all.mjs` にそろえた(ARCHITECTURE.md)
 - engineer へ: くぼみに置いたときの旗は `applyInteract` の戻り値 `flag`(openTower など)。立てるのはゲーム側
+- game-designer へ(DESIGN.md §6・tower.md の申し送り): ピンセットの規則に「くぼみには形があり、合う物だけはまる(`socket.accepts`)」を足してほしい。塔の積み木は1階=四角・5階=アーチ。4階に歯車の置き台を足した。つみき野③の積み木は台Dのはしの台座(腕からは届かない)
+- monster-forge / tech-artist へ: 積み木の形 `item.shape`(square / arch)と、くぼみの点線の形を合わせて描く

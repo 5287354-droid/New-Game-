@@ -182,3 +182,18 @@ test('本物のマップ: 大きさと建物(村は 48×40・8棟、時計塔の
   assert.equal(tw.levels.length, 6);
   assert.equal(tw.objects.filter((o) => o.type === 'chest').length, 11);
 });
+
+test('くぼみの accepts: 形の合う積み木だけはまる(ほかの階の積み木は wrong-kind)', () => {
+  const a = mk();
+  a.objects.push(
+    { id: 'b1', type: 'item', item: 'b1', kind: 'block', l: 0, x: 5, z: 5 },
+    { id: 'b5', type: 'item', item: 'b5', kind: 'block', l: 0, x: 8, z: 5 },
+    { id: 's5', type: 'socket', kind: 'block', accepts: ['b5'], l: 0, x: 12, z: 10, h: 2 },
+  );
+  const T = { tweezers: true };
+  let gs = G.applyInteract(a, G.newGimmickState(a), a.objects[0], [0, 5, 6], T).gs;
+  assert.equal(G.applyInteract(a, gs, a.objects[2], [0, 12, 11], T).msg, 'wrong-kind');
+  gs = G.newGimmickState(a);
+  gs = G.applyInteract(a, gs, a.objects[1], [0, 8, 6], T).gs;
+  assert.equal(G.applyInteract(a, gs, a.objects[2], [0, 12, 11], T).ok, true);
+});
