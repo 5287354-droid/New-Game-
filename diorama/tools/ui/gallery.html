@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<link rel="icon" href="data:,">
+<title>UI ギャラリー — ジオラマ魔物記</title>
+<link rel="stylesheet" href="../../css/ui.css">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #2a211c; touch-action: none; }
+  #bg { position: fixed; inset: 0; background: #3a2e26 center / cover no-repeat; }
+  #nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; gap: 4px; overflow-x: auto; padding: 6px; background: #1B1915; }
+  #nav a { flex: none; color: #F4F1EA; font: 700 12px/1 sans-serif; padding: 8px 8px; border: 1.5px solid #F4F1EA; border-radius: 3px; text-decoration: none; }
+  #nav a.on { background: #E3A72F; color: #1B1915; }
+  body.shot #nav { display: none; }
+  /* 3D の場所のかわり: 人形の「仮の印」 */
+  .dummy-doll { position: fixed; width: 54px; height: 54px; margin: -54px 0 0 -27px; border: 3px solid #1B1915; border-radius: 50% 50% 44% 44%; background: var(--c); z-index: 1; }
+  .dummy-doll::before, .dummy-doll::after { content: ''; position: absolute; top: 38%; width: 10px; height: 10px; border-radius: 50%; background: #1B1915; }
+  .dummy-doll::before { left: 24%; } .dummy-doll::after { right: 24%; }
+  .dummy-stage { position: fixed; left: 50%; top: 50%; width: 120vmin; height: 46vmin; margin: -18vmin 0 0 -60vmin; border-radius: 50%; background: #c9b58f; border: 3px solid #1B1915; }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<nav id="nav"></nav>
+<script type="module">
+import * as UI from '../../src/ui/index.js';
+const { fx } = UI;
+
+const q = new URLSearchParams(location.search);
+const scene = q.get('scene') || 'title';
+const area = q.get('area') || ({ battle: 'tsumiki', battle_skill: 'tsumiki', battle_target: 'tsumiki', battle_lamp: 'forest', battle_clock: 'tower', dex: 'village', bom: 'village' }[scene] || 'village');
+if (q.has('shot')) document.body.classList.add('shot');
+UI.setArea(area);
+const portrait = innerHeight > innerWidth;
+Object.assign(document.getElementById('bg').style, { backgroundImage: `url(../../docs/shots/phase0_render_outside_${portrait ? 'portrait' : 'landscape'}.png)`, backgroundSize: '175%', backgroundPosition: '50% 55%' });
+
+const SCENES = ['title', 'name', 'field', 'dialog', 'dialog_choice', 'note', 'menu', 'party', 'detail', 'items', 'settings', 'save',
+  'battle', 'battle_skill', 'battle_target', 'battle_lamp', 'battle_clock', 'breed', 'breed_parts', 'breed_skills', 'breed_asm',
+  'dex', 'bom', 'shop', 'inn', 'storage', 'got'];
+const nav = document.getElementById('nav');
+for (const s of SCENES) { const a = document.createElement('a'); a.href = `?scene=${s}`; a.textContent = s; if (s === scene) a.className = 'on'; nav.append(a); }
+
+const [mons, skills] = await Promise.all([fetch('../../data/monsters.json').then((r) => r.json()), fetch('../../data/skills.json').then((r) => r.json())]);
+UI.setMaterials(mons.materials);
+const SP = Object.fromEntries(mons.species.map((s) => [s.id, s]));
+const SK = Object.fromEntries(skills.skills.map((s) => [s.id, s]));
+const log = [];
+UI.setSfx((n) => log.push(n));
+window.__ui = { ready: false, log, scene };
+
+// ---- ダミーのなかま ----
+function mon(id, lv, o = {}) {
+  const s = SP[id];
+  const g = 1 + 0.1 * (lv - 1);
+  const maxHp = Math.floor(s.base.hp * g * 1.6), maxMp = Math.floor(s.base.mp * g);
+  const learned = s.learn.filter(([l]) => l <= lv).slice(-4).map(([, k]) => SK[k]).filter(Boolean);
+  const partSkill = Object.values(s.parts).find((p) => p.skill);
+  return {
+    id: o.uid || id, name: o.name || s.name, species: s.name, lv, mat: s.mat, color: s.color,
+    hp: o.hp ?? maxHp, maxHp, mp: o.mp ?? maxMp, maxMp, status: o.status,
+    stats: Object.fromEntries(['atk', 'def', 'spd', 'int'].map((k) => [k, Math.floor(s.base[k] * g)])),
+    xp: 120, nextXp: 210, gen: o.gen || 0, bonus: o.bonus || 0,
+    skills: [...learned.map((k) => ({ id: k.id, name: k.name, el: k.el, mp: k.mp, kind: k.kind, range: k.range, target: k.target, desc: k.desc })),
+      ...(partSkill && SK[partSkill.skill] ? [{ id: partSkill.skill, name: SK[partSkill.skill].name, el: SK[partSkill.skill].el, mp: SK[partSkill.skill].mp, part: true }] : [])],
+    parts: Object.fromEntries(Object.entries(s.parts).map(([k, p]) => [k, { ...p, ...(o.parts?.[k] || {}) }])),
+  };
+}
+const party = [
+  mon('nejiko', 14, { name: 'ネジ太', gen: 2, bonus: 0.18, parts: { tail: { label: 'マッチのしっぽ', from: 'マッチボウ(母)', star: 2, stat: 'atk', pct: 6 } } }),
+  mon('perari', 12, { hp: 9, status: 'burn' }),
+  mon('koroishi', 11, { parts: { head: { label: 'つみきの冠', from: 'ツミキング', star: 3, stat: 'def', pct: 10 } } }),
+  mon('matchbo', 10),
+  mon('watabou', 7, { hp: 0 }),
+  mon('inky', 9),
+];
+const items = [
+  { id: 'patch', name: 'ばんそうこう', count: 5, desc: 'なかま1体のHPを45直す' },
+  { id: 'paint', name: '絵の具チューブ', count: 2, desc: 'なかま1体のMPを20もどす' },
+  { id: 'thread', name: 'ほころび糸', count: 1, desc: '状態異常を直す' },
+  { id: 'oil', name: 'ぜんまいオイル', count: 1, target: 'down', desc: 'たおれたなかまを、HP半分で起こす' },
+  { id: 'spray', name: 'まるごとスプレー', count: 1, target: 'all', desc: 'なかまみんなのHPを80直す' },
+  { id: 'varnish', name: 'つやだしニス', count: 3, field: false, target: 'none', desc: 'スカウトが成功しやすくなる' },
+];
+const settings = { quality: 'mid', bgm: 3, se: 4 };
+
+function dolls(list) {
+  // 3D の人形のかわり(仮の印)。戦闘の数字・対象の印はこの位置に出る
+  const W = innerWidth, H = innerHeight, out = {};
+  document.body.insertAdjacentHTML('beforeend', '<div class="dummy-stage"></div>');
+  list.forEach(([id, x, y, c]) => {
+    const d = document.createElement('div'); d.className = 'dummy-doll'; d.style.left = x * W + 'px'; d.style.top = y * H + 'px'; d.style.setProperty('--c', c); document.body.append(d);
+    out[id] = { x: x * W, y: y * H - 60 };
+  });
+  return out;
+}
+
+async function battle(kind) {
+  const foes = [
+    { id: 'f0', name: 'コロイシ', lv: 8, mat: 'stone', hp: 40, maxHp: 52 },
+    { id: 'f1', name: 'マッチボウ', lv: 9, mat: 'fire', hp: 48, maxHp: 48, status: kind === 'battle' ? 'sleep' : null },
+    { id: 'f2', name: 'ワタボウシ', lv: 7, mat: 'cloth', hp: 30, maxHp: 30, row: 'back' },
+  ];
+  if (kind === 'battle_lamp') { foes.splice(0, 3, { id: 'f0', name: 'カゲボウシ', lv: 18, mat: 'cloth', hp: 300, maxHp: 380, boss: true }); }
+  if (kind === 'battle_clock') { foes.splice(0, 3, { id: 'f0', name: 'トケイモリ', lv: 24, mat: 'tin', hp: 520, maxHp: 600, boss: true }, { id: 'f1', name: 'ゼンマイヌ', lv: 20, mat: 'tin', hp: 60, maxHp: 80, row: 'back' }); }
+  const al = party.slice(0, 3).map((m, i) => ({ id: 'a' + i, name: m.name, lv: m.lv, mat: m.mat, hp: m.hp, maxHp: m.maxHp, mp: m.mp, maxMp: m.maxMp, status: m.status, row: i === 2 ? 'back' : 'front' }));
+  const bt = UI.createBattleUI({ allies: al, foes, turn: 3 });
+  const P = portrait;
+  const anchors = dolls([
+    ...foes.map((f, i) => [f.id, P ? 0.25 + 0.25 * i : 0.55 + 0.14 * i, P ? (f.row === 'back' ? 0.33 : 0.4) : (f.row === 'back' ? 0.36 : 0.44), '#b8a07a']),
+    ...al.map((a, i) => [a.id, P ? 0.25 + 0.25 * i : 0.12 + 0.13 * i, P ? (a.row === 'back' ? 0.6 : 0.54) : (a.row === 'back' ? 0.54 : 0.6), party[i].color]),
+  ]);
+  bt.setAnchors(anchors);
+  if (kind === 'battle_lamp') bt.setPhase({ lamp: { now: 'shadow', next: ['shadow', 'light'] } });
+  if (kind === 'battle_clock') bt.setPhase({ clock: { hand: 1, nextIn: 2 } });
+  await fx.wait(500);
+  const ctx = { skills: party[0].skills, items: items.map((i) => ({ ...i, target: i.target === 'none' ? 'foe' : i.target })), canScout: kind !== 'battle_clock', canRun: kind === 'battle' };
+  window.__ui.cmd = bt.askCommand('a0', ctx).then((r) => (window.__ui.result = r));
+  if (kind === 'battle_skill') { await fx.wait(80); document.querySelectorAll('.ui-bt__cmd .ui-part')[1].click(); }
+  if (kind === 'battle_target') {
+    await fx.wait(80); document.querySelectorAll('.ui-bt__cmd .ui-part')[1].click();
+    await fx.wait(80); [...document.querySelectorAll('.ui-bt__sub .ui-part')].find((b) => !b.disabled && /ブリキ|パンチ|たいあたり/.test(b.textContent))?.click();
+    await fx.wait(120);
+    bt.pop('a1', 24, 'heal');
+    bt.pop('f2', 'MISS', 'miss');
+    bt.pop('f0', 38, 'weak', { newHp: 2, delay: 120 });
+    bt.pop('f1', 12, 'dmg', { newHp: 36, delay: 260 });
+    await fx.wait(300);
+  }
+  if (kind === 'battle_lamp' || kind === 'battle_clock') { bt.pop('f0', kind === 'battle_lamp' ? 64 : 112, 'crit', { newHp: kind === 'battle_lamp' ? 236 : 408 }); bt.setMon('a0', { hp: party[0].hp - 20 }); }
+  window.__ui.bt = bt;
+}
+
+const predict = (a, b) => {
+  const A = party.find((m) => m.id === a), B = party.find((m) => m.id === b);
+  const child = (A.mat === 'tin' && B.mat === 'fire') || (A.mat === 'fire' && B.mat === 'tin') ? SP.nuihebi : SP.haribote;
+  const bonus = Math.min(0.5, (A.lv + B.lv) / 200 + 0.5 * Math.max(A.bonus, B.bonus));
+  return {
+    species: { name: child.name, mat: child.mat, body: child.body, no: child.no },
+    stats: Object.fromEntries(Object.entries(child.base).map(([k, v]) => [k, Math.floor(v * (1 + bonus))])),
+    bonus, gen: Math.max(A.gen, B.gen) + 1, native: child.parts,
+    note: child.id === 'nuihebi' ? '火のしで ブリキを 当てると…… 布になる(向かいあう素材)' : null,
+  };
+};
+
+async function run() {
+  switch (scene) {
+    case 'title': UI.openTitle({ hasSave: true, version: '0.2', onNew() {}, onContinue() {} }); break;
+    case 'name': UI.openNameEntry({ initial: 'ネジ', onDone: (n) => (window.__ui.name = n) }); break;
+    case 'field': {
+      const pad = UI.createPad({ onButton: (n, d) => log.push('pad:' + n + ':' + d) });
+      UI.showAreaPlate(area, { hold: 60000 });
+      window.__ui.pad = pad; break;
+    }
+    case 'dialog': { UI.createPad({}); const dl = UI.createDialog({ speed: 0 }); dl.say({ name: 'ボルト親方', code: 'NPC-2', text: 'よう、起きたか。先生がいなくなってから、箱の**つなぎ目**が ほどけっぱなしだ。' }); break; }
+    case 'dialog_choice': { const dl = UI.createDialog({ speed: 0 }); window.__ui.choice = dl.say({ name: 'ボルト親方', text: 'こいつらのうち、ひとり連れてけ。', choices: ['ネジコ(速さのブリキ)', 'ペラリ(かしこい紙)', 'インキー(ねばり強い水)'] }); break; }
+    case 'note': { const dl = UI.createDialog({ speed: 0 }); dl.say({ note: true, name: '注意', text: '建物の中に入ると、**屋根と手前の壁**が はずれて、中が見えます。' }); break; }
+    case 'menu': case 'party': case 'detail': case 'items': case 'settings': case 'save': {
+      UI.createPad({});
+      UI.openMenu({ money: 1280, playTime: '01:24', place: 'ネジマキ村', party, items, settings, onSave: () => ({ ok: true }), getExport: () => 'DMK1:eyJ2IjoxLCJhcmVhIjoidmlsbGFnZSJ9', onImport: (t) => ({ ok: t.startsWith('DMK1:'), msg: t.startsWith('DMK1:') ? '読みこみました' : '形が ちがいます' }), onSettings: (s) => (window.__ui.settings = s) });
+      await fx.wait(300);
+      const idx = { party: 0, detail: 0, items: 1, settings: 3, save: 4 }[scene];
+      if (idx != null) document.querySelectorAll('.ui-menu .ui-part')[idx].click();
+      if (scene === 'detail') { await fx.wait(300); document.querySelectorAll('.ui-sheet .ui-part')[0].click(); }
+      break;
+    }
+    case 'battle': case 'battle_skill': case 'battle_target': case 'battle_lamp': case 'battle_clock': await battle(scene); break;
+    case 'breed': case 'breed_parts': case 'breed_skills': case 'breed_asm': {
+      const br = UI.openBreed({ candidates: party, predict, onConfirm: (p) => ({ name: 'ヌイヘビ', pick: p }), onDone: (r) => (window.__ui.bred = r) });
+      window.__ui.breed = br;
+      await fx.wait(250);
+      if (scene !== 'breed' || true) { const ps = document.querySelectorAll('.ui-br .ui-page:first-child .ui-runner .ui-part'); ps[0].click(); await fx.wait(30); document.querySelectorAll('.ui-br .ui-page:first-child .ui-runner .ui-part')[3].click(); }
+      if (scene === 'breed') break;
+      await fx.wait(60); document.querySelector('.ui-br__foot .ui-btn--ink').click();
+      await fx.wait(60); document.querySelector('.ui-br__foot .ui-btn--ink').click();
+      await fx.wait(60); document.querySelectorAll('.ui-br__picks .ui-part')[2].click();
+      if (scene === 'breed_parts') break;
+      await fx.wait(60); document.querySelector('.ui-br__foot .ui-btn--ink').click();
+      await fx.wait(60); const sk = document.querySelectorAll('.ui-br__picks .ui-part'); sk[0].click(); await fx.wait(30); document.querySelectorAll('.ui-br__picks .ui-part')[3].click();
+      if (scene === 'breed_skills') break;
+      await fx.wait(60); document.querySelector('.ui-br__foot .ui-btn--acc').click();
+      await new Promise((r) => { const t = setInterval(() => { const d = document.querySelector('.ui-asm__done'); if (d && !d.hidden) { clearInterval(t); r(); } }, 100); });
+      break;
+    }
+    case 'dex': case 'bom': {
+      const state = {}; mons.species.forEach((s, i) => (state[s.id] = i < 9 ? 'caught' : i < 14 ? 'seen' : 'unseen'));
+      const bom = {}; ['nejiko.back', 'matchbo.tail', 'perari.head', 'tsumiking.head', 'koroishi.back', 'felton.head', 'watabou.back'].forEach((k, i) => (bom[k] = i === 3 ? 2 : 1));
+      UI.openDex({ species: mons.species.map((s) => ({ ...s, noParts: s.id === 'tokeimori' })), state, bom, bodies: mons.bodies, tab: scene === 'bom' ? 'bom' : 'dex' });
+      break;
+    }
+    case 'shop': UI.openShop({ name: 'コロのよろず屋', money: 640, stock: [
+      { id: 'patch', name: 'ばんそうこう', price: 20, desc: 'なかま1体のHPを45直す' }, { id: 'paint', name: '絵の具チューブ', price: 60, desc: 'なかま1体のMPを20もどす' },
+      { id: 'thread', name: 'ほころび糸', price: 25, desc: '状態異常を直す' }, { id: 'oil', name: 'ぜんまいオイル', price: 120, desc: 'たおれたなかまを、HP半分で起こす' },
+      { id: 'varnish', name: 'つやだしニス', price: 50, desc: 'スカウト ×1.6' }, { id: 'smoke', name: 'けむり玉', price: 30, desc: '必ずにげる' }, { id: 'spray', name: 'まるごとスプレー', price: 900, desc: 'みんなのHP+80' }],
+      bag: items.map((i) => ({ ...i, price: 10 })), onBuy: (id, n) => ({ ok: true, money: 640 - 20 * n }), onSell: (id, n) => ({ ok: true, money: 640 + 10 * n }) }); break;
+    case 'inn': UI.openInn({ price: 30, money: 640, party, onStay: () => ({ ok: true }) }); break;
+    case 'storage': UI.openStorage({ party: party.slice(0, 4), box: [mon('felton', 12), mon('jarihebi', 10), mon('hotarubin', 13)], onMove: () => ({ ok: true, party: party.slice(0, 3), box: [mon('felton', 12), mon('jarihebi', 10), mon('hotarubin', 13), party[3]] }) }); break;
+    case 'got': {
+      UI.createPad({});
+      UI.showGot({ name: 'つなぎネジ', kind: 'chest', desc: '配合で おさがりを2か所 受けつげる', hold: 60000 });
+      UI.showAreaPlate('tower', { floor: '3F', hold: 60000 });
+      break;
+    }
+  }
+  window.__ui.ready = true;
+}
+run().catch((e) => { window.__ui.error = String(e.stack || e); console.error(e); });
+</script>
+</body>
+</html>
