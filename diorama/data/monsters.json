@@ -1,135 +1,1398 @@
 {
-  "materials": {
-    "water": { "name": "水", "color": "#3f74b8", "beats": "fire", "why": "水は火を消す" },
-    "fire": { "name": "火", "color": "#e0562a", "beats": "paper", "why": "火は紙を燃やす" },
-    "paper": { "name": "紙", "color": "#eadfc4", "beats": "stone", "why": "紙は石を包む" },
-    "stone": { "name": "石", "color": "#8f8b82", "beats": "tin", "why": "石はブリキをへこませる" },
-    "tin": { "name": "ブリキ", "color": "#a9b6c0", "beats": "cloth", "why": "ブリキ(はさみ)は布を切る" },
-    "cloth": { "name": "布", "color": "#cf8aa8", "beats": "water", "why": "布は水を吸う" }
+ "_note": "能力の式は docs/DESIGN.md §4・§5。base は Lv1 の値。stat(L)=floor(base×(1+0.1×(L-1))×(1+伸びボーナス)×(1+パーツの%の合計))。parts は生まれつきのパーツ(おさがりで1か所を入れかえられる)。trait は traits の表、skill はパーツわざ(5つ目のわざ枠)。hpMul はぬし・ボスのHP倍率",
+ "materials": {
+  "water": {
+   "name": "水",
+   "color": "#3f74b8",
+   "beats": "fire",
+   "why": "水は火を消す"
   },
-  "bodies": {
-    "maru": "まる", "shizuku": "しずく", "yotsuashi": "四つ足", "tori": "鳥", "hebi": "へび", "ningyo": "人形"
+  "fire": {
+   "name": "火",
+   "color": "#e0562a",
+   "beats": "paper",
+   "why": "火は紙を燃やす"
   },
-  "species": [
-    { "id": "nejiko", "no": 1, "name": "ネジコ", "mat": "tin", "body": "maru", "where": "最初の3体 / つみき野",
-      "desc": "背中にねじ巻き。巻くほど速くなる。", "color": "#b8c4cc", "accent": "#c9a227", "shiny": "#e8c46a",
-      "base": { "hp": 34, "mp": 14, "atk": 15, "def": 13, "spd": 17, "int": 9 },
-      "learn": [[1, "tackle"], [1, "windup"], [5, "tinpunch"], [11, "sharpen"], [17, "gearsaw"], [24, "clang"]],
-      "parts": { "head": { "stat": "def", "pct": 4 }, "back": { "stat": "spd", "pct": 5, "label": "ねじ巻き" }, "tail": { "stat": "atk", "pct": 3 } },
-      "scout": 0.5, "xp": 14, "gold": 6 },
-    { "id": "perari", "no": 2, "name": "ペラリ", "mat": "paper", "body": "shizuku", "where": "最初の3体 / つみき野",
-      "desc": "1枚の紙でできた、ひらひらの子。", "color": "#f1e9d6", "accent": "#d64a3a", "shiny": "#a7d3e8",
-      "base": { "hp": 30, "mp": 20, "atk": 11, "def": 10, "spd": 15, "int": 16 },
-      "learn": [[1, "tackle"], [1, "papercut"], [6, "tickle"], [10, "heal"], [16, "fold"], [23, "confetti"]],
-      "parts": { "head": { "stat": "int", "pct": 5 }, "back": { "stat": "spd", "pct": 4, "label": "紙のひれ" }, "tail": { "stat": "mp", "pct": 6 } },
-      "scout": 0.5, "xp": 13, "gold": 5 },
-    { "id": "inky", "no": 3, "name": "インキー", "mat": "water", "body": "shizuku", "where": "最初の3体 / ランプの森",
-      "desc": "インク壺から生まれた。歩くとしみが残る。", "color": "#33508f", "accent": "#e8d9b0", "shiny": "#5bbf9a",
-      "base": { "hp": 32, "mp": 18, "atk": 12, "def": 12, "spd": 13, "int": 15 },
-      "learn": [[1, "tackle"], [1, "splash"], [6, "inkshot"], [12, "heal"], [18, "drain"], [25, "wave"]],
-      "parts": { "head": { "stat": "int", "pct": 4 }, "back": { "stat": "mp", "pct": 6 }, "tail": { "stat": "def", "pct": 3, "skill": "inkshot" } },
-      "scout": 0.45, "xp": 15, "gold": 6 },
-    { "id": "koroishi", "no": 4, "name": "コロイシ", "mat": "stone", "body": "maru", "where": "つみき野",
-      "desc": "河原の石に目がついた。転がって体当たり。", "color": "#9a958b", "accent": "#5f7d4a", "shiny": "#d3b98c",
-      "base": { "hp": 38, "mp": 8, "atk": 14, "def": 19, "spd": 7, "int": 6 },
-      "learn": [[1, "tackle"], [3, "roll"], [8, "stoneskin"], [14, "pebble"], [20, "quake"]],
-      "parts": { "head": { "stat": "def", "pct": 6 }, "back": { "stat": "hp", "pct": 5, "label": "こけ石" }, "tail": { "stat": "def", "pct": 3 } },
-      "scout": 0.55, "xp": 12, "gold": 5 },
-    { "id": "watabou", "no": 5, "name": "ワタボウシ", "mat": "cloth", "body": "tori", "where": "つみき野",
-      "desc": "綿のつばさ。風が吹くと飛ばされる。", "color": "#f4eef0", "accent": "#e6a24a", "shiny": "#c8b6e8",
-      "base": { "hp": 28, "mp": 16, "atk": 10, "def": 9, "spd": 19, "int": 12 },
-      "learn": [[1, "tackle"], [1, "stitch"], [7, "fluff"], [12, "lullaby"], [18, "healall"]],
-      "parts": { "head": { "stat": "spd", "pct": 4 }, "back": { "stat": "spd", "pct": 6, "label": "綿のつばさ" }, "tail": { "stat": "hp", "pct": 3 } },
-      "scout": 0.5, "xp": 12, "gold": 5 },
-    { "id": "matchbo", "no": 6, "name": "マッチボウ", "mat": "fire", "body": "hebi", "where": "つみき野(夕方)",
-      "desc": "マッチ棒がつながったへび。頭が火。", "color": "#d8b57a", "accent": "#d33a24", "shiny": "#7fb7e0",
-      "base": { "hp": 29, "mp": 16, "atk": 17, "def": 10, "spd": 15, "int": 13 },
-      "learn": [[1, "bite"], [1, "spark"], [7, "sharpen"], [13, "flame"], [21, "blaze"]],
-      "parts": { "head": { "stat": "atk", "pct": 5, "skill": "spark" }, "back": { "stat": "atk", "pct": 3 }, "tail": { "stat": "spd", "pct": 3 } },
-      "scout": 0.4, "xp": 16, "gold": 7 },
-    { "id": "origarasu", "no": 7, "name": "オリガラス", "mat": "paper", "body": "tori", "where": "ランプの森(影)",
-      "desc": "折り紙のカラス。影の中にだけいる。", "color": "#2c2b33", "accent": "#e3c54d", "shiny": "#e8e2d0",
-      "base": { "hp": 31, "mp": 15, "atk": 17, "def": 11, "spd": 19, "int": 11 },
-      "learn": [[1, "papercut"], [1, "shadowstep"], [10, "fold"], [15, "tickle"], [22, "confetti"]],
-      "parts": { "head": { "stat": "atk", "pct": 4 }, "back": { "stat": "spd", "pct": 5, "label": "折り羽" }, "tail": { "stat": "spd", "pct": 3 } },
-      "scout": 0.4, "xp": 18, "gold": 8 },
-    { "id": "jarihebi", "no": 8, "name": "ジャリヘビ", "mat": "stone", "body": "hebi", "where": "ランプの森",
-      "desc": "砂利がつながったへび。", "color": "#7d786e", "accent": "#b9a27a", "shiny": "#9fc2a5",
-      "base": { "hp": 36, "mp": 10, "atk": 18, "def": 17, "spd": 10, "int": 8 },
-      "learn": [[1, "bite"], [1, "pebble"], [10, "roll"], [16, "stoneskin"], [22, "quake"]],
-      "parts": { "head": { "stat": "atk", "pct": 4 }, "back": { "stat": "def", "pct": 5 }, "tail": { "stat": "def", "pct": 4, "label": "じゃりの鈴" } },
-      "scout": 0.42, "xp": 18, "gold": 8 },
-    { "id": "felton", "no": 9, "name": "フェルトン", "mat": "cloth", "body": "maru", "where": "ランプの森(光)",
-      "desc": "フェルトの毛玉。ぶつかると縫いつける。", "color": "#7fae6b", "accent": "#e85c5c", "shiny": "#e8a0c8",
-      "base": { "hp": 37, "mp": 15, "atk": 14, "def": 14, "spd": 12, "int": 12 },
-      "learn": [[1, "tackle"], [1, "stitch"], [10, "wrap"], [14, "heal"], [20, "drain"], [26, "fluff"]],
-      "parts": { "head": { "stat": "hp", "pct": 5 }, "back": { "stat": "atk", "pct": 4, "label": "ぬい針", "skill": "stitch" }, "tail": { "stat": "hp", "pct": 4 } },
-      "scout": 0.45, "xp": 17, "gold": 7 },
-    { "id": "hotarubin", "no": 10, "name": "ホタルビン", "mat": "water", "body": "tori", "where": "ランプの森(影)",
-      "desc": "小びんに水と光。夜の森を照らす。", "color": "#9fd0d8", "accent": "#f2e36a", "shiny": "#f2a6c4",
-      "base": { "hp": 30, "mp": 22, "atk": 10, "def": 11, "spd": 17, "int": 18 },
-      "learn": [[1, "splash"], [1, "flash"], [10, "heal"], [15, "varnish"], [21, "wave"], [26, "healall"]],
-      "parts": { "head": { "stat": "mp", "pct": 6 }, "back": { "stat": "int", "pct": 5, "label": "ガラスの羽" }, "tail": { "stat": "int", "pct": 3, "skill": "flash" } },
-      "scout": 0.4, "xp": 18, "gold": 8 },
-    { "id": "zenmainu", "no": 11, "name": "ゼンマイヌ", "mat": "tin", "body": "yotsuashi", "where": "ゼンマイ時計塔",
-      "desc": "ゼンマイ仕掛けの犬。", "color": "#c7cfd6", "accent": "#b5452f", "shiny": "#e8c46a",
-      "base": { "hp": 38, "mp": 12, "atk": 19, "def": 16, "spd": 16, "int": 9 },
-      "learn": [[1, "bite"], [1, "tinpunch"], [14, "windup"], [18, "gearsaw"], [24, "encourage"]],
-      "parts": { "head": { "stat": "atk", "pct": 4 }, "back": { "stat": "spd", "pct": 6, "label": "大ゼンマイ" }, "tail": { "stat": "spd", "pct": 3 } },
-      "scout": 0.38, "xp": 24, "gold": 10 },
-    { "id": "rousokun", "no": 12, "name": "ロウソクン", "mat": "fire", "body": "shizuku", "where": "ゼンマイ時計塔",
-      "desc": "ロウソクの子。火が消えると眠る。", "color": "#f2ead8", "accent": "#f08a24", "shiny": "#9fb7f0",
-      "base": { "hp": 33, "mp": 22, "atk": 11, "def": 12, "spd": 13, "int": 19 },
-      "learn": [[1, "spark"], [1, "flash"], [15, "lullaby"], [18, "flame"], [24, "blaze"]],
-      "parts": { "head": { "stat": "int", "pct": 5 }, "back": { "stat": "mp", "pct": 5 }, "tail": { "stat": "def", "pct": 3 } },
-      "scout": 0.38, "xp": 24, "gold": 10 },
-    { "id": "tsumiking", "no": 13, "name": "ツミキング", "mat": "stone", "body": "ningyo", "where": "ゼンマイ時計塔",
-      "desc": "積み木を積んだ小さな王。", "color": "#e8c35a", "accent": "#3f6fb5", "shiny": "#d97ab0",
-      "base": { "hp": 42, "mp": 14, "atk": 18, "def": 20, "spd": 9, "int": 12 },
-      "learn": [[1, "tackle"], [1, "pebble"], [14, "stoneskin"], [18, "encourage"], [23, "quake"]],
-      "parts": { "head": { "stat": "def", "pct": 5, "label": "つみきの冠" }, "back": { "stat": "hp", "pct": 5 }, "tail": { "stat": "atk", "pct": 4 } },
-      "scout": 0.35, "xp": 26, "gold": 12 },
-    { "id": "kamishibai", "no": 14, "name": "カミシバイ", "mat": "paper", "body": "ningyo", "where": "ゼンマイ時計塔",
-      "desc": "紙芝居の枠から出てくる語り部。", "color": "#f0e6cf", "accent": "#8a3b2c", "shiny": "#7ec0b0",
-      "base": { "hp": 34, "mp": 24, "atk": 10, "def": 12, "spd": 14, "int": 20 },
-      "learn": [[1, "papercut"], [1, "lullaby"], [14, "heal"], [18, "confetti"], [24, "healall"]],
-      "parts": { "head": { "stat": "int", "pct": 6 }, "back": { "stat": "mp", "pct": 5, "label": "まき物" }, "tail": { "stat": "int", "pct": 3 } },
-      "scout": 0.35, "xp": 26, "gold": 12 },
-    { "id": "haribote", "no": 15, "name": "ハリボテ", "mat": "paper", "body": "yotsuashi", "where": "配合 / つみき野の池の小島(ピンセット)",
-      "desc": "はりぼての馬。中はからっぽ。", "color": "#e9d2a6", "accent": "#c43d3d", "shiny": "#f0f0f0",
-      "base": { "hp": 40, "mp": 16, "atk": 19, "def": 15, "spd": 18, "int": 13 },
-      "learn": [[1, "tackle"], [1, "fold"], [10, "encourage"], [16, "papercut"], [22, "confetti"]],
-      "parts": { "head": { "stat": "spd", "pct": 5 }, "back": { "stat": "def", "pct": 5, "label": "くら" }, "tail": { "stat": "spd", "pct": 4 } },
-      "scout": 0.25, "xp": 30, "gold": 15 },
-    { "id": "hibachineko", "no": 16, "name": "ヒバチネコ", "mat": "fire", "body": "yotsuashi", "where": "配合のみ",
-      "desc": "火鉢を背負った猫。ぬくい。", "color": "#5b4a43", "accent": "#e27a2b", "shiny": "#e8e0d0",
-      "base": { "hp": 42, "mp": 20, "atk": 21, "def": 15, "spd": 18, "int": 17 },
-      "learn": [[1, "bite"], [1, "spark"], [8, "flame"], [15, "sharpen"], [20, "blaze"]],
-      "parts": { "head": { "stat": "spd", "pct": 4 }, "back": { "stat": "atk", "pct": 6, "label": "火鉢" }, "tail": { "stat": "atk", "pct": 4 } },
-      "breedOnly": true, "scout": 0, "xp": 32, "gold": 15 },
-    { "id": "nuihebi", "no": 17, "name": "ヌイヘビ", "mat": "cloth", "body": "hebi", "where": "配合のみ",
-      "desc": "ぬいぐるみのへび。継ぎはぎがある。", "color": "#8c6db0", "accent": "#f2c84b", "shiny": "#7fd0c0",
-      "base": { "hp": 46, "mp": 20, "atk": 17, "def": 18, "spd": 14, "int": 16 },
-      "learn": [[1, "bite"], [1, "wrap"], [8, "drain"], [14, "healall"], [20, "glue"]],
-      "parts": { "head": { "stat": "hp", "pct": 5 }, "back": { "stat": "def", "pct": 6, "label": "つぎはぎ" }, "tail": { "stat": "hp", "pct": 4 } },
-      "breedOnly": true, "scout": 0, "xp": 32, "gold": 15 },
-    { "id": "burikishi", "no": 18, "name": "ブリキシ", "mat": "tin", "body": "ningyo", "where": "配合のみ",
-      "desc": "ブリキの騎士。体験版でいちばん強い。", "color": "#c4ccd4", "accent": "#2f4f8f", "shiny": "#e3b84a",
-      "base": { "hp": 48, "mp": 18, "atk": 25, "def": 22, "spd": 16, "int": 13 },
-      "learn": [[1, "tinpunch"], [1, "sharpen"], [8, "gearsaw"], [14, "encourage"], [20, "knightcharge"]],
-      "parts": { "head": { "stat": "def", "pct": 6, "label": "かぶと" }, "back": { "stat": "def", "pct": 6, "label": "たて" }, "tail": { "stat": "atk", "pct": 6, "label": "けん" } },
-      "breedOnly": true, "scout": 0, "xp": 36, "gold": 18 },
-    { "id": "kageboushi", "no": 19, "name": "カゲボウシ", "mat": "cloth", "body": "ningyo", "where": "ランプの森のぬし / 倒したあと配合",
-      "desc": "影の帽子をかぶった人影。光のときだけ姿が見える。", "color": "#2a2738", "accent": "#5a4a8a", "shiny": "#e0d8f0",
-      "base": { "hp": 52, "mp": 24, "atk": 20, "def": 16, "spd": 18, "int": 19 },
-      "learn": [[1, "shadowstep"], [1, "stitch"], [8, "shadowcloak"], [14, "drain"], [20, "fluff"]],
-      "parts": { "head": { "stat": "int", "pct": 5, "label": "影の帽子" }, "back": { "stat": "spd", "pct": 5 }, "tail": { "stat": "int", "pct": 4 } },
-      "boss": true, "breedOnly": true, "scout": 0, "xp": 160, "gold": 120 },
-    { "id": "tokeimori", "no": 20, "name": "トケイモリ", "mat": "tin", "body": "yotsuashi", "where": "ゼンマイ時計塔のボス",
-      "desc": "背中に文字盤の大ヤモリ。針が進むと戦場が回る。", "color": "#a7b07a", "accent": "#c79a3a", "shiny": "#9fb8e0",
-      "base": { "hp": 64, "mp": 40, "atk": 23, "def": 21, "spd": 15, "int": 20 },
-      "learn": [[1, "gearsaw"], [1, "chime"], [1, "windup"], [1, "clang"]],
-      "parts": { "head": { "stat": "spd", "pct": 4 }, "back": { "stat": "int", "pct": 6, "label": "文字盤" }, "tail": { "stat": "atk", "pct": 4 } },
-      "boss": true, "noScout": true, "scout": 0, "xp": 400, "gold": 300 }
-  ]
+  "paper": {
+   "name": "紙",
+   "color": "#eadfc4",
+   "beats": "stone",
+   "why": "紙は石を包む"
+  },
+  "stone": {
+   "name": "石",
+   "color": "#8f8b82",
+   "beats": "tin",
+   "why": "石はブリキをへこませる"
+  },
+  "tin": {
+   "name": "ブリキ",
+   "color": "#a9b6c0",
+   "beats": "cloth",
+   "why": "ブリキ(はさみ)は布を切る"
+  },
+  "cloth": {
+   "name": "布",
+   "color": "#cf8aa8",
+   "beats": "water",
+   "why": "布は水を吸う"
+  }
+ },
+ "bodies": {
+  "maru": "まる",
+  "shizuku": "しずく",
+  "yotsuashi": "四つ足",
+  "tori": "鳥",
+  "hebi": "へび",
+  "ningyo": "人形"
+ },
+ "traits": {
+  "windupStart": "戦闘の1ターン目だけ、すばやさ×1.5",
+  "regen": "毎ターンの終わりに、最大HPの1/16回復",
+  "escape": "にげるが必ず成功する(ぬし・ボス戦はのぞく)",
+  "inkpot": "水のわざの威力+10%",
+  "rattle": "戦闘のはじめに鈴が鳴り、敵みんなのすばやさ×0.9(3ターン)",
+  "clearsight": "影のターン・しみでも、命中が下がらない",
+  "mainspring": "3ターン目から、すばやさ×1.2",
+  "wakeful": "ねむりにならない",
+  "backguard": "後列にいるとき、受けるダメージがさらに×0.85",
+  "storyteller": "なかまにいると、スカウトの確率×1.15(重ならない)",
+  "goldfind": "戦闘で手に入るお金×1.2(重ならない)",
+  "burnproof": "こげにならない。火のわざの威力+10%",
+  "endure": "1回の戦闘で1度だけ、たおれるダメージをHP1で耐える",
+  "nocrit": "急所に当たらない",
+  "rustproof": "さびにならない",
+  "shadowfit": "影のターンとかげのマント中、受ける物理わざの命中がさらに×0.8",
+  "clockwork": "3ターンごとに、すばやさに関係なく先に動く"
+ },
+ "species": [
+  {
+   "id": "nejiko",
+   "no": 1,
+   "name": "ネジコ",
+   "mat": "tin",
+   "body": "maru",
+   "where": "最初の3体 / つみき野",
+   "desc": "背中にねじ巻き。巻くほど速くなる。",
+   "color": "#b8c4cc",
+   "accent": "#c9a227",
+   "shiny": "#e8c46a",
+   "base": {
+    "hp": 34,
+    "mp": 14,
+    "atk": 15,
+    "def": 13,
+    "spd": 17,
+    "int": 9
+   },
+   "learn": [
+    [
+     1,
+     "tackle"
+    ],
+    [
+     1,
+     "windup"
+    ],
+    [
+     5,
+     "tinpunch"
+    ],
+    [
+     11,
+     "sharpen"
+    ],
+    [
+     17,
+     "gearsaw"
+    ],
+    [
+     24,
+     "clang"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "ネジ頭",
+     "stat": "def",
+     "pct": 4
+    },
+    "back": {
+     "label": "ねじ巻き",
+     "stat": "spd",
+     "pct": 5,
+     "trait": "windupStart"
+    },
+    "tail": {
+     "label": "ばね",
+     "stat": "atk",
+     "pct": 3
+    }
+   },
+   "scout": 0.5,
+   "xp": 14,
+   "gold": 6,
+   "bst": 102
+  },
+  {
+   "id": "perari",
+   "no": 2,
+   "name": "ペラリ",
+   "mat": "paper",
+   "body": "shizuku",
+   "where": "最初の3体 / つみき野",
+   "desc": "1枚の紙でできた、ひらひらの子。",
+   "color": "#f1e9d6",
+   "accent": "#d64a3a",
+   "shiny": "#a7d3e8",
+   "base": {
+    "hp": 30,
+    "mp": 20,
+    "atk": 11,
+    "def": 10,
+    "spd": 15,
+    "int": 16
+   },
+   "learn": [
+    [
+     1,
+     "tackle"
+    ],
+    [
+     1,
+     "papercut"
+    ],
+    [
+     6,
+     "papershield"
+    ],
+    [
+     10,
+     "heal"
+    ],
+    [
+     16,
+     "fold"
+    ],
+    [
+     23,
+     "confetti"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "折り目",
+     "stat": "int",
+     "pct": 5
+    },
+    "back": {
+     "label": "紙のひれ",
+     "stat": "spd",
+     "pct": 4
+    },
+    "tail": {
+     "label": "しおり",
+     "stat": "mp",
+     "pct": 6,
+     "skill": "papershield"
+    }
+   },
+   "scout": 0.5,
+   "xp": 13,
+   "gold": 5,
+   "bst": 102
+  },
+  {
+   "id": "inky",
+   "no": 3,
+   "name": "インキー",
+   "mat": "water",
+   "body": "shizuku",
+   "where": "最初の3体 / ランプの森",
+   "desc": "インク壺から生まれた。歩くとしみが残る。",
+   "color": "#33508f",
+   "accent": "#e8d9b0",
+   "shiny": "#5bbf9a",
+   "base": {
+    "hp": 32,
+    "mp": 18,
+    "atk": 12,
+    "def": 12,
+    "spd": 13,
+    "int": 15
+   },
+   "learn": [
+    [
+     1,
+     "tackle"
+    ],
+    [
+     1,
+     "splash"
+    ],
+    [
+     6,
+     "inkshot"
+    ],
+    [
+     12,
+     "heal"
+    ],
+    [
+     18,
+     "rustrain"
+    ],
+    [
+     25,
+     "wave"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "インク壺のふた",
+     "stat": "int",
+     "pct": 4,
+     "trait": "inkpot"
+    },
+    "back": {
+     "label": "しずく",
+     "stat": "mp",
+     "pct": 6
+    },
+    "tail": {
+     "label": "筆の先",
+     "stat": "def",
+     "pct": 3,
+     "skill": "inkshot"
+    }
+   },
+   "scout": 0.45,
+   "xp": 15,
+   "gold": 6,
+   "bst": 102
+  },
+  {
+   "id": "koroishi",
+   "no": 4,
+   "name": "コロイシ",
+   "mat": "stone",
+   "body": "maru",
+   "where": "つみき野",
+   "desc": "河原の石に目がついた。転がって体当たり。",
+   "color": "#9a958b",
+   "accent": "#5f7d4a",
+   "shiny": "#d3b98c",
+   "base": {
+    "hp": 40,
+    "mp": 8,
+    "atk": 15,
+    "def": 20,
+    "spd": 7,
+    "int": 6
+   },
+   "learn": [
+    [
+     1,
+     "tackle"
+    ],
+    [
+     3,
+     "roll"
+    ],
+    [
+     8,
+     "stoneskin"
+    ],
+    [
+     14,
+     "pebble"
+    ],
+    [
+     18,
+     "cover"
+    ],
+    [
+     22,
+     "quake"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "河原石",
+     "stat": "def",
+     "pct": 6
+    },
+    "back": {
+     "label": "こけ石",
+     "stat": "hp",
+     "pct": 5,
+     "trait": "regen"
+    },
+    "tail": {
+     "label": "小石",
+     "stat": "def",
+     "pct": 3
+    }
+   },
+   "scout": 0.55,
+   "xp": 12,
+   "gold": 5,
+   "bst": 96
+  },
+  {
+   "id": "watabou",
+   "no": 5,
+   "name": "ワタボウシ",
+   "mat": "cloth",
+   "body": "tori",
+   "where": "つみき野",
+   "desc": "綿のつばさ。風が吹くと飛ばされる。",
+   "color": "#f4eef0",
+   "accent": "#e6a24a",
+   "shiny": "#c8b6e8",
+   "base": {
+    "hp": 30,
+    "mp": 16,
+    "atk": 11,
+    "def": 9,
+    "spd": 20,
+    "int": 12
+   },
+   "learn": [
+    [
+     1,
+     "tackle"
+    ],
+    [
+     1,
+     "stitch"
+    ],
+    [
+     7,
+     "fluff"
+    ],
+    [
+     12,
+     "lullaby"
+    ],
+    [
+     15,
+     "mend"
+    ],
+    [
+     20,
+     "healall"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "綿毛",
+     "stat": "spd",
+     "pct": 4
+    },
+    "back": {
+     "label": "綿のつばさ",
+     "stat": "spd",
+     "pct": 6,
+     "trait": "escape"
+    },
+    "tail": {
+     "label": "糸くず",
+     "stat": "hp",
+     "pct": 3
+    }
+   },
+   "scout": 0.5,
+   "xp": 12,
+   "gold": 5,
+   "bst": 98
+  },
+  {
+   "id": "matchbo",
+   "no": 6,
+   "name": "マッチボウ",
+   "mat": "fire",
+   "body": "hebi",
+   "where": "つみき野(夕方)",
+   "desc": "マッチ棒がつながったへび。頭が火。",
+   "color": "#d8b57a",
+   "accent": "#d33a24",
+   "shiny": "#7fb7e0",
+   "base": {
+    "hp": 29,
+    "mp": 16,
+    "atk": 17,
+    "def": 10,
+    "spd": 15,
+    "int": 13
+   },
+   "learn": [
+    [
+     1,
+     "bite"
+    ],
+    [
+     1,
+     "spark"
+    ],
+    [
+     7,
+     "temper"
+    ],
+    [
+     13,
+     "flame"
+    ],
+    [
+     21,
+     "blaze"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "マッチの頭",
+     "stat": "atk",
+     "pct": 5,
+     "skill": "spark"
+    },
+    "back": {
+     "label": "マッチの軸",
+     "stat": "atk",
+     "pct": 3
+    },
+    "tail": {
+     "label": "燃えさし",
+     "stat": "spd",
+     "pct": 3
+    }
+   },
+   "scout": 0.4,
+   "xp": 16,
+   "gold": 7,
+   "bst": 100
+  },
+  {
+   "id": "origarasu",
+   "no": 7,
+   "name": "オリガラス",
+   "mat": "paper",
+   "body": "tori",
+   "where": "ランプの森(影)",
+   "desc": "折り紙のカラス。影の中にだけいる。",
+   "color": "#2c2b33",
+   "accent": "#e3c54d",
+   "shiny": "#e8e2d0",
+   "base": {
+    "hp": 31,
+    "mp": 15,
+    "atk": 17,
+    "def": 11,
+    "spd": 19,
+    "int": 11
+   },
+   "learn": [
+    [
+     1,
+     "papercut"
+    ],
+    [
+     1,
+     "shadowstep"
+    ],
+    [
+     10,
+     "fold"
+    ],
+    [
+     15,
+     "glue"
+    ],
+    [
+     22,
+     "confetti"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "くちばし",
+     "stat": "atk",
+     "pct": 4
+    },
+    "back": {
+     "label": "折り羽",
+     "stat": "spd",
+     "pct": 5,
+     "skill": "shadowstep"
+    },
+    "tail": {
+     "label": "尾羽",
+     "stat": "spd",
+     "pct": 3
+    }
+   },
+   "scout": 0.4,
+   "xp": 18,
+   "gold": 8,
+   "bst": 104
+  },
+  {
+   "id": "jarihebi",
+   "no": 8,
+   "name": "ジャリヘビ",
+   "mat": "stone",
+   "body": "hebi",
+   "where": "ランプの森",
+   "desc": "砂利がつながったへび。",
+   "color": "#7d786e",
+   "accent": "#b9a27a",
+   "shiny": "#9fc2a5",
+   "base": {
+    "hp": 38,
+    "mp": 10,
+    "atk": 18,
+    "def": 17,
+    "spd": 11,
+    "int": 10
+   },
+   "learn": [
+    [
+     1,
+     "bite"
+    ],
+    [
+     1,
+     "pebble"
+    ],
+    [
+     10,
+     "roll"
+    ],
+    [
+     16,
+     "stoneskin"
+    ],
+    [
+     22,
+     "quake"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "じゃりの頭",
+     "stat": "atk",
+     "pct": 4
+    },
+    "back": {
+     "label": "じゃりの胴",
+     "stat": "def",
+     "pct": 5
+    },
+    "tail": {
+     "label": "じゃりの鈴",
+     "stat": "def",
+     "pct": 4,
+     "trait": "rattle"
+    }
+   },
+   "scout": 0.42,
+   "xp": 18,
+   "gold": 8,
+   "bst": 104
+  },
+  {
+   "id": "felton",
+   "no": 9,
+   "name": "フェルトン",
+   "mat": "cloth",
+   "body": "maru",
+   "where": "ランプの森(光)",
+   "desc": "フェルトの毛玉。ぶつかると縫いつける。",
+   "color": "#7fae6b",
+   "accent": "#e85c5c",
+   "shiny": "#e8a0c8",
+   "base": {
+    "hp": 37,
+    "mp": 15,
+    "atk": 14,
+    "def": 14,
+    "spd": 12,
+    "int": 12
+   },
+   "learn": [
+    [
+     1,
+     "tackle"
+    ],
+    [
+     1,
+     "stitch"
+    ],
+    [
+     10,
+     "wrap"
+    ],
+    [
+     14,
+     "heal"
+    ],
+    [
+     20,
+     "drain"
+    ],
+    [
+     26,
+     "fluff"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "毛玉",
+     "stat": "hp",
+     "pct": 5
+    },
+    "back": {
+     "label": "ぬい針",
+     "stat": "atk",
+     "pct": 4,
+     "skill": "stitch"
+    },
+    "tail": {
+     "label": "ぽんぽん",
+     "stat": "hp",
+     "pct": 4
+    }
+   },
+   "scout": 0.45,
+   "xp": 17,
+   "gold": 7,
+   "bst": 104
+  },
+  {
+   "id": "hotarubin",
+   "no": 10,
+   "name": "ホタルビン",
+   "mat": "water",
+   "body": "tori",
+   "where": "ランプの森(影)",
+   "desc": "小びんに水と光。夜の森を照らす。",
+   "color": "#9fd0d8",
+   "accent": "#f2e36a",
+   "shiny": "#f2a6c4",
+   "base": {
+    "hp": 30,
+    "mp": 22,
+    "atk": 10,
+    "def": 11,
+    "spd": 17,
+    "int": 18
+   },
+   "learn": [
+    [
+     1,
+     "splash"
+    ],
+    [
+     1,
+     "flash"
+    ],
+    [
+     10,
+     "heal"
+    ],
+    [
+     15,
+     "varnish"
+    ],
+    [
+     21,
+     "wave"
+    ],
+    [
+     26,
+     "healall"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "コルク栓",
+     "stat": "mp",
+     "pct": 6
+    },
+    "back": {
+     "label": "ガラスの羽",
+     "stat": "int",
+     "pct": 5,
+     "trait": "clearsight"
+    },
+    "tail": {
+     "label": "ひかり玉",
+     "stat": "int",
+     "pct": 3,
+     "skill": "flash"
+    }
+   },
+   "scout": 0.4,
+   "xp": 18,
+   "gold": 8,
+   "bst": 108
+  },
+  {
+   "id": "zenmainu",
+   "no": 11,
+   "name": "ゼンマイヌ",
+   "mat": "tin",
+   "body": "yotsuashi",
+   "where": "ゼンマイ時計塔",
+   "desc": "ゼンマイ仕掛けの犬。",
+   "color": "#c7cfd6",
+   "accent": "#b5452f",
+   "shiny": "#e8c46a",
+   "base": {
+    "hp": 38,
+    "mp": 12,
+    "atk": 19,
+    "def": 16,
+    "spd": 16,
+    "int": 9
+   },
+   "learn": [
+    [
+     1,
+     "bite"
+    ],
+    [
+     1,
+     "tinpunch"
+    ],
+    [
+     14,
+     "windup"
+    ],
+    [
+     18,
+     "gearsaw"
+    ],
+    [
+     24,
+     "encourage"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "ブリキの耳",
+     "stat": "atk",
+     "pct": 4
+    },
+    "back": {
+     "label": "大ゼンマイ",
+     "stat": "spd",
+     "pct": 6,
+     "trait": "mainspring"
+    },
+    "tail": {
+     "label": "ばねのしっぽ",
+     "stat": "spd",
+     "pct": 3
+    }
+   },
+   "scout": 0.38,
+   "xp": 24,
+   "gold": 10,
+   "bst": 110
+  },
+  {
+   "id": "rousokun",
+   "no": 12,
+   "name": "ロウソクン",
+   "mat": "fire",
+   "body": "shizuku",
+   "where": "ゼンマイ時計塔",
+   "desc": "ロウソクの子。火が消えると眠る。",
+   "color": "#f2ead8",
+   "accent": "#f08a24",
+   "shiny": "#9fb7f0",
+   "base": {
+    "hp": 33,
+    "mp": 22,
+    "atk": 11,
+    "def": 12,
+    "spd": 13,
+    "int": 19
+   },
+   "learn": [
+    [
+     1,
+     "spark"
+    ],
+    [
+     1,
+     "flash"
+    ],
+    [
+     10,
+     "mend"
+    ],
+    [
+     15,
+     "lullaby"
+    ],
+    [
+     24,
+     "blaze"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "ロウソクの芯",
+     "stat": "int",
+     "pct": 5,
+     "trait": "wakeful"
+    },
+    "back": {
+     "label": "ろう",
+     "stat": "mp",
+     "pct": 5
+    },
+    "tail": {
+     "label": "ろうだまり",
+     "stat": "def",
+     "pct": 3
+    }
+   },
+   "scout": 0.38,
+   "xp": 24,
+   "gold": 10,
+   "bst": 110
+  },
+  {
+   "id": "tsumiking",
+   "no": 13,
+   "name": "ツミキング",
+   "mat": "stone",
+   "body": "ningyo",
+   "where": "ゼンマイ時計塔",
+   "desc": "積み木を積んだ小さな王。",
+   "color": "#e8c35a",
+   "accent": "#3f6fb5",
+   "shiny": "#d97ab0",
+   "base": {
+    "hp": 42,
+    "mp": 14,
+    "atk": 18,
+    "def": 20,
+    "spd": 9,
+    "int": 12
+   },
+   "learn": [
+    [
+     1,
+     "tackle"
+    ],
+    [
+     1,
+     "pebble"
+    ],
+    [
+     14,
+     "stoneskin"
+    ],
+    [
+     18,
+     "encourage"
+    ],
+    [
+     23,
+     "quake"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "つみきの冠",
+     "stat": "def",
+     "pct": 5
+    },
+    "back": {
+     "label": "つみきの城",
+     "stat": "hp",
+     "pct": 5,
+     "trait": "backguard"
+    },
+    "tail": {
+     "label": "王しゃく",
+     "stat": "atk",
+     "pct": 4
+    }
+   },
+   "scout": 0.35,
+   "xp": 26,
+   "gold": 12,
+   "bst": 115
+  },
+  {
+   "id": "kamishibai",
+   "no": 14,
+   "name": "カミシバイ",
+   "mat": "paper",
+   "body": "ningyo",
+   "where": "ゼンマイ時計塔",
+   "desc": "紙芝居の枠から出てくる語り部。",
+   "color": "#f0e6cf",
+   "accent": "#8a3b2c",
+   "shiny": "#7ec0b0",
+   "base": {
+    "hp": 34,
+    "mp": 24,
+    "atk": 10,
+    "def": 12,
+    "spd": 14,
+    "int": 20
+   },
+   "learn": [
+    [
+     1,
+     "papercut"
+    ],
+    [
+     1,
+     "lullaby"
+    ],
+    [
+     14,
+     "heal"
+    ],
+    [
+     18,
+     "confetti"
+    ],
+    [
+     24,
+     "healall"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "ひょうし木",
+     "stat": "int",
+     "pct": 6
+    },
+    "back": {
+     "label": "まき物",
+     "stat": "mp",
+     "pct": 5,
+     "trait": "storyteller"
+    },
+    "tail": {
+     "label": "紙のすそ",
+     "stat": "int",
+     "pct": 3
+    }
+   },
+   "scout": 0.35,
+   "xp": 26,
+   "gold": 12,
+   "bst": 114
+  },
+  {
+   "id": "haribote",
+   "no": 15,
+   "name": "ハリボテ",
+   "mat": "paper",
+   "body": "yotsuashi",
+   "where": "配合 / つみき野の池の小島(ピンセット)",
+   "desc": "はりぼての馬。中はからっぽ。",
+   "color": "#e9d2a6",
+   "accent": "#c43d3d",
+   "shiny": "#f0f0f0",
+   "base": {
+    "hp": 40,
+    "mp": 16,
+    "atk": 19,
+    "def": 15,
+    "spd": 18,
+    "int": 13
+   },
+   "learn": [
+    [
+     1,
+     "tackle"
+    ],
+    [
+     1,
+     "fold"
+    ],
+    [
+     10,
+     "encourage"
+    ],
+    [
+     16,
+     "papershield"
+    ],
+    [
+     22,
+     "confetti"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "張り子の顔",
+     "stat": "spd",
+     "pct": 5
+    },
+    "back": {
+     "label": "くら",
+     "stat": "def",
+     "pct": 5,
+     "trait": "goldfind"
+    },
+    "tail": {
+     "label": "ほうきの尾",
+     "stat": "spd",
+     "pct": 4
+    }
+   },
+   "scout": 0.25,
+   "xp": 30,
+   "gold": 15,
+   "bst": 121
+  },
+  {
+   "id": "hibachineko",
+   "no": 16,
+   "name": "ヒバチネコ",
+   "mat": "fire",
+   "body": "yotsuashi",
+   "where": "配合のみ",
+   "desc": "火鉢を背負った猫。ぬくい。",
+   "color": "#5b4a43",
+   "accent": "#e27a2b",
+   "shiny": "#e8e0d0",
+   "base": {
+    "hp": 42,
+    "mp": 20,
+    "atk": 21,
+    "def": 15,
+    "spd": 18,
+    "int": 17
+   },
+   "learn": [
+    [
+     1,
+     "bite"
+    ],
+    [
+     1,
+     "spark"
+    ],
+    [
+     8,
+     "flame"
+    ],
+    [
+     15,
+     "temper"
+    ],
+    [
+     20,
+     "blaze"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "猫耳",
+     "stat": "spd",
+     "pct": 4
+    },
+    "back": {
+     "label": "火鉢",
+     "stat": "atk",
+     "pct": 6,
+     "trait": "burnproof"
+    },
+    "tail": {
+     "label": "火ばし",
+     "stat": "atk",
+     "pct": 4,
+     "skill": "flame"
+    }
+   },
+   "scout": 0,
+   "xp": 32,
+   "gold": 15,
+   "bst": 133,
+   "breedOnly": true
+  },
+  {
+   "id": "nuihebi",
+   "no": 17,
+   "name": "ヌイヘビ",
+   "mat": "cloth",
+   "body": "hebi",
+   "where": "配合のみ",
+   "desc": "ぬいぐるみのへび。継ぎはぎがある。",
+   "color": "#8c6db0",
+   "accent": "#f2c84b",
+   "shiny": "#7fd0c0",
+   "base": {
+    "hp": 46,
+    "mp": 20,
+    "atk": 17,
+    "def": 18,
+    "spd": 14,
+    "int": 16
+   },
+   "learn": [
+    [
+     1,
+     "bite"
+    ],
+    [
+     1,
+     "wrap"
+    ],
+    [
+     8,
+     "drain"
+    ],
+    [
+     12,
+     "cover"
+    ],
+    [
+     20,
+     "healall"
+    ],
+    [
+     26,
+     "glue"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "ボタンの目",
+     "stat": "hp",
+     "pct": 5
+    },
+    "back": {
+     "label": "つぎはぎ",
+     "stat": "def",
+     "pct": 6,
+     "trait": "endure"
+    },
+    "tail": {
+     "label": "綿のしっぽ",
+     "stat": "hp",
+     "pct": 4
+    }
+   },
+   "scout": 0,
+   "xp": 32,
+   "gold": 15,
+   "bst": 131,
+   "breedOnly": true
+  },
+  {
+   "id": "burikishi",
+   "no": 18,
+   "name": "ブリキシ",
+   "mat": "tin",
+   "body": "ningyo",
+   "where": "配合のみ",
+   "desc": "ブリキの騎士。体験版でいちばん強い。",
+   "color": "#c4ccd4",
+   "accent": "#2f4f8f",
+   "shiny": "#e3b84a",
+   "base": {
+    "hp": 48,
+    "mp": 18,
+    "atk": 25,
+    "def": 22,
+    "spd": 16,
+    "int": 13
+   },
+   "learn": [
+    [
+     1,
+     "tinpunch"
+    ],
+    [
+     1,
+     "sharpen"
+    ],
+    [
+     8,
+     "gearsaw"
+    ],
+    [
+     14,
+     "cover"
+    ],
+    [
+     20,
+     "knightcharge"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "かぶと",
+     "stat": "def",
+     "pct": 6,
+     "trait": "nocrit"
+    },
+    "back": {
+     "label": "たて",
+     "stat": "def",
+     "pct": 6,
+     "trait": "rustproof"
+    },
+    "tail": {
+     "label": "けん",
+     "stat": "atk",
+     "pct": 6,
+     "skill": "knightcharge"
+    }
+   },
+   "scout": 0,
+   "xp": 36,
+   "gold": 18,
+   "bst": 142,
+   "breedOnly": true
+  },
+  {
+   "id": "kageboushi",
+   "no": 19,
+   "name": "カゲボウシ",
+   "mat": "cloth",
+   "body": "ningyo",
+   "where": "ランプの森のぬし(スカウト不可)/ 倒したあと、特別な配合で作れる",
+   "desc": "影の帽子をかぶった人影。光のときだけ姿が見える。",
+   "color": "#2a2738",
+   "accent": "#5a4a8a",
+   "shiny": "#e0d8f0",
+   "base": {
+    "hp": 52,
+    "mp": 24,
+    "atk": 16,
+    "def": 16,
+    "spd": 18,
+    "int": 17
+   },
+   "learn": [
+    [
+     1,
+     "shadowstep"
+    ],
+    [
+     1,
+     "stitch"
+    ],
+    [
+     8,
+     "shadowcloak"
+    ],
+    [
+     14,
+     "drain"
+    ],
+    [
+     20,
+     "fluff"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "影の帽子",
+     "stat": "int",
+     "pct": 5,
+     "trait": "shadowfit"
+    },
+    "back": {
+     "label": "影のえり",
+     "stat": "spd",
+     "pct": 5
+    },
+    "tail": {
+     "label": "影のすそ",
+     "stat": "int",
+     "pct": 4,
+     "skill": "shadowcloak"
+    }
+   },
+   "scout": 0,
+   "xp": 160,
+   "gold": 120,
+   "bst": 143,
+   "boss": true,
+   "breedOnly": true,
+   "hpMul": 3.5
+  },
+  {
+   "id": "tokeimori",
+   "no": 20,
+   "name": "トケイモリ",
+   "mat": "tin",
+   "body": "yotsuashi",
+   "where": "ゼンマイ時計塔のボス",
+   "desc": "背中に文字盤の大ヤモリ。針が進むと戦場が回る。",
+   "color": "#a7b07a",
+   "accent": "#c79a3a",
+   "shiny": "#9fb8e0",
+   "base": {
+    "hp": 64,
+    "mp": 40,
+    "atk": 19,
+    "def": 21,
+    "spd": 15,
+    "int": 16
+   },
+   "learn": [
+    [
+     1,
+     "gearsaw"
+    ],
+    [
+     1,
+     "chime"
+    ],
+    [
+     1,
+     "windup"
+    ],
+    [
+     1,
+     "clang"
+    ],
+    [
+     1,
+     "rustrain"
+    ]
+   ],
+   "parts": {
+    "head": {
+     "label": "ヤモリの目",
+     "stat": "spd",
+     "pct": 4
+    },
+    "back": {
+     "label": "文字盤",
+     "stat": "int",
+     "pct": 6,
+     "trait": "clockwork"
+    },
+    "tail": {
+     "label": "振り子のしっぽ",
+     "stat": "atk",
+     "pct": 4
+    }
+   },
+   "scout": 0,
+   "xp": 400,
+   "gold": 300,
+   "bst": 175,
+   "boss": true,
+   "noScout": true,
+   "hpMul": 5,
+   "noBreed": true
+  }
+ ]
 }
