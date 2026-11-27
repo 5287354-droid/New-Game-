@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<link rel="icon" href="data:,">
+<title>描画の試作 — ジオラマ魔物記</title>
+<style>
+  :root { --paper: #f4f1ea; --ink: #1b1915; --accent: #e0a526; }
+  html, body { margin: 0; height: 100%; background: #2a211c; overflow: hidden; touch-action: none; }
+  canvas { display: block; width: 100vw; height: 100vh; height: 100dvh; }
+  .num { font-family: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif; font-weight: 700; letter-spacing: 0.02em; }
+  #hud {
+    position: fixed; left: 8px; top: 8px; background: var(--paper); color: var(--ink);
+    border: 2px solid var(--ink); border-radius: 3px; padding: 6px 8px 6px 8px;
+    font: 700 11px/1.35 "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif; min-width: 148px;
+  }
+  #hud .t { display: flex; align-items: center; gap: 6px; border-bottom: 2px solid var(--ink); margin: -2px -2px 4px; padding: 0 2px 3px; }
+  #hud .t b { background: var(--accent); border: 2px solid var(--ink); padding: 0 4px; font-size: 11px; }
+  #hud .row { display: flex; justify-content: space-between; gap: 8px; }
+  #hud .row .k { color: #5a554b; }
+  #hud .row .num { font-size: 15px; }
+  #hud .over { color: #c0452f; }
+  #hud .bar { height: 4px; border: 1.5px solid var(--ink); margin: 1px 0 3px; background: #fff; }
+  #hud .bar i { display: block; height: 100%; background: var(--ink); }
+  #where { margin-top: 3px; padding-top: 3px; border-top: 1.5px dashed var(--ink); font-size: 11px; }
+  .btns { position: fixed; display: flex; gap: 6px; }
+  .btns button {
+    font: 700 14px/1 "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; color: var(--ink); background: var(--paper);
+    border: 2px solid var(--ink); border-radius: 3px; min-width: 40px; height: 40px; padding: 0 8px;
+  }
+  .btns button.on { background: var(--accent); }
+  #qbtn { right: 8px; top: 8px; }
+  #rbtn { right: 8px; top: 56px; }
+  #pad { position: fixed; left: 12px; bottom: 14px; display: grid; grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 44px); gap: 3px; }
+  #pad button { font: 700 18px/1 sans-serif; background: var(--paper); border: 2px solid var(--ink); border-radius: 3px; color: var(--ink); }
+  #help { position: fixed; right: 8px; bottom: 10px; background: var(--paper); border: 2px solid var(--ink); border-radius: 3px; padding: 4px 7px; font: 700 10px/1.5 sans-serif; color: var(--ink); max-width: 180px; }
+  @media (max-width: 500px) { #help { display: none; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../../vendor/three/three.module.js", "three/addons/": "../../vendor/three/addons/" } }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="t"><b class="num">A-1</b>描画の計器</div>
+  <div class="row"><span class="k">三角形</span><span class="num" id="tri">-</span></div>
+  <div class="bar"><i id="triBar"></i></div>
+  <div class="row"><span class="k">描画の呼び出し</span><span class="num" id="calls">-</span></div>
+  <div class="bar"><i id="callBar"></i></div>
+  <div class="row"><span class="k">fps / 画質</span><span class="num" id="fps">-</span></div>
+  <div id="where">-</div>
+</div>
+<div class="btns" id="qbtn"><button data-q="low">低</button><button data-q="mid">中</button><button data-q="high">高</button></div>
+<div class="btns" id="rbtn"><button id="rotL">⟲</button><button id="rotR">⟳</button></div>
+<div id="pad">
+  <span></span><button data-d="up">▲</button><span></span>
+  <button data-d="left">◀</button><span></span><button data-d="right">▶</button>
+  <span></span><button data-d="down">▼</button><span></span>
+</div>
+<div id="help">矢印: 歩く / Q・E: 回す<br>ドラッグ: ±15° 傾ける<br>1・2・3: 画質 低・中・高</div>
+<script type="module">
+import * as THREE from 'three';
+import { createRenderer } from '../../src/render/renderer.js';
+import { createDioramaCamera } from '../../src/render/camera.js';
+import { createCutaway } from '../../src/render/cutaway.js';
+import { buildDiorama, makePawnGeometry } from '../../src/render/diorama.js';
+import { buildBuildings } from '../../src/render/buildings.js';
+import { paint } from '../../src/render/materials.js';
+import { newGimmickState, cell, canStep, stairsAt } from '../../src/core/grid.js';
+
+const params = new URLSearchParams(location.search);
+const area = await (await fetch('../../data/areas/' + (params.get('area') || 'village') + '.json')).json();
+const gs = newGimmickState(area);
+
+const canvas = document.getElementById('c');
+const R = createRenderer(canvas);
+const cam = createDioramaCamera();
+cam.attach(canvas);
+const cutaway = createCutaway();
+const D = buildDiorama(area, R.scene, cutaway);
+const B = buildBuildings(D, R.scene);
+
+// 主人公の代わりの駒(背中にねじ巻き)+ 足もとの輪
+const accent = area.accent || '#e0a526';
+const pawn = new THREE.Mesh(makePawnGeometry({ key: true }), paint({ vertexColors: true, color: accent, roughness: 0.4, paintAmt: 0.06 }));
+pawn.castShadow = true;
+pawn.name = 'player';
+const ring = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.38, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: accent, transparent: true, opacity: 0.85, depthWrite: false }));
+ring.name = 'playerRing';
+R.scene.add(pawn, ring);
+
+const at = (params.get('at') || '').split(',').map(Number);
+const start = at.length === 3 && !at.some(isNaN) ? { l: at[0], x: at[1], z: at[2] } : { l: 0, x: 5, z: 12 };
+const P = { ...start, pos: new THREE.Vector3(), from: new THREE.Vector3(), to: new THREE.Vector3(), t: 1, face: 0, faceGoal: 0 };
+const worldOf = (l, x, z) => new THREE.Vector3(x, D.floorY(l, x, z), z);
+P.pos.copy(worldOf(P.l, P.x, P.z)); P.to.copy(P.pos);
+
+function tryMove(dx, dz) {
+  if (P.t < 1) return false;
+  const a = cell(area, gs, P.l, P.x, P.z), b = cell(area, gs, P.l, P.x + dx, P.z + dz);
+  P.faceGoal = Math.atan2(dx, dz);
+  if (!a || !b || !canStep(a, b)) return false;
+  P.x += dx; P.z += dz;
+  P.from.copy(P.pos); P.to.copy(worldOf(P.l, P.x, P.z)); P.t = 0;
+  return true;
+}
+function arrive() {
+  const st = stairsAt(area, P.l, P.x, P.z);
+  if (st && st.to && !P.justWarped) {
+    P.l = st.to.l; P.x = st.to.x; P.z = st.to.z;
+    P.from.copy(P.pos); P.to.copy(worldOf(P.l, P.x, P.z)); P.t = 0; P.justWarped = true;
+    return;
+  }
+  P.justWarped = false;
+}
+function teleport(l, x, z) { P.l = l; P.x = x; P.z = z; P.pos.copy(worldOf(l, x, z)); P.to.copy(P.pos); P.t = 1; P.justWarped = true; }
+
+// 入力
+const held = new Set();
+const KEYMAP = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+addEventListener('keydown', (e) => {
+  if (KEYMAP[e.key]) { held.add(KEYMAP[e.key]); e.preventDefault(); }
+  if (e.key === 'q' || e.key === 'Q') cam.rotate(-1);
+  if (e.key === 'e' || e.key === 'E') cam.rotate(1);
+  if (e.key === '1') setQ('low');
+  if (e.key === '2') setQ('mid');
+  if (e.key === '3') setQ('high');
+});
+addEventListener('keyup', (e) => { if (KEYMAP[e.key]) held.delete(KEYMAP[e.key]); });
+for (const b of document.querySelectorAll('#pad button')) {
+  b.addEventListener('pointerdown', (e) => { held.add(b.dataset.d); e.stopPropagation(); });
+  b.addEventListener('pointerup', () => held.delete(b.dataset.d));
+  b.addEventListener('pointerleave', () => held.delete(b.dataset.d));
+}
+document.getElementById('rotL').onclick = () => cam.rotate(-1);
+document.getElementById('rotR').onclick = () => cam.rotate(1);
+function setQ(q) { R.setQuality(q); for (const b of document.querySelectorAll('#qbtn button')) b.classList.toggle('on', b.dataset.q === q); }
+for (const b of document.querySelectorAll('#qbtn button')) b.onclick = () => setQ(b.dataset.q);
+
+function resize() { const w = innerWidth, h = innerHeight; R.resize(w, h); cam.setAspect(w / h); }
+addEventListener('resize', resize);
+resize();
+
+const q0 = params.get('q');
+if (q0) setQ(q0);
+
+// 毎フレーム
+const ndc = new THREE.Vector3();
+let last = performance.now(), fpsAcc = 0, fpsN = 0, fps = 0, frames = 0;
+const el = (id) => document.getElementById(id);
+function frame(now = performance.now()) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  // 歩く
+  if (P.t >= 1 && held.size) {
+    const { up, right } = cam.gridDirs();
+    const d = [...held].pop();
+    const v = d === 'up' ? up : d === 'down' ? [-up[0], -up[1]] : d === 'right' ? right : [-right[0], -right[1]];
+    tryMove(v[0], v[1]);
+  }
+  if (P.t < 1) {
+    P.t = Math.min(1, P.t + dt / (P.justWarped ? 0.35 : 0.17));
+    P.pos.lerpVectors(P.from, P.to, P.t);
+    if (P.t >= 1) arrive();
+  }
+  let df = P.faceGoal - P.face; df = Math.atan2(Math.sin(df), Math.cos(df)); P.face += df * Math.min(1, dt * 14);
+  const hop = P.t < 1 ? Math.sin(P.t * Math.PI) * 0.08 : 0;
+  pawn.position.copy(P.pos); pawn.position.y += hop; pawn.rotation.y = P.face;
+  ring.position.copy(P.pos); ring.position.y += 0.012;
+
+  cam.follow(P.pos);
+  const playerState = { l: P.l, x: P.x, z: P.z, pos: P.pos };
+  const zoom = B.update(dt, playerState, cam.camera);
+  cam.setZoom(zoom);
+  cam.update(dt);
+  cutaway.update(dt, P.pos, cam.camera, B.forced);
+
+  ndc.copy(P.pos); ndc.y += 0.35; ndc.project(cam.camera);
+  R.render(cam.camera, { focusY: THREE.MathUtils.clamp((ndc.y + 1) / 2, 0.15, 0.85), target: P.pos });
+
+  // 計器
+  fpsAcc += dt; fpsN++;
+  if (fpsAcc > 0.5) { fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
+  if (frames++ % 10 === 0) {
+    const s = R.stats();
+    el('tri').textContent = s.triangles.toLocaleString() + ' / 150,000';
+    el('tri').classList.toggle('over', s.triangles > 150000);
+    el('triBar').style.width = Math.min(100, s.triangles / 1500) + '%';
+    el('calls').textContent = s.calls + ' / 150';
+    el('calls').classList.toggle('over', s.calls > 150);
+    el('callBar').style.width = Math.min(100, s.calls / 1.5) + '%';
+    el('fps').textContent = fps.toFixed(0) + ' / ' + { low: '低', mid: '中', high: '高' }[R.quality];
+    const b = B.list.find((r) => B.inside(r.b, playerState));
+    el('where').textContent = `${area.name}  ${P.l + 1}階 (${P.x}, ${P.z})${b ? ' — ' + b.b.name + 'の中' : ''}`;
+  }
+  requestAnimationFrame(frame);
+}
+setQ(q0 || R.quality);
+if (!q0 && !params.has('noauto')) R.autoQuality().then(({ quality }) => setQ(quality));
+requestAnimationFrame(frame);
+
+// Playwright 用の操作口
+window.__debug = {
+  teleport, R, cam, D, B,
+  rotate: (d) => cam.rotate(d),
+  quality: setQ,
+  tilt: (y, p) => cam.setTilt(y, p),
+  snap: () => cam.snap(),
+  stats: () => ({ ...R.stats(), quality: R.quality, player: { l: P.l, x: P.x, z: P.z }, open: B.list.filter((r) => r.open > 0.5).map((r) => r.b.id) }),
+  move: (dx, dz) => tryMove(dx, dz),
+  ready: true,
+};
+</script>
+</body>
+</html>

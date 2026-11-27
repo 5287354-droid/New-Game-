@@ -1,0 +1,284 @@
+{
+ "outside_portrait": {
+  "file": "phase0_render_outside_portrait.png",
+  "quality": "mid",
+  "triangles": 80495,
+  "calls": 44,
+  "geometries": 30,
+  "textures": 7,
+  "programs": 25,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 19,
+   "z": 16
+  }
+ },
+ "inside_home_portrait": {
+  "file": "phase0_render_inside_home_portrait.png",
+  "quality": "mid",
+  "triangles": 76723,
+  "calls": 37,
+  "geometries": 28,
+  "textures": 6,
+  "programs": 24,
+  "open": [
+   "home"
+  ],
+  "player": {
+   "l": 0,
+   "x": 5,
+   "z": 6
+  }
+ },
+ "inside_chief_1f_portrait": {
+  "file": "phase0_render_inside_chief_1f_portrait.png",
+  "quality": "mid",
+  "triangles": 79871,
+  "calls": 43,
+  "geometries": 29,
+  "textures": 7,
+  "programs": 26,
+  "open": [
+   "chief"
+  ],
+  "player": {
+   "l": 0,
+   "x": 33,
+   "z": 25
+  }
+ },
+ "inside_chief_2f_portrait": {
+  "file": "phase0_render_inside_chief_2f_portrait.png",
+  "quality": "mid",
+  "triangles": 79615,
+  "calls": 42,
+  "geometries": 29,
+  "textures": 7,
+  "programs": 26,
+  "open": [
+   "chief"
+  ],
+  "player": {
+   "l": 1,
+   "x": 33,
+   "z": 24
+  }
+ },
+ "rotate_e_portrait": {
+  "file": "phase0_render_rotate_e_portrait.png",
+  "quality": "mid",
+  "triangles": 83891,
+  "calls": 49,
+  "geometries": 30,
+  "textures": 7,
+  "programs": 26,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 19,
+   "z": 16
+  }
+ },
+ "rotate_tilt_portrait": {
+  "file": "phase0_render_rotate_tilt_portrait.png",
+  "quality": "mid",
+  "triangles": 83003,
+  "calls": 48,
+  "geometries": 30,
+  "textures": 7,
+  "programs": 26,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 12,
+   "z": 15
+  }
+ },
+ "behind_wall_portrait": {
+  "file": "phase0_render_behind_wall_portrait.png",
+  "quality": "mid",
+  "triangles": 76267,
+  "calls": 37,
+  "geometries": 26,
+  "textures": 7,
+  "programs": 25,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 33,
+   "z": 1
+  }
+ },
+ "q_low_portrait": {
+  "file": "phase0_render_q_low_portrait.png",
+  "quality": "low",
+  "triangles": 80494,
+  "calls": 43,
+  "geometries": 29,
+  "textures": 6,
+  "programs": 24,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 19,
+   "z": 16
+  }
+ },
+ "q_high_portrait": {
+  "file": "phase0_render_q_high_portrait.png",
+  "quality": "high",
+  "triangles": 80495,
+  "calls": 44,
+  "geometries": 30,
+  "textures": 8,
+  "programs": 25,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 19,
+   "z": 16
+  }
+ },
+ "outside_landscape": {
+  "file": "phase0_render_outside_landscape.png",
+  "quality": "mid",
+  "triangles": 83891,
+  "calls": 49,
+  "geometries": 30,
+  "textures": 7,
+  "programs": 26,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 19,
+   "z": 16
+  }
+ },
+ "inside_home_landscape": {
+  "file": "phase0_render_inside_home_landscape.png",
+  "quality": "mid",
+  "triangles": 78247,
+  "calls": 39,
+  "geometries": 28,
+  "textures": 7,
+  "programs": 25,
+  "open": [
+   "home"
+  ],
+  "player": {
+   "l": 0,
+   "x": 5,
+   "z": 6
+  }
+ },
+ "inside_chief_1f_landscape": {
+  "file": "phase0_render_inside_chief_1f_landscape.png",
+  "quality": "mid",
+  "triangles": 79823,
+  "calls": 43,
+  "geometries": 29,
+  "textures": 7,
+  "programs": 26,
+  "open": [
+   "chief"
+  ],
+  "player": {
+   "l": 0,
+   "x": 33,
+   "z": 25
+  }
+ },
+ "inside_chief_2f_landscape": {
+  "file": "phase0_render_inside_chief_2f_landscape.png",
+  "quality": "mid",
+  "triangles": 80791,
+  "calls": 44,
+  "geometries": 30,
+  "textures": 7,
+  "programs": 26,
+  "open": [
+   "chief"
+  ],
+  "player": {
+   "l": 1,
+   "x": 33,
+   "z": 24
+  }
+ },
+ "rotate_e_landscape": {
+  "file": "phase0_render_rotate_e_landscape.png",
+  "quality": "mid",
+  "triangles": 83891,
+  "calls": 49,
+  "geometries": 30,
+  "textures": 7,
+  "programs": 26,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 19,
+   "z": 16
+  }
+ },
+ "rotate_tilt_landscape": {
+  "file": "phase0_render_rotate_tilt_landscape.png",
+  "quality": "mid",
+  "triangles": 80775,
+  "calls": 45,
+  "geometries": 30,
+  "textures": 7,
+  "programs": 26,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 12,
+   "z": 15
+  }
+ },
+ "behind_wall_landscape": {
+  "file": "phase0_render_behind_wall_landscape.png",
+  "quality": "mid",
+  "triangles": 77631,
+  "calls": 37,
+  "geometries": 26,
+  "textures": 7,
+  "programs": 25,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 33,
+   "z": 1
+  }
+ },
+ "q_low_landscape": {
+  "file": "phase0_render_q_low_landscape.png",
+  "quality": "low",
+  "triangles": 83890,
+  "calls": 48,
+  "geometries": 29,
+  "textures": 6,
+  "programs": 25,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 19,
+   "z": 16
+  }
+ },
+ "q_high_landscape": {
+  "file": "phase0_render_q_high_landscape.png",
+  "quality": "high",
+  "triangles": 83891,
+  "calls": 49,
+  "geometries": 30,
+  "textures": 8,
+  "programs": 26,
+  "open": [],
+  "player": {
+   "l": 0,
+   "x": 19,
+   "z": 16
+  }
+ }
+}
