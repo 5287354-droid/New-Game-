@@ -3,9 +3,10 @@
 ## Phase 0 技術検証
 - [x] bpy 5.3 が動き、.glb を書き出せる(総司令官が確認)
 - [x] Three.js r160 を vendor/three/ に同梱
-- [ ] scout: 60×48 マップを InstancedMesh で描いて renderer.info を計測、スマホ相当での確認 → docs/RECON.md
-- [ ] tech-artist: ティルトシフト・手前の切り抜き・屋根が開く演出の試作とスクショ
-- [ ] Blender か代わりの方法かを決める(暫定: Blender)
+- [x] scout: 計測 → docs/RECON.md(工夫後 描画23回・13.4万△・2.64MB。魔物は1体を1形状に焼いて BatchedMesh)
+- [x] tech-artist: src/render/ 7部品、tools/proto/render.html → docs/RECON_RENDER.md(最大 8.4万△・49回)
+- [x] Blender に決定
+- 宿題: トケイモリ 4,308△ を 4,000 以下に / build_parts.py の出力を毎回同じにする(monster-forge)
 
 ## Phase 1 作戦立案
 - [ ] game-designer: docs/DESIGN.md、docs/maps/*.md、わざ表・配合表の確定
