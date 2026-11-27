@@ -1,0 +1,302 @@
+{
+ "area": "village",
+ "note": "最少の操作手順。walk = そのマスまで歩く [階,x,z]、use = その物を調べる、exit = 出口から出て入りなおす。ops = ギミックの操作の回数",
+ "states": 4,
+ "targets": {
+  "village_stairs_2": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      10,
+      7
+     ]
+    },
+    {
+     "use": "village_stairs_2"
+    }
+   ]
+  },
+  "village_stairs_3": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      1,
+      10,
+      7
+     ]
+    },
+    {
+     "use": "village_stairs_3"
+    }
+   ]
+  },
+  "v_home_attic": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      1,
+      4,
+      3
+     ]
+    },
+    {
+     "use": "v_home_attic"
+    }
+   ]
+  },
+  "v_exit_tower_23": {
+   "ops": 2,
+   "steps": [
+    {
+     "walk": [
+      0,
+      38,
+      16
+     ]
+    },
+    {
+     "use": "v_gear"
+    },
+    {
+     "walk": [
+      0,
+      25,
+      15
+     ]
+    },
+    {
+     "use": "v_tower_axle"
+    },
+    {
+     "walk": [
+      0,
+      23,
+      12
+     ]
+    },
+    {
+     "use": "v_exit_tower_23"
+    }
+   ]
+  },
+  "v_exit_tower_24": {
+   "ops": 2,
+   "steps": [
+    {
+     "walk": [
+      0,
+      38,
+      16
+     ]
+    },
+    {
+     "use": "v_gear"
+    },
+    {
+     "walk": [
+      0,
+      25,
+      15
+     ]
+    },
+    {
+     "use": "v_tower_axle"
+    },
+    {
+     "walk": [
+      0,
+      24,
+      12
+     ]
+    },
+    {
+     "use": "v_exit_tower_24"
+    }
+   ]
+  },
+  "village_stairs_4": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      42,
+      3
+     ]
+    },
+    {
+     "use": "village_stairs_4"
+    }
+   ]
+  },
+  "village_stairs_5": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      1,
+      42,
+      3
+     ]
+    },
+    {
+     "use": "village_stairs_5"
+    }
+   ]
+  },
+  "village_stairs_9": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      12,
+      32
+     ]
+    },
+    {
+     "use": "village_stairs_9"
+    }
+   ]
+  },
+  "village_stairs_10": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      1,
+      12,
+      32
+     ]
+    },
+    {
+     "use": "village_stairs_10"
+    }
+   ]
+  },
+  "village_stairs_15": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      19,
+      33
+     ]
+    },
+    {
+     "use": "village_stairs_15"
+    }
+   ]
+  },
+  "village_stairs_16": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      2,
+      19,
+      33
+     ]
+    },
+    {
+     "use": "village_stairs_16"
+    }
+   ]
+  },
+  "v_shed_attic": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      2,
+      17,
+      31
+     ]
+    },
+    {
+     "use": "v_shed_attic"
+    }
+   ]
+  },
+  "v_garden": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      46,
+      21
+     ]
+    },
+    {
+     "use": "v_garden"
+    }
+   ]
+  },
+  "v_exit_s22": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      22,
+      38
+     ]
+    },
+    {
+     "use": "v_exit_s22"
+    }
+   ]
+  },
+  "v_exit_s23": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      23,
+      38
+     ]
+    },
+    {
+     "use": "v_exit_s23"
+    }
+   ]
+  },
+  "v_exit_s24": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      24,
+      38
+     ]
+    },
+    {
+     "use": "v_exit_s24"
+    }
+   ]
+  },
+  "v_exit_s25": {
+   "ops": 0,
+   "steps": [
+    {
+     "walk": [
+      0,
+      25,
+      38
+     ]
+    },
+    {
+     "use": "v_exit_s25"
+    }
+   ]
+  }
+ }
+}
