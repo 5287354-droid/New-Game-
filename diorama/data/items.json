@@ -1,0 +1,13 @@
+{
+  "items": [
+    { "id": "patch", "name": "ばんそうこう", "price": 20, "hp": 45, "desc": "なかま1体のHPを45直す" },
+    { "id": "bigpatch", "name": "大きなばんそうこう", "price": 70, "hp": 140, "desc": "なかま1体のHPを140直す" },
+    { "id": "paint", "name": "絵の具チューブ", "price": 60, "mp": 20, "desc": "なかま1体のMPを20もどす" },
+    { "id": "oil", "name": "ぜんまいオイル", "price": 120, "rev": 0.5, "desc": "たおれたなかまを、HP半分で起こす" },
+    { "id": "spray", "name": "まるごとスプレー", "price": 160, "hpAll": 80, "desc": "なかまみんなのHPを80直す" },
+    { "id": "varnish", "name": "つやだしニス", "price": 50, "scout": 1.6, "desc": "スカウトが成功しやすくなる(戦闘中に使う)" },
+    { "id": "smoke", "name": "けむり玉", "price": 30, "escape": true, "desc": "戦闘からかならずにげる" },
+    { "id": "gearpin", "name": "金のピン", "price": 0, "sell": 200, "desc": "売るとお金になる、きれいなピン" }
+  ],
+  "shop": ["patch", "bigpatch", "paint", "oil", "varnish", "smoke", "spray"]
+}

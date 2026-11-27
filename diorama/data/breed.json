@@ -1,0 +1,37 @@
+{
+  "_note": "子の素材 = material[親1の素材][親2の素材]、子の型 = body[親1の型][親2の型]。species[素材][型] で種族が決まる。special は表より優先(順番は問わない)。表はすべて埋まっていることを tests/breed.test.mjs で確かめる",
+  "order": ["water", "fire", "paper", "stone", "tin", "cloth"],
+  "bodyOrder": ["maru", "shizuku", "yotsuashi", "tori", "hebi", "ningyo"],
+  "material": {
+    "water": { "water": "water", "fire": "water", "paper": "fire", "stone": "water", "tin": "paper", "cloth": "cloth" },
+    "fire": { "water": "water", "fire": "fire", "paper": "fire", "stone": "paper", "tin": "fire", "cloth": "tin" },
+    "paper": { "water": "fire", "fire": "fire", "paper": "paper", "stone": "paper", "tin": "stone", "cloth": "paper" },
+    "stone": { "water": "water", "fire": "paper", "paper": "paper", "stone": "stone", "tin": "stone", "cloth": "tin" },
+    "tin": { "water": "paper", "fire": "fire", "paper": "stone", "stone": "stone", "tin": "tin", "cloth": "tin" },
+    "cloth": { "water": "cloth", "fire": "tin", "paper": "paper", "stone": "tin", "tin": "tin", "cloth": "cloth" }
+  },
+  "body": {
+    "maru": { "maru": "maru", "shizuku": "shizuku", "yotsuashi": "yotsuashi", "tori": "tori", "hebi": "hebi", "ningyo": "ningyo" },
+    "shizuku": { "maru": "shizuku", "shizuku": "shizuku", "yotsuashi": "maru", "tori": "tori", "hebi": "hebi", "ningyo": "maru" },
+    "yotsuashi": { "maru": "yotsuashi", "shizuku": "maru", "yotsuashi": "yotsuashi", "tori": "ningyo", "hebi": "hebi", "ningyo": "yotsuashi" },
+    "tori": { "maru": "tori", "shizuku": "tori", "yotsuashi": "ningyo", "tori": "tori", "hebi": "yotsuashi", "ningyo": "ningyo" },
+    "hebi": { "maru": "hebi", "shizuku": "hebi", "yotsuashi": "hebi", "tori": "yotsuashi", "hebi": "hebi", "ningyo": "hebi" },
+    "ningyo": { "maru": "ningyo", "shizuku": "maru", "yotsuashi": "yotsuashi", "tori": "ningyo", "hebi": "hebi", "ningyo": "ningyo" }
+  },
+  "species": {
+    "water": { "maru": "inky", "shizuku": "inky", "yotsuashi": "hotarubin", "tori": "hotarubin", "hebi": "inky", "ningyo": "hotarubin" },
+    "fire": { "maru": "rousokun", "shizuku": "rousokun", "yotsuashi": "hibachineko", "tori": "matchbo", "hebi": "matchbo", "ningyo": "hibachineko" },
+    "paper": { "maru": "perari", "shizuku": "perari", "yotsuashi": "haribote", "tori": "origarasu", "hebi": "perari", "ningyo": "kamishibai" },
+    "stone": { "maru": "koroishi", "shizuku": "koroishi", "yotsuashi": "koroishi", "tori": "jarihebi", "hebi": "jarihebi", "ningyo": "tsumiking" },
+    "tin": { "maru": "nejiko", "shizuku": "nejiko", "yotsuashi": "zenmainu", "tori": "nejiko", "hebi": "zenmainu", "ningyo": "burikishi" },
+    "cloth": { "maru": "felton", "shizuku": "felton", "yotsuashi": "watabou", "tori": "watabou", "hebi": "nuihebi", "ningyo": "nuihebi" }
+  },
+  "special": [
+    { "a": "matchbo", "b": "zenmainu", "child": "hibachineko", "hint": "マッチの火で、ゼンマイの犬があたたまる…?" },
+    { "a": "watabou", "b": "jarihebi", "child": "nuihebi", "hint": "綿をつめたへびのぬいぐるみ" },
+    { "a": "tsumiking", "b": "nejiko", "child": "burikishi", "hint": "王さまにはブリキの騎士がつかえる" },
+    { "a": "perari", "b": "zenmainu", "child": "haribote", "hint": "紙を張った、動く馬" },
+    { "a": "felton", "b": "kamishibai", "child": "kageboushi", "needFlag": "beatKageboushi", "hint": "布と語り部が、影の帽子をよびだす(ぬしを倒したあと)" },
+    { "a": "felton", "b": "origarasu", "child": "kageboushi", "needFlag": "beatKageboushi", "hint": "影にいるカラスと毛玉" }
+  ]
+}
