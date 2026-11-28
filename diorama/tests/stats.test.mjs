@@ -2,14 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { db } from './_db.mjs';
 import { makeRng, fixedRng } from '../src/core/rng.js';
-import { createMonster, calcStats, xpForLevel, levelForXp, gainXp, learnSkill, partsOf, partPct, traitsOf, partSkills, usableSkills, learnedAt, xpMulOf, battleXp, battleGold, healFull } from '../src/core/stats.js';
+import { GROW, createMonster, calcStats, xpForLevel, levelForXp, gainXp, learnSkill, partsOf, partPct, traitsOf, partSkills, usableSkills, learnedAt, xpMulOf, battleXp, battleGold, healFull } from '../src/core/stats.js';
 
-test('経験値の表は DESIGN §3-2 の値', () => {
-  assert.deepEqual([2, 5, 10, 15, 20, 30].map(xpForLevel), [2, 52, 314, 830, 1626, 4123]);
+test('経験値の表は DESIGN §3-2 の式(定数は GROW。docs/BALANCE.md)', () => {
+  assert.deepEqual([2, 5, 10, 15, 20, 30].map(xpForLevel), [2, 5, 10, 15, 20, 30].map((L) => Math.floor(GROW.xpA * Math.pow(L - 1, GROW.xpP))));
+  assert.ok([3, 4, 5, 10, 20, 30].every((L) => xpForLevel(L) > xpForLevel(L - 1)), 'Lv が上がるほど多く要る');
   assert.equal(xpForLevel(1), 0);
   assert.equal(levelForXp(0), 1);
-  assert.equal(levelForXp(314), 10);
-  assert.equal(levelForXp(313), 9);
+  assert.equal(levelForXp(xpForLevel(10)), 10);
+  assert.equal(levelForXp(xpForLevel(10) - 1), 9);
   assert.equal(levelForXp(1e9), 30);
 });
 
@@ -24,10 +25,10 @@ test('能力値の式: Lv・伸びボーナス・パーツ%・ぬしのHP倍率'
   assert.equal(calcStats(db, b).atk, Math.floor(15 * 1.4 * 1.5 * 1.03));
   const k1 = createMonster(db, { sp: 'kageboushi', lv: 14, shiny: false });
   const k2 = createMonster(db, { sp: 'kageboushi', lv: 14, shiny: false, boss: true });
-  assert.equal(calcStats(db, k2).hp, Math.floor(calcStats(db, k1).hp * 3.5));
+  assert.equal(calcStats(db, k2).hp, Math.floor(calcStats(db, k1).hp * db.sp('kageboushi').hpMul));
   // Lv1 は base(パーツ%込み)
   const p = createMonster(db, { sp: 'perari', lv: 1, shiny: false });
-  assert.equal(calcStats(db, p).int, Math.floor(16 * 1.05));
+  assert.equal(calcStats(db, p).int, Math.floor(db.sp('perari').base.int * 1.05));
 });
 
 test('作成: その Lv までのわざ(新しい4つ)、受けついだわざを優先', () => {
@@ -97,8 +98,8 @@ test('レベルアップ: 出来事・HP が増える・わざを覚える・4�
 
 test('ごほうびの式と生まれたての子', () => {
   const e = [createMonster(db, { sp: 'koroishi', lv: 6, shiny: false })];
-  assert.equal(battleXp(db, e), 12 * 6 / 3);
-  assert.equal(battleGold(db, e), 5 * 6 / 5);
+  assert.equal(battleXp(db, e), db.sp('koroishi').xp * 6 / GROW.xpDiv);
+  assert.equal(battleGold(db, e), db.sp('koroishi').gold * 6 / GROW.goldDiv);
   assert.equal(xpMulOf({ born: 'breed', lv: 9 }), 1.5);
   assert.equal(xpMulOf({ born: 'breed', lv: 10 }), 1);
   assert.equal(xpMulOf({ born: 'scout', lv: 3 }), 1);

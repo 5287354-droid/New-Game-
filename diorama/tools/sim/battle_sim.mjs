@@ -27,17 +27,17 @@ function parseTeam(str) {
     return o;
   });
 }
-const mkTeam = (spec, rng) => spec.map((o) => createMonster(db, { ...o, rng }));
+const mkTeam = (spec, rng, d = db) => spec.map((o) => createMonster(d, { ...o, rng }));
 
-export function simulate({ a, b, n = 500, seed = 1, preset = null, maxTurns = 80 }) {
+export function simulate({ a, b, n = 500, seed = 1, preset = null, maxTurns = 80, db: d = db }) {
   const A = typeof a === 'string' ? parseTeam(a) : a;
   const Bs = typeof b === 'string' ? parseTeam(b) : b;
   const out = { n, win: 0, lose: 0, timeout: 0, turns: 0, turnsWin: 0, hpLeft: 0, faintedA: 0 };
   for (let i = 0; i < n; i++) {
     const s = seed * 100003 + i;
-    const allies = mkTeam(A, s);
-    const enemies = preset ? bossEnemies(db, preset, s) : mkTeam(Bs, s + 7);
-    const bt = createBattle(db, { allies, enemies, seed: s });
+    const allies = mkTeam(A, s, d);
+    const enemies = preset ? bossEnemies(d, preset, s) : mkTeam(Bs, s + 7, d);
+    const bt = createBattle(d, { allies, enemies, seed: s });
     const r = runAuto(bt, maxTurns);
     out[r.outcome === 'win' ? 'win' : r.outcome === 'lose' ? 'lose' : 'timeout']++;
     out.turns += r.turns;
@@ -65,6 +65,11 @@ export const PRESETS = [
   { name: '塔の5階(Lv18×3 vs ツミキングたち)', a: 'nuihebi:18,hibachineko:18,hotarubin:18', b: 'tsumiking:16,kamishibai:16,rousokun:16' },
   { name: 'ボス トケイモリ(Lv20×3)', a: 'burikishi:20,nuihebi:20,kamishibai:20', preset: 'tokeimori' },
   { name: 'ボス トケイモリ(配合なし Lv20×3)', a: 'zenmainu:20,tsumiking:20,hotarubin:20', preset: 'tokeimori' },
+  // balancer が足した「寄り道なしの平均的なパーティ」(progress_sim の真ん中あたり。docs/BALANCE.md §4)
+  { name: 'ぬし カゲボウシ(平均・配合なし: 最初の1体+つみき野2+森1)', a: 'perari:14,koroishi:13,watabou:13,inky:12', preset: 'kageboushi' },
+  { name: 'ぬし カゲボウシ(平均・配合あり: ヌイヘビ b0.1 入り)', a: 'nuihebi:12:b0.1,nejiko:14,koroishi:13,felton:12', preset: 'kageboushi' },
+  { name: 'ボス トケイモリ(平均・配合なし)', a: 'nejiko:20,koroishi:19,felton:19,rousokun:18,watabou:18', preset: 'tokeimori' },
+  { name: 'ボス トケイモリ(平均・配合あり)', a: 'nuihebi:20:b0.1,hibachineko:17:b0.1,nejiko:20,koroishi:19,felton:18', preset: 'tokeimori' },
 ];
 
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];

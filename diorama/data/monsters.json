@@ -129,9 +129,9 @@
      "pct": 3
     }
    },
-   "scout": 0.5,
-   "xp": 14,
-   "gold": 6,
+   "scout": 0.2,
+   "xp": 18,
+   "gold": 10,
    "bst": 102
   },
   {
@@ -146,12 +146,12 @@
    "accent": "#d64a3a",
    "shiny": "#a7d3e8",
    "base": {
-    "hp": 30,
-    "mp": 20,
-    "atk": 11,
-    "def": 10,
+    "hp": 32,
+    "mp": 18,
+    "atk": 14,
+    "def": 11,
     "spd": 15,
-    "int": 16
+    "int": 12
    },
    "learn": [
     [
@@ -171,7 +171,7 @@
      "heal"
     ],
     [
-     16,
+     12,
      "fold"
     ],
     [
@@ -197,9 +197,9 @@
      "skill": "papershield"
     }
    },
-   "scout": 0.5,
-   "xp": 13,
-   "gold": 5,
+   "scout": 0.2,
+   "xp": 18,
+   "gold": 9,
    "bst": 102
   },
   {
@@ -266,9 +266,9 @@
      "skill": "inkshot"
     }
    },
-   "scout": 0.45,
-   "xp": 15,
-   "gold": 6,
+   "scout": 0.19,
+   "xp": 13,
+   "gold": 9,
    "bst": 102
   },
   {
@@ -283,12 +283,12 @@
    "accent": "#5f7d4a",
    "shiny": "#d3b98c",
    "base": {
-    "hp": 40,
+    "hp": 43,
     "mp": 8,
-    "atk": 15,
-    "def": 20,
-    "spd": 7,
-    "int": 6
+    "atk": 14,
+    "def": 16,
+    "spd": 8,
+    "int": 7
    },
    "learn": [
     [
@@ -296,7 +296,7 @@
      "tackle"
     ],
     [
-     3,
+     6,
      "roll"
     ],
     [
@@ -334,9 +334,9 @@
      "pct": 3
     }
    },
-   "scout": 0.55,
-   "xp": 12,
-   "gold": 5,
+   "scout": 0.22,
+   "xp": 17,
+   "gold": 9,
    "bst": 96
   },
   {
@@ -351,11 +351,11 @@
    "accent": "#e6a24a",
    "shiny": "#c8b6e8",
    "base": {
-    "hp": 30,
-    "mp": 16,
-    "atk": 11,
-    "def": 9,
-    "spd": 20,
+    "hp": 31,
+    "mp": 14,
+    "atk": 13,
+    "def": 10,
+    "spd": 18,
     "int": 12
    },
    "learn": [
@@ -402,9 +402,9 @@
      "pct": 3
     }
    },
-   "scout": 0.5,
-   "xp": 12,
-   "gold": 5,
+   "scout": 0.2,
+   "xp": 17,
+   "gold": 9,
    "bst": 98
   },
   {
@@ -419,12 +419,12 @@
    "accent": "#d33a24",
    "shiny": "#7fb7e0",
    "base": {
-    "hp": 29,
+    "hp": 32,
     "mp": 16,
     "atk": 17,
-    "def": 10,
+    "def": 11,
     "spd": 15,
-    "int": 13
+    "int": 11
    },
    "learn": [
     [
@@ -466,10 +466,10 @@
      "pct": 3
     }
    },
-   "scout": 0.4,
-   "xp": 16,
-   "gold": 7,
-   "bst": 100
+   "scout": 0.17,
+   "xp": 21,
+   "gold": 11,
+   "bst": 102
   },
   {
    "id": "origarasu",
@@ -485,10 +485,10 @@
    "base": {
     "hp": 31,
     "mp": 15,
-    "atk": 17,
-    "def": 11,
-    "spd": 19,
-    "int": 11
+    "atk": 15,
+    "def": 12,
+    "spd": 17,
+    "int": 13
    },
    "learn": [
     [
@@ -500,7 +500,7 @@
      "shadowstep"
     ],
     [
-     10,
+     14,
      "fold"
     ],
     [
@@ -530,10 +530,10 @@
      "pct": 3
     }
    },
-   "scout": 0.4,
-   "xp": 18,
-   "gold": 8,
-   "bst": 104
+   "scout": 0.17,
+   "xp": 13,
+   "gold": 10,
+   "bst": 103
   },
   {
    "id": "jarihebi",
@@ -549,10 +549,10 @@
    "base": {
     "hp": 38,
     "mp": 10,
-    "atk": 18,
+    "atk": 16,
     "def": 17,
     "spd": 11,
-    "int": 10
+    "int": 12
    },
    "learn": [
     [
@@ -594,9 +594,9 @@
      "trait": "rattle"
     }
    },
-   "scout": 0.42,
-   "xp": 18,
-   "gold": 8,
+   "scout": 0.18,
+   "xp": 13,
+   "gold": 10,
    "bst": 104
   },
   {
@@ -662,9 +662,9 @@
      "pct": 4
     }
    },
-   "scout": 0.45,
-   "xp": 17,
-   "gold": 7,
+   "scout": 0.19,
+   "xp": 12,
+   "gold": 9,
    "bst": 104
   },
   {
@@ -731,9 +731,9 @@
      "skill": "flash"
     }
    },
-   "scout": 0.4,
-   "xp": 18,
-   "gold": 8,
+   "scout": 0.17,
+   "xp": 13,
+   "gold": 10,
    "bst": 108
   },
   {
@@ -750,10 +750,10 @@
    "base": {
     "hp": 38,
     "mp": 12,
-    "atk": 19,
+    "atk": 17,
     "def": 16,
     "spd": 16,
-    "int": 9
+    "int": 11
    },
    "learn": [
     [
@@ -795,9 +795,9 @@
      "pct": 3
     }
    },
-   "scout": 0.38,
-   "xp": 24,
-   "gold": 10,
+   "scout": 0.17,
+   "xp": 15,
+   "gold": 7,
    "bst": 110
   },
   {
@@ -859,9 +859,9 @@
      "pct": 3
     }
    },
-   "scout": 0.38,
-   "xp": 24,
-   "gold": 10,
+   "scout": 0.17,
+   "xp": 15,
+   "gold": 7,
    "bst": 110
   },
   {
@@ -923,9 +923,9 @@
      "pct": 4
     }
    },
-   "scout": 0.35,
-   "xp": 26,
-   "gold": 12,
+   "scout": 0.16,
+   "xp": 16,
+   "gold": 8,
    "bst": 115
   },
   {
@@ -987,9 +987,9 @@
      "pct": 3
     }
    },
-   "scout": 0.35,
-   "xp": 26,
-   "gold": 12,
+   "scout": 0.16,
+   "xp": 16,
+   "gold": 8,
    "bst": 114
   },
   {
@@ -1051,7 +1051,7 @@
      "pct": 4
     }
    },
-   "scout": 0.25,
+   "scout": 0.1,
    "xp": 30,
    "gold": 15,
    "bst": 121
@@ -1272,10 +1272,10 @@
    "base": {
     "hp": 52,
     "mp": 24,
-    "atk": 16,
+    "atk": 13,
     "def": 16,
-    "spd": 18,
-    "int": 17
+    "spd": 15,
+    "int": 12
    },
    "learn": [
     [
@@ -1319,12 +1319,12 @@
     }
    },
    "scout": 0,
-   "xp": 160,
-   "gold": 120,
-   "bst": 143,
+   "xp": 60,
+   "gold": 50,
+   "bst": 132,
    "boss": true,
    "breedOnly": true,
-   "hpMul": 3.5
+   "hpMul": 2.2
   },
   {
    "id": "tokeimori",
@@ -1340,19 +1340,15 @@
    "base": {
     "hp": 64,
     "mp": 40,
-    "atk": 19,
-    "def": 21,
-    "spd": 15,
-    "int": 16
+    "atk": 14,
+    "def": 17,
+    "spd": 13,
+    "int": 10
    },
    "learn": [
     [
      1,
      "gearsaw"
-    ],
-    [
-     1,
-     "chime"
     ],
     [
      1,
@@ -1388,10 +1384,10 @@
    "scout": 0,
    "xp": 400,
    "gold": 300,
-   "bst": 175,
+   "bst": 158,
    "boss": true,
    "noScout": true,
-   "hpMul": 5,
+   "hpMul": 3,
    "noBreed": true
   }
  ]

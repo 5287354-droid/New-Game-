@@ -15,13 +15,28 @@ import { addCaught as defaultAddCaught } from './inventory.js';
 export const ATTACK = { id: 'attack', name: 'たたかう', el: 'none', kind: 'phys', pow: 30, mp: 0, target: 'one', range: 'melee' };
 export const BUFF_TURNS = 5;
 export const CLOAK_TURNS = 3;
-export const BACK_MUL = 0.7;
-export const ALL_MUL = 0.75;
-export const STAB_MUL = 1.2;
-export const CRIT_RATE = 1 / 16;
-export const CRIT_MUL = 1.5;
-export const ADV = 1.5;
-export const DISADV = 0.67;
+// 調整できる定数(balancer が docs/BALANCE.md のシミュレーションで決める)。式の形は DESIGN §4 のまま。
+// シミュレーター(tools/sim/)は、調整前と後を比べるために、この中身を書きかえて使う。
+export const TUNE = {
+  powDiv: 28,      // 基本 = pow ÷ powDiv × A × A ÷ (A + D)
+  adv: 1.5,        // 弱点
+  disadv: 0.67,    // いまひとつ
+  stab: 1.2,       // 素材ぞろい
+  back: 0.7,       // 後列で受ける
+  all: 0.75,       // 全体わざ
+  critRate: 1 / 16,
+  critMul: 1.5,
+  healDiv: 40,     // 回復量 = pow × (1 + かしこさ ÷ healDiv)
+  shadowAtk: 1.2,  // カゲボウシ: 影のターンのこうげき
+  shadowHit: 0.25, // カゲボウシ: 影のターンに受ける物理わざの命中
+};
+export const BACK_MUL = TUNE.back;
+export const ALL_MUL = TUNE.all;
+export const STAB_MUL = TUNE.stab;
+export const CRIT_RATE = TUNE.critRate;
+export const CRIT_MUL = TUNE.critMul;
+export const ADV = TUNE.adv;
+export const DISADV = TUNE.disadv;
 const PRIO_FIRST = 3; // にげる・スカウト・いれかえ・どうぐ は わざより先
 
 // ---------- 準備 ----------
@@ -50,7 +65,7 @@ export function createBattle(db, opts) {
   }
   if (b.rule === 'tokeimori') {
     const minion = b.roster.enemy.map((k) => b.units[k]).find((u) => !u.isBoss);
-    b.reinforce = { sp: minion?.mon.sp || 'zenmainu', lv: minion?.mon.lv || 16, left: 2 };
+    b.reinforce = { sp: minion?.mon.sp || BOSS.tokeimori.minion, lv: minion?.mon.lv || BOSS.tokeimori.minionLv, left: BOSS.tokeimori.reinforce };
   }
   // 並べる: 先頭からたおれていない3体
   for (const side of ['ally', 'enemy']) {
@@ -94,18 +109,17 @@ function addUnit(b, side, mon, i) {
 }
 
 // ぬし・ボス戦の敵のならび(DESIGN §4-8)。ぬしは前列の左
+// ぬし・ボスの Lv と手下(balancer が調整する定数)
+export const BOSS = {
+  kageboushi: { lv: 13, minion: 'origarasu', minionLv: 9, minions: 2 },
+  tokeimori: { lv: 19, minion: 'zenmainu', minionLv: 12, minions: 2, reinforce: 1 },
+};
 export function bossEnemies(db, which, rng) {
-  if (which === 'kageboushi') return [
-    createMonster(db, { sp: 'kageboushi', lv: 14, boss: true, shiny: false, born: 'boss' }),
-    createMonster(db, { sp: 'origarasu', lv: 11, rng }),
-    createMonster(db, { sp: 'origarasu', lv: 11, rng }),
-  ];
-  if (which === 'tokeimori') return [
-    createMonster(db, { sp: 'tokeimori', lv: 20, boss: true, shiny: false, born: 'boss' }),
-    createMonster(db, { sp: 'zenmainu', lv: 16, rng }),
-    createMonster(db, { sp: 'zenmainu', lv: 16, rng }),
-  ];
-  throw new Error('ぬしがいない: ' + which);
+  const c = BOSS[which];
+  if (!c) throw new Error('ぬしがいない: ' + which);
+  const out = [createMonster(db, { sp: which, lv: c.lv, boss: true, shiny: false, born: 'boss' })];
+  for (let i = 0; i < c.minions; i++) out.push(createMonster(db, { sp: c.minion, lv: c.minionLv, rng }));
+  return out;
 }
 
 // 野生の敵 [{sp, lv}] → 個体(色違いの抽選つき)
@@ -192,7 +206,7 @@ export function effStat(b, u, stat, { ignoreGoodBuff = false } = {}) {
   if (bf) v *= ignoreGoodBuff && bf.mul > 1 ? 1 : bf.mul;
   if (stat === 'atk') {
     if (u.status?.id === 'burn') v *= 0.85;
-    if (b.rule === 'kageboushi' && u.isBoss && phaseFor(b, b.turn) === 'shadow') v *= 1.2;
+    if (b.rule === 'kageboushi' && u.isBoss && phaseFor(b, b.turn) === 'shadow') v *= TUNE.shadowAtk;
   }
   if (stat === 'spd') {
     if (u.status?.id === 'rust') v *= 0.5;
@@ -205,8 +219,8 @@ export function effStat(b, u, stat, { ignoreGoodBuff = false } = {}) {
 
 export function elementMul(b, el, defMat) {
   if (!el || el === 'none') return 1;
-  if (b.db.beats[el] === defMat) return ADV;
-  if (b.db.beats[defMat] === el) return DISADV;
+  if (b.db.beats[el] === defMat) return TUNE.adv;
+  if (b.db.beats[defMat] === el) return TUNE.disadv;
   return 1;
 }
 
@@ -219,7 +233,7 @@ export function hitChance(b, att, def, sk) {
   const cloak = !!def.buffs.eva;
   if (cloak) p *= 0.5;
   const shadow = b.rule === 'kageboushi' && phaseFor(b, b.turn) === 'shadow';
-  if (shadow && def.isBoss && !cs) p *= 0.25;
+  if (shadow && def.isBoss && !cs) p *= TUNE.shadowHit;
   if (def.traits.shadowfit && (cloak || shadow)) p *= 0.8;
   if (cs && cs.star >= 3) p += 0.05;
   return Math.min(1, p);
@@ -229,16 +243,16 @@ export function hitChance(b, att, def, sk) {
 export function calcDamage(b, att, def, sk, opts = {}) {
   const rng = opts.rng || b.rng;
   const phys = sk.kind === 'phys';
-  const crit = opts.crit ?? (phys && !def.traits.nocrit && rng.chance(CRIT_RATE));
+  const crit = opts.crit ?? (phys && !def.traits.nocrit && rng.chance(TUNE.critRate));
   const A = phys ? effStat(b, att, 'atk') : att.st.int;
   let D = phys ? effStat(b, def, 'def', { ignoreGoodBuff: crit }) : (effStat(b, def, 'def') + def.st.int) / 2;
   if (opts.cover) D *= 1.2;
-  const base = (sk.pow / 16) * A * A / Math.max(1, A + D);
+  const base = (sk.pow / TUNE.powDiv) * A * A / Math.max(1, A + D);
   const elem = elementMul(b, sk.el, def.mat);
-  const stab = sk.el !== 'none' && sk.el === att.mat ? STAB_MUL : 1;
-  const row = rowOf(b, def) === 'back' ? BACK_MUL * (def.traits.backguard ? 0.85 : 1) : 1;
-  const all = sk.target === 'all' ? ALL_MUL : 1;
-  const critM = crit ? CRIT_MUL : 1;
+  const stab = sk.el !== 'none' && sk.el === att.mat ? TUNE.stab : 1;
+  const row = rowOf(b, def) === 'back' ? TUNE.back * (def.traits.backguard ? 0.85 : 1) : 1;
+  const all = sk.target === 'all' ? TUNE.all : 1;
+  const critM = crit ? TUNE.critMul : 1;
   let trait = 1;
   if (sk.el === 'water' && att.traits.inkpot) trait *= 1.1;
   if (sk.el === 'fire' && att.traits.burnproof) trait *= 1.1;
@@ -414,7 +428,7 @@ function useSkill(b, u, sk, want, ev, free) {
       break;
     }
     case 'heal':
-      for (const t of targets) if (t.alive) heal(b, t, Math.floor(sk.pow * (1 + u.st.int / 40)), ev, 'skill');
+      for (const t of targets) if (t.alive) heal(b, t, Math.floor(sk.pow * (1 + u.st.int / TUNE.healDiv)), ev, 'skill');
       break;
     case 'buff':
       for (const t of targets) {
