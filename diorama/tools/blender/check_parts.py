@@ -7,7 +7,7 @@
 
 調べること:
   1. 全パーツの三角形数(胴 ≤1000・頭 ≤1300・背中 ≤900・しっぽ ≤700)
-  2. マテリアルのスロットは body / accent / eye だけ。eye は頭のパーツだけ
+  2. マテリアルのスロットは body / accent / eye / glow だけ。eye は頭のパーツだけ(glow は光る部品: 炎・光・炭)
   3. 目のガラス玉の規格: 頭ごとに左右2つ、半径 0.075・左右の間隔 ±0.135(誤差 0.004)
   4. 胴6型それぞれに socket_head / socket_back / socket_tail が1つずつ(名前に「.」なし)
   5. 20種それぞれに head_ / back_ / tail_ がある(data/monsters.json と照らす)
@@ -26,7 +26,7 @@ GLB = os.path.join(ROOT, 'assets', 'models', 'parts.glb')
 LIMITS = {'body': 1000, 'head': 1300, 'back': 900, 'tail': 700}
 TRI_LIMIT = 4000
 EYE_R, EYE_X, TOL = 0.075, 0.135, 0.004
-SLOTS = {'body', 'accent', 'eye'}
+SLOTS = {'body', 'accent', 'eye', 'glow'}
 CTYPE = {5120: ('b', 1), 5121: ('B', 1), 5122: ('h', 2), 5123: ('H', 2), 5125: ('I', 4), 5126: ('f', 4)}
 NCOMP = {'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4}
 

@@ -148,11 +148,11 @@ const geo = forge.build({
   },
 });
 // geo: THREE.BufferGeometry(index つき・1体 = 1形状 = 1描画)
-//   属性 position / normal / color(素材の色, linear) / aMat(vec4: スロット 0体 1差し色 2目, 素材, ★, きらり) / aPart(vec4: パーツ内の位置, 場所 0胴 1頭 2背中 3しっぽ)
+//   属性 position / normal / color(素材の色, linear) / aMat(vec4: スロット 0体 1差し色 2目 3光る, 素材, ★, きらり + 2×模様) / aPart(vec4: パーツ内の位置, 場所 0胴 1頭 2背中 3しっぽ)
 //   geo.userData = { species, shiny, parts: {head, back, tail: 付けている種}, triangles, height, scale }
 //   原点 = 足もとの中心。+Z が正面、+Y が上。高さはだいたい 1。ぬし・ボスは userData.scale 倍で置く
 
-const mat = forge.material('A');          // 'A' つやソフビ / 'B' マット塗装。全員で1つを共有(同じ文字なら同じ物が返る)
+const mat = forge.material();             // A+ 案(docs/ART_BIBLE.md §1-1)。全員で1つを共有。前の material('A') も同じ物を返す
 scene.add(new THREE.Mesh(geo, mat));      // 戦闘・図鑑: 1体 1 Mesh
 
 const batch = forge.batch(mat, { max: 24 });   // フィールド: BatchedMesh 1つ = 全員で1描画
@@ -168,6 +168,8 @@ mat.userData.uniforms.uTime.value = t;    // (予約。今は使っていない)
 - 規格: 1体 ≤ `TRI_LIMIT`(4000)△。どのおさがりの組み合わせでも超えない(`tests/forge.test.mjs` で 20×20 を確かめる)
 - 影はふつうの `castShadow` / `receiveShadow` でよい(頂点を動かしていないので、影のマテリアルの差しかえは要らない)
 - 焼くのは「組み上がったとき」に1回(配合・スカウト・読みこみ時)。毎フレーム焼かない
+- 色: `palette(sp, shiny)` は `COLOR_FIX`(art-director の判定で変えた色。monsters.json に移すまでの上書き)を先に見る。光る部品(glow)の色は `GLOW_COLOR`、部品の模様は `PART_PATTERN`
+- 質感の値は `STYLE`(A+)と `MAT_FINISH`(素材ごとのつや・あらさ)。`createMonsterMaterial(over)` で一部だけ変えて試せる
 
 ## ui(UI/演出班 — `src/ui/` `css/ui.css`)
 
