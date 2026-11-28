@@ -231,3 +231,17 @@ test('振り子: 自動で歩くとき、ふさがれていたら待ってから
   run(f);
   assert.deepEqual(f.pos(), [3, cx + 2, cz]);
 });
+
+test('群れの数: 出現の表の pack の割合で 1〜3 体(BALANCE.md §5)。つみき野の入口は1体だけ', async () => {
+  const { rollPack } = await import('../src/field/monsters.js');
+  const { makeRng } = await import('../src/core/rng.js');
+  const rng = makeRng(9);
+  const cnt = [0, 0, 0, 0];
+  for (let i = 0; i < 3000; i++) cnt[rollPack(rng, [0.4, 0.4, 0.2])]++;
+  assert.ok(Math.abs(cnt[3] / 3000 - 0.2) < 0.03);
+  const ts = loadArea('tsumiki');
+  assert.deepEqual(ts.spawns[0].pack, [1, 0, 0]);
+  assert.deepEqual(ts.spawns[0].lv, [2, 3]);
+  const tw = loadArea('tower');
+  assert.deepEqual(tw.spawns.find((s) => s.l === 4).lv, [16, 18]);
+});

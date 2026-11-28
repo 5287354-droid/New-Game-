@@ -13,7 +13,7 @@
 import * as G from '../core/grid.js';
 import { timeOfDay } from '../core/story.js';
 import { toRng } from '../core/rng.js';
-import { fillSpawns, pruneSpawns, wander } from './monsters.js';
+import { fillSpawns, pruneSpawns, wander, rollPack } from './monsters.js';
 
 export const STEP_MS = { walk: 220, run: 130 };
 export const DIR_NAMES = ['east', 'south', 'west', 'north'];
@@ -404,7 +404,7 @@ export class Field {
     if (this.busy) return null;
     this.busy = 'battle';
     this.path = null; this.held = null;
-    const e = { t: 'encounter', puppet: p.id, species: p.sp, lv: p.lv, first, rare: !!p.rare, rareId: p.rareId, shinyRate: p.shinyRate };
+    const e = { t: 'encounter', puppet: p.id, species: p.sp, lv: p.lv, count: p.rare ? 1 : rollPack(this.rng, p.pack), rule: p.rule, first, rare: !!p.rare, rareId: p.rareId, shinyRate: p.shinyRate };
     ev.push(e);
     return e;
   }

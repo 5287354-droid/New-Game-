@@ -318,7 +318,7 @@ Phase 1 のたたき台からの形はできるだけ保った。**変わった�
   "lampStart": 2,                      // ランプの森だけ(0 東 / 1 真上 / 2 西)
   "groundShade": [[x,z]…]【新: 森の飾りの木陰。歩く影とは関係ない。影の魔物の出現に使う】,
   "decor": [ { "type": "flowers|backyard", "l", "x0", "z0", "x1", "z1" } ]【新: 描画だけの飾り】,
-  "spawns": [ { "l", "x0", "z0", "x1", "z1", "species": [[id, 重み]…], "lv": [下, 上], "n", "cond"?: "evening|shadow|light|beat", "disc"?: 台の上に出す【新】 } ],
+  "spawns": [ { "l", "x0", "z0", "x1", "z1", "species": [[id, 重み]…], "lv": [下, 上], "n", "cond"?: "evening|shadow|light|beat", "disc"?: 台の上に出す【新】, "pack"?: [1体,2体,3体の割合]【新】 } ],
   "rares": [ { "id", "species", "l", "x", "z", "lv", "needs"?: ["tweezers"], "shinyRate"? } ],
   "entries": { "home": {l,x,z}, ... }, "entry": "home"
 }
@@ -449,7 +449,7 @@ let ev = f.update(dtMs);               // 毎フレーム。出来事の配列
 | chest / chestEmpty | id, item, qty, book?, flag?, shelf? | 宝箱・棚(1回だけ。`state.opened`) |
 | talk | id, name, role, lines, face | 人と話す(face = 人がこちらを向く向き) |
 | read | id, text, book?, role?, locked? | 看板・本・家具 |
-| encounter | puppet, species, lv, first: 'player'(後ろから触れた=先制)/'enemy'(後ろから触れられた)/null, rare, rareId, shinyRate | 人形に触れた → 戦闘 |
+| encounter | puppet, species, lv, count(群れの数 1〜3。spawns[].pack の割合), rule, first: 'player'(後ろから触れた=先制)/'enemy'(後ろから触れられた)/null, rare, rareId, shinyRate | 人形に触れた → 戦闘 |
 | boss / goal | id, species, lv, flag / id, flag, text | ぬし・ボス / つなぎ目・塔の文字盤 |
 | exit / exitClosed / say | id, to, entry, state / id, needFlag / key:'dropFirst' | 出口(state はセーブに入れる)/ 閉じている / 部品を置いてから |
 | spawn / despawn / puppetMove / puppetTurn | puppet / id, why / id, from, to, dir / id, dir | 人形 |

@@ -280,15 +280,15 @@ function tsumiki() {
     placed++;
   }
   b.spawns.push(
-    { l: 0, x0: 14, z0: 43, x1: 46, z1: 47, species: [['nejiko', 3], ['koroishi', 3], ['perari', 2]], lv: [2, 4], n: 3 },
-    { l: 0, x0: 2, z0: 30, x1: 24, z1: 41, species: [['koroishi', 3], ['watabou', 3], ['perari', 2]], lv: [3, 6], n: 4 },
-    { l: 0, x0: 36, z0: 30, x1: 58, z1: 41, species: [['nejiko', 3], ['watabou', 2], ['matchbo', 1]], lv: [4, 7], n: 4 },
-    { l: 0, x0: 2, z0: 2, x1: 24, z1: 18, species: [['watabou', 2], ['koroishi', 2], ['matchbo', 2]], lv: [6, 9], n: 4 },
-    { l: 0, x0: 36, z0: 2, x1: 58, z1: 18, species: [['nejiko', 2], ['perari', 2], ['matchbo', 2]], lv: [6, 9], n: 4 },
-    { l: 0, x0: 20, z0: 20, x1: 24, z1: 28, species: [['perari', 1], ['koroishi', 1]], lv: [5, 7], n: 1 },
-    { l: 0, disc: 'D', species: [['koroishi', 1]], lv: [5, 7], n: 1, note: '回転台の上。台といっしょに回る' },
-    { l: 0, disc: 'C', species: [['nejiko', 1]], lv: [5, 7], n: 1, note: '回転台の上。台といっしょに回る' },
-    { l: 0, x0: 2, z0: 30, x1: 58, z1: 41, species: [['matchbo', 1]], lv: [6, 8], n: 2, cond: 'evening' }
+    { l: 0, x0: 14, z0: 43, x1: 46, z1: 47, species: [['nejiko', 3], ['koroishi', 3], ['perari', 2]], lv: [2, 3], n: 3, pack: [1, 0, 0] },
+    { l: 0, x0: 2, z0: 30, x1: 24, z1: 41, species: [['koroishi', 3], ['watabou', 3], ['perari', 2]], lv: [3, 4], n: 4, pack: [0.8, 0.2, 0] },
+    { l: 0, x0: 36, z0: 30, x1: 58, z1: 41, species: [['nejiko', 3], ['watabou', 2], ['matchbo', 1]], lv: [4, 6], n: 4, pack: [0.8, 0.2, 0] },
+    { l: 0, x0: 2, z0: 2, x1: 24, z1: 18, species: [['watabou', 2], ['koroishi', 2], ['matchbo', 2]], lv: [6, 8], n: 4, pack: [0.5, 0.4, 0.1] },
+    { l: 0, x0: 36, z0: 2, x1: 58, z1: 18, species: [['nejiko', 2], ['perari', 2], ['matchbo', 2]], lv: [6, 8], n: 4, pack: [0.5, 0.4, 0.1] },
+    { l: 0, x0: 20, z0: 20, x1: 24, z1: 28, species: [['perari', 1], ['koroishi', 1]], lv: [5, 7], n: 1, pack: [0.8, 0.2, 0] },
+    { l: 0, disc: 'D', species: [['koroishi', 1]], lv: [5, 7], n: 1, pack: [0.8, 0.2, 0], note: '回転台の上。台といっしょに回る' },
+    { l: 0, disc: 'C', species: [['nejiko', 1]], lv: [5, 7], n: 1, pack: [0.8, 0.2, 0], note: '回転台の上。台といっしょに回る' },
+    { l: 0, x0: 2, z0: 30, x1: 58, z1: 41, species: [['matchbo', 1]], lv: [6, 8], n: 2, pack: [0.8, 0.2, 0], cond: 'evening' }
   );
   b.entries = { south: { l: 0, x: 30, z: 45 } };
   b.entry = 'south';
@@ -363,11 +363,11 @@ function forest() {
     keep.push([x, z]);
   }
   b.spawns.push(
-    { l: 0, x0: 0, z0: 0, x1: 13, z1: 45, species: [['inky', 3], ['felton', 2], ['watabou', 1]], lv: [7, 10], n: 4 },
-    { l: 0, x0: 18, z0: 0, x1: 26, z1: 47, species: [['jarihebi', 3], ['inky', 2], ['felton', 2]], lv: [8, 11], n: 4 },
-    { l: 0, x0: 34, z0: 0, x1: 41, z1: 47, species: [['jarihebi', 2], ['felton', 2], ['inky', 1]], lv: [9, 12], n: 3 },
-    { l: 0, x0: 0, z0: 0, x1: 55, z1: 47, species: [['origarasu', 2], ['hotarubin', 2]], lv: [9, 12], n: 4, cond: 'shadow' },
-    { l: 0, x0: 0, z0: 0, x1: 41, z1: 47, species: [['felton', 2]], lv: [8, 11], n: 2, cond: 'light' }
+    { l: 0, x0: 0, z0: 0, x1: 13, z1: 45, species: [['inky', 3], ['felton', 2], ['watabou', 1]], lv: [8, 10], n: 4, pack: [0.4, 0.4, 0.2] },
+    { l: 0, x0: 18, z0: 0, x1: 26, z1: 47, species: [['jarihebi', 3], ['inky', 2], ['felton', 2]], lv: [9, 11], n: 4, pack: [0.4, 0.4, 0.2] },
+    { l: 0, x0: 34, z0: 0, x1: 55, z1: 47, species: [['jarihebi', 2], ['felton', 2], ['inky', 1]], lv: [10, 13], n: 5, pack: [0.4, 0.4, 0.2] },
+    { l: 0, x0: 0, z0: 0, x1: 55, z1: 47, species: [['origarasu', 2], ['hotarubin', 2]], lv: [10, 12], n: 4, pack: [0.4, 0.4, 0.2], cond: 'shadow' },
+    { l: 0, x0: 0, z0: 0, x1: 41, z1: 47, species: [['felton', 2]], lv: [9, 11], n: 2, pack: [0.4, 0.4, 0.2], cond: 'light' }
   );
   b.entries = { south: { l: 0, x: 6, z: 45 } };
   b.entry = 'south';
@@ -542,11 +542,11 @@ function tower() {
   b.o('clockface', 5, C, C, { id: 'tw_clock', needFlag: 'beatTokeimori', flag: 'ending', text: '塔の文字盤。針を動かすと……' });
 
   b.spawns.push(
-    { l: 0, x0: 0, z0: 0, x1: 24, z1: 24, species: [['zenmainu', 2], ['rousokun', 2]], lv: [11, 13], n: 2 },
-    { l: 1, x0: 0, z0: 0, x1: 24, z1: 24, species: [['zenmainu', 2], ['rousokun', 2], ['kamishibai', 1]], lv: [12, 14], n: 3 },
-    { l: 2, x0: 0, z0: 0, x1: 24, z1: 24, species: [['kamishibai', 2], ['tsumiking', 1]], lv: [13, 15], n: 3 },
-    { l: 3, x0: 0, z0: 0, x1: 24, z1: 24, species: [['tsumiking', 2], ['zenmainu', 2]], lv: [14, 16], n: 3, cond: 'beat' },
-    { l: 4, x0: 0, z0: 0, x1: 24, z1: 24, species: [['tsumiking', 2], ['kamishibai', 2], ['rousokun', 1]], lv: [15, 17], n: 3 }
+    { l: 0, x0: 0, z0: 0, x1: 24, z1: 24, species: [['zenmainu', 2], ['rousokun', 2]], lv: [13, 14], n: 2, pack: [0.4, 0.4, 0.2] },
+    { l: 1, x0: 0, z0: 0, x1: 24, z1: 24, species: [['zenmainu', 2], ['rousokun', 2], ['kamishibai', 1]], lv: [14, 15], n: 3, pack: [0.4, 0.4, 0.2] },
+    { l: 2, x0: 0, z0: 0, x1: 24, z1: 24, species: [['kamishibai', 2], ['tsumiking', 1]], lv: [15, 16], n: 3, pack: [0.4, 0.4, 0.2] },
+    { l: 3, x0: 0, z0: 0, x1: 24, z1: 24, species: [['tsumiking', 2], ['zenmainu', 2]], lv: [15, 17], n: 3, pack: [0.4, 0.4, 0.2], cond: 'beat' },
+    { l: 4, x0: 0, z0: 0, x1: 24, z1: 24, species: [['tsumiking', 2], ['kamishibai', 2], ['rousokun', 1]], lv: [16, 18], n: 3, pack: [0.3, 0.45, 0.25] }
   );
   return b.out();
 }

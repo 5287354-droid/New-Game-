@@ -18,6 +18,14 @@ function pickWeighted(rng, list) {
 }
 
 // その決まりが今ひらいているか(時刻)
+// 群れの数: シンボル1体にふれると 1〜3 体が出る。pack = [1体, 2体, 3体] の割合(docs/BALANCE.md §5)。なければ1体
+export function rollPack(rng, pack) {
+  if (!pack) return 1;
+  let r = rng.next() * pack.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < pack.length; i++) if ((r -= pack[i]) < 0) return i + 1;
+  return 1;
+}
+
 export function ruleActive(rule, tod) {
   if (rule.cond === 'evening') return tod === 'evening';
   return true;
@@ -56,7 +64,7 @@ export function makePuppet(f, rule, ri) {
   const [x, z] = f.rng.pick(cells);
   return {
     id: 'pp' + (++uidN), rule: ri, sp: pickWeighted(f.rng, rule.species), lv: f.rng.int(rule.lv[0], rule.lv[1]),
-    l, x, z, dir: f.rng.int(0, 3), wait: f.rng.int(...WANDER_MS), stun: 0, rare: false,
+    l, x, z, dir: f.rng.int(0, 3), wait: f.rng.int(...WANDER_MS), stun: 0, rare: false, pack: rule.pack,
   };
 }
 
