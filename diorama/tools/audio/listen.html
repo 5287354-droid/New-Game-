@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>試聴 — ジオラマ魔物記の音</title>
+<style>
+  :root { --paper:#f3ecd9; --ink:#1d1a16; --tl:#e0a526; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:16px; background:var(--paper); color:var(--ink); font:600 15px/1.5 "Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  h2 { font-size:15px; margin:20px 0 8px; border-bottom:2px solid var(--ink); padding-bottom:2px; }
+  .row { display:flex; flex-wrap:wrap; gap:6px; }
+  button { font:inherit; font-size:14px; padding:6px 10px; border:2px solid var(--ink); background:#fff; color:var(--ink); border-radius:3px; cursor:pointer; }
+  button.on { background:var(--tl); }
+  button small { display:block; font-size:11px; font-weight:500; }
+  .num { font-family:"Barlow Condensed",sans-serif; font-variant-numeric:tabular-nums; }
+  #beat { display:flex; gap:10px; align-items:center; margin-top:8px; }
+  #pend { width:160px; height:40px; border:2px solid var(--ink); position:relative; background:#fff; }
+  #bob { position:absolute; top:6px; width:24px; height:24px; border-radius:50%; background:var(--ink); }
+  .dots span { display:inline-block; width:14px; height:14px; border:2px solid var(--ink); margin-right:3px; }
+  .dots span.on { background:var(--tl); }
+  table { border-collapse:collapse; margin-top:8px; }
+  td, th { border:1px solid var(--ink); padding:2px 8px; text-align:right; }
+  th { background:#fff; }
+  td:first-child { text-align:left; }
+  select { font:inherit; }
+</style>
+</head>
+<body>
+<h1>試聴(sound-lab)</h1>
+<div>どこかをタップすると音が出ます。曲はフェードで切りかわります。</div>
+
+<h2>音量(5段階)</h2>
+<div class="row">BGM <span id="bgmLv" class="row"></span></div>
+<div class="row" style="margin-top:6px">効果音 <span id="seLv" class="row"></span></div>
+
+<h2>曲</h2>
+<div class="row" id="songs"></div>
+<div class="row" style="margin-top:6px"><button id="stop">止める</button></div>
+<div id="beat">
+  <div id="pend"><div id="bob"></div></div>
+  <div class="dots" id="dots"><span></span><span></span><span></span><span></span></div>
+  <div class="num" id="beatTxt">—</div>
+</div>
+
+<h2>ジングル</h2>
+<div class="row" id="jingles"></div>
+
+<h2>効果音</h2>
+<div class="row" id="sfx"></div>
+
+<h2>足音(地面の種類)</h2>
+<div class="row" id="steps"></div>
+
+<h2>書き出して測る(OfflineAudioContext)</h2>
+<div class="row"><button id="measure">全曲を 12 秒ずつ測る</button></div>
+<table id="tbl"></table>
+
+<script type="module">
+import * as audio from '../../src/audio/audio.js';
+window.__audio = audio;
+audio.initAudio();
+
+const $ = (id) => document.getElementById(id);
+const btn = (parent, label, sub, fn) => {
+  const b = document.createElement('button');
+  b.innerHTML = label + (sub ? `<small>${sub}</small>` : '');
+  b.onclick = async () => { await audio.unlock(); fn(b); };
+  parent.appendChild(b);
+  return b;
+};
+
+function levels() {
+  for (const [id, get, set] of [['bgmLv', 'bgm', audio.setBgmLevel], ['seLv', 'se', audio.setSeLevel]]) {
+    const el = $(id); el.innerHTML = '';
+    for (let i = 0; i <= 4; i++) {
+      const b = btn(el, String(i), '', () => { set(i); levels(); if (id === 'seLv') audio.sfx('cursor'); });
+      b.classList.add('num');
+      if (audio.getLevels()[get] === i) b.classList.add('on');
+    }
+  }
+}
+levels();
+
+const songBtns = {};
+for (const n of audio.SONG_NAMES) {
+  const i = audio.songInfo(n);
+  songBtns[n] = btn($('songs'), i.label, `${n} · ${i.bpm}`, () => { audio.playBgm(n); mark(); });
+}
+function mark() { for (const [n, b] of Object.entries(songBtns)) b.classList.toggle('on', audio.currentBgm() === n); }
+$('stop').onclick = () => { audio.stopBgm(); mark(); };
+
+for (const n of audio.JINGLE_NAMES) btn($('jingles'), audio.songInfo(n).label, n, () => audio.jingle(n));
+const LABEL = {
+  cursor: 'カーソル', ok: '決定', cancel: 'キャンセル', pickup: 'つまむ', place: '置けた(パチッ)', roof: '屋根が開く', roofClose: '屋根が閉じる',
+  step: '足音', turntable: '回転台', lamp: 'ランプの角度', tick: '針(カチッ)', gear: '歯車がかみ合う', kintsugi: '金つぎが光る', chest: '宝箱',
+  hit: 'ヒット', hitWeak: '弱点ヒット', miss: 'はずれ', faint: '倒れる(パタン)', heal: '回復', fall: '落ちる', door: '扉', buy: '買う', alarm: 'ぬしの合図',
+};
+for (const n of audio.SFX_NAMES) {
+  if (n === 'step') continue;
+  btn($('sfx'), LABEL[n] || n, n, () => audio.sfx(n));
+}
+const G = { g: '草', p: '道', d: '土', s: '砂', f: '床', k: '回転台', B: '橋', L: 'はしご', c: '影', m: '石', r: '敷物' };
+for (const [ch, label] of Object.entries(G)) btn($('steps'), label, ch, () => { for (let i = 0; i < 4; i++) audio.sfx('step', { ground: ch, when: i * 0.32 }); });
+
+// 拍の表示(振り子の通路と同じ関数で動かす)
+function frame() {
+  const b = audio.beat();
+  const x = audio.pendulum(4); // 4拍で1往復
+  const pos = (1 - Math.cos(x * Math.PI * 2)) / 2;
+  $('bob').style.left = (6 + pos * 124) + 'px';
+  [...$('dots').children].forEach((s, i) => s.classList.toggle('on', i === b.beatInBar));
+  $('beatTxt').textContent = `${b.song ?? '(曲なし)'}  ${b.bpm} BPM  小節 ${b.bar + 1}  拍 ${b.beatInBar + 1}  位相 ${b.phase.toFixed(2)}`;
+  requestAnimationFrame(frame);
+}
+frame();
+
+// 測る
+const db = (x) => (x > 0 ? 20 * Math.log10(x) : -Infinity);
+function measure(buf, from = 0) {
+  let peak = 0, sum = 0, n = 0;
+  for (let c = 0; c < buf.numberOfChannels; c++) {
+    const d = buf.getChannelData(c);
+    for (let i = Math.floor(from * buf.sampleRate); i < d.length; i++) { const v = Math.abs(d[i]); if (v > peak) peak = v; sum += d[i] * d[i]; n++; }
+  }
+  return { peak: db(peak), rms: db(Math.sqrt(sum / n)) };
+}
+window.__measure = measure;
+$('measure').onclick = async () => {
+  const t = $('tbl');
+  t.innerHTML = '<tr><th>曲</th><th>ピーク dBFS</th><th>RMS dBFS</th></tr>';
+  for (const n of audio.SONG_NAMES) {
+    const buf = await audio.renderSong(n, { secs: 12 });
+    const m = measure(buf, 1);
+    t.insertAdjacentHTML('beforeend', `<tr><td>${n}</td><td class="num">${m.peak.toFixed(1)}</td><td class="num">${m.rms.toFixed(1)}</td></tr>`);
+  }
+};
+</script>
+</body>
+</html>
