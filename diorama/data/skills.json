@@ -42,8 +42,8 @@
     { "id": "fluff", "name": "わたぼこり", "el": "cloth", "kind": "mag", "pow": 48, "mp": 8, "target": "all", "range": "ranged", "desc": "綿のほこりを舞わせる" },
     { "id": "drain", "name": "すいとり", "el": "cloth", "kind": "mag", "pow": 44, "mp": 5, "target": "one", "range": "ranged", "drain": 0.5, "desc": "与えた分の半分を回復" },
 
-    { "id": "heal", "name": "つくろい", "el": "none", "kind": "heal", "pow": 40, "mp": 4, "target": "ally", "desc": "なかま1体のHPを直す" },
-    { "id": "healall", "name": "おおつくろい", "el": "none", "kind": "heal", "pow": 28, "mp": 9, "target": "allies", "desc": "なかまみんなのHPを直す" },
+    { "id": "heal", "name": "つくろい", "el": "none", "kind": "heal", "pow": 30, "mp": 4, "target": "ally", "desc": "なかま1体のHPを直す" },
+    { "id": "healall", "name": "おおつくろい", "el": "none", "kind": "heal", "pow": 20, "mp": 9, "target": "allies", "desc": "なかまみんなのHPを直す" },
     { "id": "mend", "name": "ほころびなおし", "el": "none", "kind": "cure", "mp": 3, "target": "ally", "desc": "なかま1体の状態異常を直す" },
     { "id": "varnish", "name": "ニスぬり", "el": "none", "kind": "buff", "stat": "def", "mul": 1.35, "mp": 4, "target": "ally", "desc": "なかまのまもりを上げる" },
     { "id": "encourage", "name": "がんばれ", "el": "none", "kind": "buff", "stat": "atk", "mul": 1.3, "mp": 6, "target": "allies", "desc": "なかまみんなのこうげきを上げる" },

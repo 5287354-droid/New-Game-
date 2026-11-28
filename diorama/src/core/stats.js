@@ -7,11 +7,19 @@ export const SHINY_RATE = 1 / 256;
 export const STAR_MUL = { 1: 1.0, 2: 1.5, 3: 2.0 };
 export const MAX_SKILLS = 4;
 export const FRESH_XP_MUL = 1.5; // 生まれたての子(配合・Lv10未満)
+// 成長とごほうびの定数(balancer が docs/BALANCE.md で決める。式の形は DESIGN §3 のまま)
+export const GROW = {
+  lvRate: 0.1,   // 能力(L) = base × (1 + lvRate × (L−1)) × …
+  xpA: 1,        // T(L) = xpA × (L−1)^xpP
+  xpP: 3,
+  xpDiv: 1,      // 1戦闘の経験値 = Σ(xp × Lv ÷ xpDiv)
+  goldDiv: 2,    // お金 = Σ(gold × Lv ÷ goldDiv)
+};
 
 // Lv L に上がるのに必要な経験値の合計
 export function xpForLevel(L) {
   if (L <= 1) return 0;
-  return Math.floor(2.5 * Math.pow(L - 1, 2.2));
+  return Math.floor(GROW.xpA * Math.pow(L - 1, GROW.xpP));
 }
 export function levelForXp(xp) {
   let L = 1;
@@ -98,7 +106,7 @@ export function usableSkills(db, mon) { return [...mon.skills, ...partSkills(db,
 export function calcStats(db, mon) {
   const s = db.sp(mon.sp);
   const pct = partPct(db, mon);
-  const lvMul = 1 + 0.1 * (mon.lv - 1);
+  const lvMul = 1 + GROW.lvRate * (mon.lv - 1);
   const out = {};
   for (const k of STATS) out[k] = Math.max(1, Math.floor(s.base[k] * lvMul * (1 + (mon.bonus || 0)) * (1 + pct[k] / 100)));
   if (mon.isBoss && s.hpMul) out.hp = Math.floor(out.hp * s.hpMul);
@@ -154,5 +162,5 @@ export function learnSkill(mon, skill, forget = null) {
 export function xpMulOf(mon) { return mon.born === 'breed' && mon.lv < 10 ? FRESH_XP_MUL : 1; }
 
 // 戦闘のごほうび(敵の個体のならび)
-export function battleXp(db, enemies) { return enemies.reduce((a, e) => a + db.sp(e.sp).xp * e.lv / 3, 0); }
-export function battleGold(db, enemies) { return enemies.reduce((a, e) => a + db.sp(e.sp).gold * e.lv / 5, 0); }
+export function battleXp(db, enemies) { return enemies.reduce((a, e) => a + db.sp(e.sp).xp * e.lv / GROW.xpDiv, 0); }
+export function battleGold(db, enemies) { return enemies.reduce((a, e) => a + db.sp(e.sp).gold * e.lv / GROW.goldDiv, 0); }

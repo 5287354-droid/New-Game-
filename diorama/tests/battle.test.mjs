@@ -5,8 +5,9 @@ import { makeRng, fixedRng } from '../src/core/rng.js';
 import { createMonster, calcStats, xpForLevel } from '../src/core/stats.js';
 import {
   createBattle, submit, calcDamage, hitChance, elementMul, scoutChance, runChance, availableCommands, validTargets, getView,
-  runAuto, applyBattleResult, bossEnemies, phaseFor, handFor, rowOf, effStat, forceFinish, wildEnemies, autoAction,
+  runAuto, applyBattleResult, bossEnemies, phaseFor, handFor, rowOf, effStat, forceFinish, wildEnemies, autoAction, TUNE, BOSS,
 } from '../src/core/battle.js';
+import { GROW } from '../src/core/stats.js';
 import { newSave } from '../src/core/save.js';
 import { addCaught } from '../src/core/inventory.js';
 
@@ -19,12 +20,12 @@ test('ダメージの式(DESIGN §4-4)', () => {
   const a = U(b, 'a0'), e = U(b, 'e0');
   const tackle = db.sk('tackle');
   const A = a.st.atk, D = e.st.def;
-  const base = 30 / 16 * A * A / (A + D);
+  const base = 30 / TUNE.powDiv * A * A / (A + D);
   assert.equal(calcDamage(b, a, e, tackle, { roll: 1, crit: false }).dmg, Math.floor(base));
   assert.equal(calcDamage(b, a, e, tackle, { roll: 1, crit: true }).dmg, Math.floor(base * 1.5));
   // 素材ぞろい 1.2(ブリキパンチ)・弱点 1.5 ・いまひとつ 0.67
   const tp = db.sk('tinpunch');
-  const bt = 44 / 16 * A * A / (A + D);
+  const bt = 44 / TUNE.powDiv * A * A / (A + D);
   assert.equal(calcDamage(b, a, e, tp, { roll: 1, crit: false }).dmg, Math.floor(bt * 1.2 * 0.67)); // 石はブリキに強い → ブリキわざは石に弱い
   assert.equal(elementMul(b, 'water', 'fire'), 1.5);
   assert.equal(elementMul(b, 'fire', 'water'), 0.67);
@@ -35,7 +36,7 @@ test('ダメージの式(DESIGN §4-4)', () => {
   const b2 = B([mk('matchbo', 7)], [mk('perari', 6)]);
   const m = U(b2, 'a0'), p = U(b2, 'e0');
   const Am = m.st.int, Dm = (p.st.def + p.st.int) / 2;
-  assert.equal(calcDamage(b2, m, p, db.sk('spark'), { roll: 1 }).dmg, Math.floor(36 / 16 * Am * Am / (Am + Dm) * 1.5 * 1.2));
+  assert.equal(calcDamage(b2, m, p, db.sk('spark'), { roll: 1 }).dmg, Math.floor(36 / TUNE.powDiv * Am * Am / (Am + Dm) * 1.5 * 1.2));
   // 最低 1
   const b3 = B([mk('perari', 1)], [mk('koroishi', 30)]);
   assert.ok(calcDamage(b3, U(b3, 'a0'), U(b3, 'e0'), db.sk('tackle'), { roll: 0.9, crit: false }).dmg >= 1);
@@ -45,7 +46,7 @@ test('後列: ダメージ ×0.7、近接わざが届かない・出せない、
   const b = B([mk('nejiko'), mk('perari'), mk('inky')], [mk('koroishi'), mk('koroishi'), mk('koroishi')]);
   assert.equal(rowOf(b, U(b, 'e2')), 'back');
   const a = U(b, 'a0');
-  const raw = (sk, t) => { const A = a.st.atk, D = t.st.def; return sk.pow / 16 * A * A / (A + D) * elementMul(b, sk.el, t.mat) * (sk.el === a.mat ? 1.2 : 1); };
+  const raw = (sk, t) => { const A = a.st.atk, D = t.st.def; return sk.pow / TUNE.powDiv * A * A / (A + D) * elementMul(b, sk.el, t.mat) * (sk.el === a.mat ? 1.2 : 1); };
   const pebble = db.sk('pebble');
   assert.equal(calcDamage(b, a, U(b, 'e0'), pebble, { roll: 1, crit: false }).dmg, Math.floor(raw(pebble, U(b, 'e0'))));
   assert.equal(calcDamage(b, a, U(b, 'e2'), pebble, { roll: 1, crit: false }).dmg, Math.floor(raw(pebble, U(b, 'e2')) * 0.7));
@@ -158,7 +159,7 @@ test('カゲボウシ戦: 光・光・影・影…、影のターンは物理の
   assert.deepEqual([1, 2, 3, 4, 5, 6].map((t) => phaseFor(b, t)), ['light', 'light', 'shadow', 'shadow', 'light', 'light']);
   const boss = U(b, 'e0');
   assert.ok(boss.isBoss);
-  assert.equal(boss.maxHp, Math.floor(calcStats(db, { ...boss.mon, isBoss: false }).hp * 3.5));
+  assert.equal(boss.maxHp, Math.floor(calcStats(db, { ...boss.mon, isBoss: false }).hp * db.sp('kageboushi').hpMul));
   b.turn = 3; // 影
   const fl = db.sk('flame');
   const pShadow = hitChance(b, U(b, 'a0'), boss, fl);
@@ -192,7 +193,7 @@ test('カゲボウシ戦: 光・光・影・影…、影のターンは物理の
   assert.equal(availableCommands(b, 'a0').run, false);
 });
 
-test('トケイモリ戦: 針・3時と9時で前後が入れかわる・12時にじこくのかね・手下の補充は2回まで', () => {
+test('トケイモリ戦: 針・3時と9時で前後が入れかわる・12時にじこくのかね・手下の補充は BOSS.tokeimori.reinforce 回まで', () => {
   const allies = [mk('burikishi', 20), mk('nuihebi', 20), mk('kamishibai', 20)];
   const b = B(allies, bossEnemies(db, 'tokeimori', 1), { seed: 5 });
   assert.equal(b.rule, 'tokeimori');
@@ -219,8 +220,8 @@ test('トケイモリ戦: 針・3時と9時で前後が入れかわる・12時�
     spawned += ev.filter((e) => e.type === 'reinforce').length;
     if (c.over) break;
   }
-  assert.ok(spawned <= 2);
-  assert.equal(spawned, 2);
+  assert.ok(spawned <= BOSS.tokeimori.reinforce);
+  assert.equal(spawned, BOSS.tokeimori.reinforce);
 });
 
 test('ぬしを倒したら手下は逃げて勝ち', () => {
@@ -234,25 +235,26 @@ test('ぬしを倒したら手下は逃げて勝ち', () => {
 test('スカウトの式(DESIGN §4-6): HP・同じ素材・レベル差・ニス・ねむり・ねばり', () => {
   const b = B([mk('nejiko', 5)], [mk('nejiko', 5)]);
   const e = U(b, 'e0');
-  // 満タン: 0.5 × 0.5 × (1+0.15×1) × 1 = 0.2875
-  assert.ok(Math.abs(scoutChance(b, e) - 0.5 * 0.5 * 1.15) < 1e-9);
+  const S = db.sp('nejiko').scout;
+  // 満タン: scout × 0.5 × (1+0.15×1) × 1
+  assert.ok(Math.abs(scoutChance(b, e) - S * 0.5 * 1.15) < 1e-9);
   e.hp = 1;
   const low = scoutChance(b, e);
-  assert.ok(low > 0.5 * 0.5 * 1.15);
+  assert.ok(low > S * 0.5 * 1.15);
   e.hp = e.maxHp;
-  assert.ok(Math.abs(scoutChance(b, e, { varnish: true }) - 0.5 * 0.5 * 1.15 * 1.6) < 1e-9);
+  assert.ok(Math.abs(scoutChance(b, e, { varnish: true }) - S * 0.5 * 1.15 * 1.6) < 1e-9);
   e.status = { id: 'sleep', turns: 2 };
-  assert.ok(Math.abs(scoutChance(b, e) - 0.5 * 0.5 * 1.15 * 1.3) < 1e-9);
+  assert.ok(Math.abs(scoutChance(b, e) - S * 0.5 * 1.15 * 1.3) < 1e-9);
   e.status = null;
   b.scoutFails = 5;
-  assert.ok(Math.abs(scoutChance(b, e) - 0.5 * 0.5 * 1.15 * 1.3) < 1e-9); // ねばり最大 +0.3
+  assert.ok(Math.abs(scoutChance(b, e) - S * 0.5 * 1.15 * 1.3) < 1e-9); // ねばり最大 +0.3
   b.scoutFails = 0;
   // 同じ素材が3体
   const c = B([mk('nejiko', 5), mk('zenmainu', 5), mk('nejiko', 5)], [mk('nejiko', 5)]);
-  assert.ok(Math.abs(scoutChance(c, U(c, 'e0')) - 0.5 * 0.5 * 1.45) < 1e-9);
+  assert.ok(Math.abs(scoutChance(c, U(c, 'e0')) - S * 0.5 * 1.45) < 1e-9);
   // レベル差 clamp
   const d = B([mk('perari', 30)], [mk('nejiko', 1)]);
-  assert.ok(Math.abs(scoutChance(d, U(d, 'e0')) - Math.min(0.95, 0.5 * 0.5 * 1.3)) < 1e-9);
+  assert.ok(Math.abs(scoutChance(d, U(d, 'e0')) - Math.min(0.95, S * 0.5 * 1.3)) < 1e-9);
   // 上下限
   const f = B([mk('perari', 1)], [mk('haribote', 30)]);
   assert.ok(scoutChance(f, U(f, 'e0')) >= 0.02);
@@ -319,13 +321,13 @@ test('勝ち: 経験値(台の上=全部・控え=半分・たおれた=0・生�
   const b = createBattle(db, { allies: ms, enemies, seed: 2 });
   U(b, 'a1').hp = 0; U(b, 'a1').alive = false;
   forceFinish(b, 'win');
-  const total = 12 * 6 / 3;
+  const total = db.sp('koroishi').xp * 6 / GROW.xpDiv;
   const xp = Object.fromEntries(b.result.xp.map((x) => [x.unit, x.amount]));
   assert.equal(xp.a0, Math.floor(total));
   assert.equal(xp.a1, 0);
   assert.equal(xp.a3, Math.floor(total * 0.5));
   assert.equal(xp.a4, Math.floor(total * 0.5 * 1.5));
-  assert.equal(b.result.gold, Math.floor(5 * 6 / 5));
+  assert.equal(b.result.gold, Math.floor(db.sp('koroishi').gold * 6 / GROW.goldDiv));
   const g0 = save.gold;
   const xp0 = ms[0].xp;
   const out = applyBattleResult(db, save, b);
@@ -336,7 +338,7 @@ test('勝ち: 経験値(台の上=全部・控え=半分・たおれた=0・生�
   // ハリボテの宝の台座(goldfind)
   const h = createBattle(db, { allies: [mk('haribote', 10)], enemies: [mk('koroishi', 10)], seed: 2 });
   forceFinish(h, 'win');
-  assert.equal(h.result.gold, Math.floor(5 * 10 / 5 * 1.2));
+  assert.equal(h.result.gold, Math.floor(db.sp('koroishi').gold * 10 / GROW.goldDiv * 1.2));
 });
 
 test('負け: お金が半分・最後の宿屋で目覚めて全回復', () => {
