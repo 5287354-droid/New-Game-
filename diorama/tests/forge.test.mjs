@@ -50,5 +50,8 @@ test('forge: 20種 × おさがりの全組み合わせ', async () => {
     }
   }
   assert.equal(n, 400);
+  // 光る部品(glow = スロット 3)は 炎・光・炭 の種だけ(ART_BIBLE §1-6)
+  const glowSp = mons.species.filter((s) => { const am = buildMonster(lib, byId, { species: s.id }).attributes.aMat.array; for (let i = 0; i < am.length; i += 4) if (am[i] === 3) return true; return false; }).map((s) => s.id).sort();
+  assert.deepEqual(glowSp, ['hibachineko', 'hotarubin', 'matchbo', 'rousokun']);
   assert.ok(worst <= TRI_LIMIT);
 });

@@ -8,7 +8,8 @@
 - 胴: body_<型>  原点 = 足もとの中心。空オブジェクト socket_head_<型> / socket_back_<型> / socket_tail_<型> を子に持つ
   (GLTFLoader は名前の「.」を消すので、番号つきの名前は使わない。読む側は前方一致 socket_head で探す)
 - パーツ: head_<種> / back_<種> / tail_<種>  原点 = つなぎ目(ソケットの位置に置く)
-- マテリアルのスロットは body / accent / eye の3つだけ。色と質感は実行時に素材ごとに塗る(src/forge/forge.js)
+- マテリアルのスロットは body / accent / eye / glow の4つだけ。色と質感は実行時に素材ごとに塗る(src/forge/forge.js)
+- glow は光ってよい部品(炎・ホタルの光・炭)だけ(docs/ART_BIBLE.md §1-6)
 - eye スロットは「目のガラス玉」だけに使う。全種共通: 半径 EYE_R の玉を左右 ±EYE_X に2つ、頭の正面
 - 三角形: 胴 ≤ 1000、頭 ≤ 1300、背中 ≤ 900、しっぽ ≤ 700 → どんな組み合わせ(おさがり)でも 1体 ≤ 3900
 - 何度流しても同じバイト列になる(面と頂点の順番を正規化、ハッシュの種を固定)
@@ -34,12 +35,12 @@ LIMITS = {'body': 1000, 'head': 1300, 'back': 900, 'tail': 700}
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 MATS = {}
-for name, col in (('body', (0.8, 0.8, 0.8, 1)), ('accent', (0.3, 0.3, 0.3, 1)), ('eye', (0.05, 0.05, 0.05, 1))):
+for name, col in (('body', (0.8, 0.8, 0.8, 1)), ('accent', (0.3, 0.3, 0.3, 1)), ('eye', (0.05, 0.05, 0.05, 1)), ('glow', (1.0, 0.5, 0.1, 1))):
     m = bpy.data.materials.new(name)
     m.diffuse_color = col
     m.use_backface_culling = True   # → glTF の doubleSided: false
     MATS[name] = m
-MAT_ORDER = ['body', 'accent', 'eye']
+MAT_ORDER = ['body', 'accent', 'eye', 'glow']
 
 
 def _sel(objs):
@@ -112,15 +113,76 @@ def P(kind, loc=(0, 0, 0), scl=(1, 1, 1), rot=(0, 0, 0), mat='body', sub=0, beve
     return o
 
 
-def ribbon(pts, w=0.05, h=0.022, mat='body', axis=(1, 0, 0)):
-    """点の列に沿った四角い断面の帯(ゼンマイのうず巻きなど)。axis は帯の幅の向き。"""
+def _mesh_obj(verts, faces, mats):
+    """from_pydata でメッシュを作る。mats は面ごとのマテリアル名。"""
+    me = bpy.data.meshes.new('m')
+    me.from_pydata(verts, [], faces)
+    names = []
+    for m in mats:
+        if m not in names:
+            names.append(m)
+    for n in names:
+        me.materials.append(MATS[n])
+    for p, m in zip(me.polygons, mats):
+        p.material_index = names.index(m)
+    me.update()
+    o = bpy.data.objects.new('m', me)
+    bpy.context.scene.collection.objects.link(o)
+    return o
+
+
+def lathe(profile, seg=16, mat='body', loc=(0, 0, 0), scl=(1, 1, 1)):
+    """(半径, 高さ) の列を Z 軸のまわりに回した立体(下から上へ)。両端はふたをする。"""
+    verts, faces = [], []
+    n = len(profile)
+    for i in range(seg):
+        a = 2 * math.pi * i / seg
+        for r, z in profile:
+            verts.append((loc[0] + scl[0] * r * math.cos(a), loc[1] + scl[1] * r * math.sin(a), loc[2] + scl[2] * z))
+    for i in range(seg):
+        j = (i + 1) % seg
+        for k in range(n - 1):
+            faces.append((i * n + k, j * n + k, j * n + k + 1, i * n + k + 1))
+    faces.append(tuple(i * n for i in reversed(range(seg))))
+    faces.append(tuple(i * n + n - 1 for i in range(seg)))
+    return _mesh_obj(verts, faces, [mat] * len(faces))
+
+
+def shell(profile, a0, a1, seg=14, t=0.025, outer='body', inner='accent', loc=(0, 0, 0)):
+    """Z 軸のまわりの、角度 a0〜a1(度)だけの厚みのある殻(マント)。外側と内側で色を分ける。"""
+    verts, faces, mats = [], [], []
+    n = len(profile)
+    for i in range(seg + 1):
+        a = math.radians(a0 + (a1 - a0) * i / seg)
+        for r, z in profile:
+            verts.append((loc[0] + r * math.cos(a), loc[1] + r * math.sin(a), loc[2] + z))
+        for r, z in profile:
+            verts.append((loc[0] + (r - t) * math.cos(a), loc[1] + (r - t) * math.sin(a), loc[2] + z))
+    W = 2 * n
+    for i in range(seg):
+        j = i + 1
+        for k in range(n - 1):
+            faces.append((i * W + k, j * W + k, j * W + k + 1, i * W + k + 1)); mats.append(outer)
+            faces.append((i * W + n + k + 1, j * W + n + k + 1, j * W + n + k, i * W + n + k)); mats.append(inner)
+        faces.append((i * W + n, j * W + n, j * W, i * W)); mats.append(outer)                          # 下のふち
+        faces.append((i * W + n - 1, j * W + n - 1, j * W + 2 * n - 1, i * W + 2 * n - 1)); mats.append(outer)  # 上のふち
+    for i, sgn in ((0, 1), (seg, -1)):
+        for k in range(n - 1):
+            q = (i * W + k, i * W + k + 1, i * W + n + k + 1, i * W + n + k)
+            faces.append(q if sgn > 0 else tuple(reversed(q))); mats.append(outer)
+    return _mesh_obj(verts, faces, mats)
+
+
+def ribbon(pts, w=0.05, h=0.022, mat='body', axis=(1, 0, 0), twist=0.0):
+    """点の列に沿った四角い断面の帯(ゼンマイのうず巻き・紙のリボン)。axis は帯の幅の向き、twist はねじれ(度)。"""
     import mathutils
-    A = mathutils.Vector(axis)
+    A0 = mathutils.Vector(axis)
     verts, faces = [], []
     n = len(pts)
     for i, p in enumerate(pts):
         p = mathutils.Vector(p)
         t = (mathutils.Vector(pts[min(i + 1, n - 1)]) - mathutils.Vector(pts[max(i - 1, 0)])).normalized()
+        A = mathutils.Quaternion(t, math.radians(twist) * i / max(1, n - 1)) @ A0
         nrm = t.cross(A).normalized()
         for sa, sb in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
             verts.append(tuple(p + A * (sa * w / 2) + nrm * (sb * h / 2)))
@@ -225,12 +287,12 @@ def bodies():
         P('sphere', (-0.4, -0.04, 0.32), (0.08, 0.08, 0.12), seg=10, rings=6),  # 手
         P('sphere', (0.4, -0.04, 0.32), (0.08, 0.08, 0.12), seg=10, rings=6),
     ], {'head': (0, -0.02, 0.6), 'back': (0, 0.36, 0.38), 'tail': (0, 0.36, 0.14)})
-    # しずく: 下がふくらみ、上がとがった雫 + すその輪
+    # しずく: 1つのしずく形(下が大きくふくらみ、上へ細くなる)。先は頭のパーツでかくす(ART_BIBLE §1-4・§4-1)
+    drop = [(0.25, 0.0), (0.36, 0.04), (0.42, 0.13), (0.44, 0.25), (0.41, 0.37), (0.34, 0.5), (0.25, 0.62), (0.16, 0.72), (0.08, 0.8), (0.02, 0.85)]
     join('body_shizuku', [
-        P('sphere', (0, 0, 0.3), (0.4, 0.38, 0.3), seg=20, rings=12),
-        P('frustum', (0, 0, 0.6), (0.33, 0.31, 0.16), minor=0.45, seg=20),
-        P('torus', (0, 0, 0.07), (0.37, 0.35, 0.45), mat='accent', minor=0.2, seg=24),
-    ], {'head': (0, -0.04, 0.74), 'back': (0, 0.32, 0.4), 'tail': (0, 0.36, 0.1)})
+        lathe(drop, seg=20),
+        P('torus', (0, 0, 0.06), (0.37, 0.37, 0.4), mat='accent', minor=0.16, seg=24, minor_seg=6),
+    ], {'head': (0, -0.02, 0.7), 'back': (0, 0.37, 0.38), 'tail': (0, 0.4, 0.1)})
     # 四つ足: 横長の胴 + 4本の脚 + ひづめ
     legs = []
     for lx in (-0.21, 0.21):
@@ -249,13 +311,13 @@ def bodies():
         P('cone', (-0.12, -0.08, 0.02), (0.1, 0.13, 0.02), mat='accent', seg=3, rot=(0, 0, 30)),
         P('cone', (0.12, -0.08, 0.02), (0.1, 0.13, 0.02), mat='accent', seg=3, rot=(0, 0, 30)),
     ], {'head': (0, -0.1, 0.84), 'back': (0, 0.24, 0.6), 'tail': (0, 0.36, 0.36)})
-    # へび: 玉が5つつながって S 字に。頭の方を持ち上げる
+    # へび: 前の1/3 を S 字に持ち上げたかま首。節の玉は前ほど大きく、後ろほど小さい(頭の高さ ≥ 0.55)
     segs = []
-    pts = [(0, -0.36, 0.36), (0.13, -0.14, 0.22), (0.0, 0.1, 0.16), (-0.15, 0.32, 0.13), (-0.05, 0.52, 0.1)]
-    for i, p in enumerate(pts):
-        r = 0.22 - i * 0.026
-        segs.append(P('sphere', p, (r, r, r * 0.88), mat='body' if i % 2 == 0 else 'accent', seg=14, rings=8))
-    join('body_hebi', segs, {'head': (0, -0.46, 0.54), 'back': (0.0, 0.1, 0.3), 'tail': (-0.06, 0.62, 0.1)})
+    pts = [(0, -0.3, 0.52, 0.19), (0, -0.25, 0.35, 0.2), (0.02, -0.16, 0.19, 0.2), (0.11, 0.02, 0.15, 0.18),
+           (0.02, 0.2, 0.13, 0.16), (-0.11, 0.36, 0.11, 0.13), (-0.08, 0.51, 0.08, 0.1)]
+    for i, (x, y, z, r) in enumerate(pts):
+        segs.append(P('sphere', (x, y, z), (r, r, r * 0.9), mat='body' if i % 2 == 0 else 'accent', seg=12, rings=6))
+    join('body_hebi', segs, {'head': (0, -0.33, 0.66), 'back': (0.06, 0.02, 0.31), 'tail': (-0.1, 0.6, 0.08)})
     # 人形: 胴 + 手足。しっぽのソケットは右手(手持ち)
     join('body_ningyo', [
         P('frustum', (0, 0, 0.42), (0.24, 0.19, 0.22), minor=0.8, seg=14),
@@ -274,23 +336,26 @@ def bodies():
 # ================================================================== 種ごとのパーツ
 # 64px でも見分けるための「決め手の形」を、種ごとに1つずつ持たせる(docs/FORGE.md の表)
 def nejiko():
-    # 決め手: 横に大きく張り出した、ねじ巻きの鍵(背中)
+    # 決め手: 背中から真後ろへ出る、平たい蝶の形(8の字の板)のねじ巻きの鍵。板は左右を向き、真横で一番大きい
     join('head_nejiko', [
         P('cyl', (0, 0, 0.27), (0.37, 0.35, 0.27), bevel=0.05, seg=20),
-        P('torus', (0, 0, 0.47), (0.37, 0.35, 0.5), mat='accent', minor=0.1, seg=20, minor_seg=6),
-        P('torus', (0, 0, 0.05), (0.37, 0.35, 0.5), mat='accent', minor=0.1, seg=20, minor_seg=6),
+        P('torus', (0, 0, 0.5), (0.42, 0.4, 0.5), mat='accent', minor=0.14, seg=20, minor_seg=6),
+        P('torus', (0, 0, 0.05), (0.42, 0.4, 0.5), mat='accent', minor=0.14, seg=20, minor_seg=6),
         P('cyl', (0, 0, 0.58), (0.1, 0.1, 0.06), mat='accent', seg=6, bevel=0.015),  # 六角ボルト
     ] + eyes(-0.35, 0.28))
-    key = [P('cyl', (0, 0.12, 0.02), (0.045, 0.045, 0.13), rot=(90, 0, 0), mat='accent', seg=10)]
-    for sx in (-1, 1):
-        key.append(P('torus', (sx * 0.24, 0.26, 0.1), (0.2, 0.2, 0.3), rot=(90, 0, 0), mat='accent', minor=0.35, seg=16, minor_seg=6))
-    key.append(P('sphere', (0, 0.26, 0.1), (0.07, 0.05, 0.07), mat='accent', seg=10, rings=6))
-    join('back_nejiko', key)
+    join('back_nejiko', [
+        P('cyl', (0, 0.11, 0.11), (0.05, 0.05, 0.16), rot=(45, 0, 0), mat='accent', seg=10),
+        P('sphere', (0, 0.23, 0.23), (0.07, 0.06, 0.07), mat='accent', seg=10, rings=6),
+        P('cyl', (0, 0.3, 0.42), (0.17, 0.14, 0.022), rot=(0, 90, 0), mat='accent', seg=18, bevel=0.012),
+        P('cyl', (0, 0.3, 0.78), (0.17, 0.14, 0.022), rot=(0, 90, 0), mat='accent', seg=18, bevel=0.012),
+        P('cube', (0, 0.3, 0.6), (0.022, 0.06, 0.09), mat='accent'),
+        P('cube', (0, 0.27, 0.27), (0.022, 0.05, 0.06), mat='accent'),
+    ])
     join('tail_nejiko', [P('torus', (0, 0.05 + i * 0.065, 0.04 + i * 0.03), (0.09, 0.09, 0.22), rot=(90, 0, 0), mat='accent', minor=0.28, seg=10, minor_seg=6) for i in range(4)])
 
 
 def perari():
-    # 決め手: とがった紙のテント形の頭と、はね上がった角の折り返し
+    # 決め手: とがった紙のテント形の頭と、はね上がった角の折り返し。しっぽは1回ねじれた紙のリボン
     join('head_perari', [
         P('cone', (0, 0, 0.36), (0.44, 0.38, 0.36), seg=4, rot=(0, 0, 45)),
         P('plane', (0.2, 0.06, 0.62), (0.2, 0.14, 1), rot=(40, -30, 10), mat='accent', bend=50),
@@ -299,28 +364,32 @@ def perari():
         P('plane', (-0.22, 0.08, 0.16), (0.26, 0.16, 1), rot=(70, 10, 35), bend=70),
         P('plane', (0.22, 0.08, 0.16), (0.26, 0.16, 1), rot=(70, -10, -35), bend=70),
     ], flat=True)
-    join('tail_perari', [P('plane', (0, 0.2, 0.0), (0.07, 0.24, 1), rot=(20, 0, 0), mat='accent', bend=-90, twist=30),
-                         P('cone', (0, 0.42, -0.08), (0.07, 0.04, 0.012), seg=3, rot=(0, 0, 90), mat='accent')], flat=True)
+    pts = [(0.03 * math.sin(i * 0.5), 0.03 * i, 0.06 * math.sin(i * 0.45) - 0.008 * i) for i in range(16)]
+    join('tail_perari', [ribbon(pts, w=0.1, h=0.024, mat='accent', twist=180)], flat=True)
 
 
 def inky():
-    # 決め手: インク壺の首とふた(頭の上が細く立つ)
+    # 決め手: 横に広い四角いインク壺(短い首とコルク)+ 背中にななめに刺さったつけペン
     join('head_inky', [
-        P('sphere', (0, 0, 0.24), (0.38, 0.36, 0.26), seg=18, rings=10),
-        P('cyl', (0, 0, 0.52), (0.16, 0.16, 0.08), seg=14),
-        P('cyl', (0, 0, 0.66), (0.19, 0.19, 0.07), mat='accent', bevel=0.02, seg=14),
-        P('sphere', (0.0, -0.3, 0.06), (0.16, 0.08, 0.06), mat='accent', seg=10, rings=6),  # たれたインク
-    ] + eyes(-0.33, 0.26))
-    join('back_inky', [P('sphere', (0.1 * math.sin(i * 2.1), 0.06 + 0.05 * i, 0.08 + 0.15 * i), (0.09 - 0.015 * i,) * 2 + (0.13 - 0.02 * i,), mat='accent', seg=12, rings=8, taper=-0.6) for i in range(3)])
+        P('cube', (0, 0, 0.2), (0.4, 0.34, 0.2), bevel=0.07),
+        P('cyl', (0, 0, 0.45), (0.15, 0.15, 0.06), seg=14),
+        P('torus', (0, 0, 0.5), (0.16, 0.16, 0.4), minor=0.2, seg=14, minor_seg=4),
+        P('frustum', (0, 0, 0.58), (0.13, 0.13, 0.07), minor=1.15, mat='accent', seg=12),
+        P('sphere', (0.12, -0.32, 0.05), (0.13, 0.06, 0.06), seg=10, rings=6),  # たれたインク
+    ] + eyes(-0.34, 0.2))
+    join('back_inky', [P('cyl', (0.08, 0.1, 0.24), (0.03, 0.03, 0.26), rot=(-35, 18, 0), seg=10),
+                       P('cyl', (0.155, 0.22, 0.44), (0.036, 0.036, 0.05), rot=(-35, 18, 0), mat='accent', seg=10),
+                       P('cone', (0.2, 0.29, 0.56), (0.045, 0.02, 0.1), rot=(-35, 18, 0), mat='accent', seg=4),
+                       P('sphere', (0.0, 0.03, 0.02), (0.06, 0.06, 0.05), seg=8, rings=5)])
     join('tail_inky', [P('cyl', (0, 0.14, 0.04), (0.035, 0.035, 0.14), rot=(80, 0, 0), seg=8),
                        P('cone', (0, 0.36, 0.08), (0.08, 0.08, 0.13), rot=(-80, 0, 0), mat='accent', seg=10)])
 
 
 def koroishi():
-    # 決め手: 横に平たく大きい、でこぼこの河原石の頭(上に何も立たない)
-    join('head_koroishi', [P('ico', (0, 0, 0.2), (0.5, 0.44, 0.26), seg=2, noise=0.07)] + eyes(-0.41, 0.22))
+    # 決め手: 胴に半分以上めりこんだ、なめらかで平たい大きな河原石(胴と石で1つの石に見える)
+    join('head_koroishi', [P('sphere', (0, 0, -0.14), (0.48, 0.45, 0.37), seg=18, rings=10, noise=0.02)] + eyes(-0.41, -0.05))
     join('back_koroishi', [P('ico', (0.13 * (i - 1), 0.06 + 0.02 * (i % 2), 0.08 + 0.06 * (i % 2)), (0.12, 0.11, 0.1), mat='accent', seg=1, noise=0.03) for i in range(3)] +
-         [P('sphere', (0, 0.03, 0.18), (0.18, 0.12, 0.05), mat='accent', seg=10, rings=5)])  # こけ
+         [P('sphere', (0, 0.03, 0.18), (0.18, 0.12, 0.05), mat='accent', seg=10, rings=5)])  # 地衣
     join('tail_koroishi', [P('ico', (0.03 * i, 0.07 + 0.13 * i, 0.04 - 0.01 * i), (0.1 - i * 0.02,) * 3, mat='accent', seg=1, noise=0.02) for i in range(3)])
 
 
@@ -342,12 +411,12 @@ def watabou():
 
 
 def matchbo():
-    # 決め手: 縦に長いマッチの頭と、その上で燃える炎
+    # 決め手: 縦長のだ円のマッチの頭(朱)と、そこから立つ、なびくしずく形の炎(外 朱 → 内 黄、発光)
     join('head_matchbo', [
-        P('sphere', (0, -0.02, 0.26), (0.28, 0.3, 0.32), seg=16, rings=10),
-        P('cone', (0, 0.0, 0.76), (0.17, 0.17, 0.26), mat='accent', seg=12, bend=30),
-        P('sphere', (0, 0.0, 0.55), (0.14, 0.14, 0.12), mat='accent', seg=10, rings=6),
-    ] + eyes(-0.28, 0.24))
+        P('sphere', (0, 0, 0.3), (0.24, 0.26, 0.32), seg=16, rings=10, mat='accent'),
+        P('sphere', (0.02, 0.02, 0.82), (0.15, 0.15, 0.26), seg=12, rings=8, mat='glow', taper=-0.85, bend=-28),
+        P('sphere', (-0.08, 0.04, 0.7), (0.07, 0.07, 0.13), seg=8, rings=6, mat='glow', taper=-0.8, bend=25),
+    ] + eyes(-0.215, 0.3))
     join('back_matchbo', [P('cube', (math.sin(math.radians(a)) * 0.16, 0.0, 0.2), (0.035, 0.035, 0.24), rot=(0, a, 0), bevel=0.01) for a in (-28, 0, 28)] +
          [P('sphere', (math.sin(math.radians(a)) * 0.38, 0, 0.44), (0.055, 0.055, 0.07), mat='accent', seg=8, rings=5) for a in (-28, 0, 28)])
     join('tail_matchbo', [P('cube', (0, 0.15, 0.04), (0.04, 0.17, 0.04), bevel=0.01),
@@ -361,51 +430,57 @@ def origarasu():
         P('cone', (0, -0.44, 0.22), (0.1, 0.1, 0.24), seg=4, rot=(90, 0, 0), mat='accent'),
         P('cone', (0, 0.12, 0.58), (0.13, 0.06, 0.14), seg=3, rot=(-35, 0, 0)),
     ] + eyes(-0.27, 0.32), flat=True)
-    join('back_origarasu', [P('cone', (sx * 0.4, 0.08, 0.2), (0.42, 0.12, 0.03), seg=3, rot=(0, sx * -25, sx * 90)) for sx in (-1, 1)] +
+    join('back_origarasu', [P('cone', (sx * 0.5, 0.08, 0.24), (0.52, 0.13, 0.03), seg=3, rot=(0, sx * -22, sx * 90)) for sx in (-1, 1)] +
          [P('cone', (sx * 0.24, 0.1, 0.12), (0.22, 0.1, 0.03), seg=3, rot=(0, sx * -5, sx * 90), mat='accent') for sx in (-1, 1)], flat=True)
     join('tail_origarasu', [P('cone', (0.11 * (i - 1), 0.26, 0.08), (0.07, 0.22, 0.02), seg=3, rot=(80, 0, (i - 1) * 28), mat='accent') for i in range(3)], flat=True)
 
 
 def jarihebi():
-    # 決め手: 平たい頭と、背中に並んだ砂利のとげ
+    # 決め手: こてのような三角の平石の頭 + 背中に平たく並べた2色の玉砂利 + しっぽの先の砂利の山
     join('head_jarihebi', [
-        P('sphere', (0, -0.1, 0.17), (0.3, 0.42, 0.18), seg=16, rings=10, noise=0.04),
-        P('cone', (0, -0.52, 0.12), (0.12, 0.08, 0.04), rot=(90, 0, 0), mat='accent', seg=8),
-        P('ico', (-0.16, 0.12, 0.3), (0.07,) * 3, mat='accent', seg=1),
-        P('ico', (0.16, 0.12, 0.3), (0.07,) * 3, mat='accent', seg=1),
-    ] + eyes(-0.32, 0.26))
-    join('back_jarihebi', [P('cone', (0, -0.22 + 0.15 * i, 0.12), (0.075, 0.075, 0.16), mat='accent', seg=6) for i in range(4)])
-    join('tail_jarihebi', [P('ico', (0, 0.1 + 0.1 * i, 0.06 * i), (0.07 + 0.01 * (i == 3),) * 3, mat='accent', seg=1, noise=0.02) for i in range(4)])
+        P('cyl', (0, -0.14, 0.1), (0.46, 0.46, 0.07), rot=(0, 0, -90), seg=3, bevel=0.035, noise=0.015),
+        P('sphere', (0, -0.02, 0.22), (0.24, 0.2, 0.14), seg=14, rings=8),
+        P('ico', (0.0, -0.4, 0.17), (0.05, 0.05, 0.03), mat='accent', seg=1),
+    ] + eyes(-0.185, 0.25))
+    spine = [(0, -0.18, 0.39), (0.1, 0.0, 0.33), (0.0, 0.2, 0.3), (-0.12, 0.36, 0.24), (-0.08, 0.5, 0.18)]
+    peb = []
+    for i, (x, y, z) in enumerate(spine):
+        r = 0.1 - 0.008 * i
+        peb.append(P('ico', (x - 0.06, y - 0.02, z - 0.31), (r, r * 1.15, r * 0.42), mat='accent' if i % 2 else 'body', seg=1, rot=(0, 0, 30 * i), noise=0.01))
+        peb.append(P('ico', (x - 0.06 + 0.07 * (1 if i % 2 else -1), y + 0.05, z - 0.33), (r * 0.6, r * 0.6, r * 0.3), mat='body' if i % 2 else 'accent', seg=1))
+    join('back_jarihebi', peb)
+    pile = [(0, 0.06, 0.02, 0.08, 'accent'), (0.07, 0.1, 0.0, 0.065, 'body'), (-0.07, 0.11, 0.0, 0.065, 'body'),
+            (0.0, 0.15, -0.01, 0.07, 'accent'), (0.03, 0.08, 0.1, 0.06, 'body'), (-0.03, 0.12, 0.08, 0.055, 'accent'), (0.0, 0.1, 0.16, 0.045, 'body')]
+    join('tail_jarihebi', [P('ico', (x, y, z), (r,) * 3, mat=m, seg=1, noise=0.01) for x, y, z, r, m in pile])
 
 
 def felton():
-    # 決め手: ななめに突き出たぬい針と糸の輪 + 頭の上の2つのぽんぽん
+    # 決め手: 頭のてっぺんに前後に並んで直接つく大きな毛玉2つ(耳に見えないよう左右に置かない) + ななめに長く突き出たぬい針と、胴に1周巻いた糸
     join('head_felton', [
         P('sphere', (0, 0, 0.3), (0.38, 0.36, 0.32), seg=18, rings=10, noise=0.025),
-        P('cyl', (-0.16, 0.0, 0.66), (0.02, 0.02, 0.08), rot=(0, -20, 0), mat='accent', seg=6),
-        P('cyl', (0.16, 0.0, 0.66), (0.02, 0.02, 0.08), rot=(0, 20, 0), mat='accent', seg=6),
-        P('sphere', (-0.2, 0.0, 0.76), (0.08, 0.08, 0.08), mat='accent', seg=10, rings=6),
-        P('sphere', (0.2, 0.0, 0.76), (0.08, 0.08, 0.08), mat='accent', seg=10, rings=6),
+        P('sphere', (0.0, -0.06, 0.64), (0.12, 0.12, 0.11), mat='accent', seg=12, rings=7, noise=0.02),
+        P('sphere', (0.02, 0.14, 0.6), (0.1, 0.1, 0.095), mat='accent', seg=12, rings=7, noise=0.02),
     ] + eyes(-0.34, 0.32))
-    join('back_felton', [P('cyl', (0.12, 0.08, 0.3), (0.025, 0.025, 0.36), rot=(-25, 35, 0), mat='accent', seg=8),
-                         P('cone', (0.33, 0.24, 0.6), (0.025, 0.025, 0.06), rot=(-25, 35, 0), mat='accent', seg=8),
-                         P('torus', (0.0, 0.0, 0.08), (0.08, 0.08, 0.08), rot=(0, 90, 0), mat='accent', minor=0.3, seg=10, minor_seg=6),
-                         P('torus', (-0.12, 0.06, 0.24), (0.1, 0.1, 0.1), rot=(20, 70, 0), minor=0.1, seg=12, minor_seg=4)])
+    join('back_felton', [P('cyl', (0.2, 0.12, 0.42), (0.028, 0.028, 0.56), rot=(-20, 42, 0), mat='accent', seg=8),
+                         P('cone', (0.55, 0.33, 0.88), (0.028, 0.028, 0.08), rot=(-20, 42, 0), mat='accent', seg=8),
+                         P('torus', (-0.11, -0.08, -0.03), (0.06, 0.06, 0.06), rot=(-25, 35, 0), mat='accent', minor=0.3, seg=8, minor_seg=4),
+                         P('torus', (0, -0.36, -0.06), (0.43, 0.41, 0.4), mat='accent', minor=0.06, seg=24, minor_seg=4)])
     join('tail_felton', [P('sphere', (0, 0.15, 0.06), (0.15, 0.15, 0.15), mat='accent', seg=12, rings=8, noise=0.03)])
 
 
 def hotarubin():
-    # 決め手: 背の高いびんの頭(コルク栓)と、うすいガラスの羽
+    # 決め手: 細長いびん + 長い首 + コルク栓。びんの下に光る水(発光)、うすいガラスの羽
     join('head_hotarubin', [
-        P('cyl', (0, 0, 0.26), (0.28, 0.28, 0.26), bevel=0.08, seg=16),
-        P('frustum', (0, 0, 0.6), (0.24, 0.24, 0.1), minor=0.5, seg=16),
-        P('cyl', (0, 0, 0.74), (0.11, 0.11, 0.06), seg=12),
-        P('cyl', (0, 0, 0.86), (0.1, 0.1, 0.07), mat='accent', bevel=0.02, seg=12),
-    ] + eyes(-0.28, 0.3))
-    join('back_hotarubin', [P('sphere', (sx * 0.3, 0.06, 0.24), (0.3, 0.025, 0.16), rot=(0, sx * -35, sx * 15), mat='accent', seg=14, rings=6) for sx in (-1, 1)] +
-         [P('sphere', (sx * 0.22, 0.08, 0.08), (0.18, 0.02, 0.09), rot=(0, sx * 10, sx * 25), mat='accent', seg=12, rings=6) for sx in (-1, 1)])
+        P('cyl', (0, 0, 0.24), (0.22, 0.22, 0.2), bevel=0.05, seg=16),
+        P('cyl', (0, 0, 0.07), (0.228, 0.228, 0.07), mat='glow', seg=16),
+        P('frustum', (0, 0, 0.5), (0.22, 0.22, 0.07), minor=0.45, seg=16),
+        P('cyl', (0, 0, 0.64), (0.095, 0.095, 0.08), seg=12),
+        P('cyl', (0, 0, 0.77), (0.088, 0.088, 0.06), mat='accent', bevel=0.02, seg=12),
+    ] + eyes(-0.174, 0.27))
+    join('back_hotarubin', [P('sphere', (sx * 0.2, 0.08, 0.36), (0.3, 0.025, 0.12), rot=(0, sx * -62, 0), mat='accent', seg=14, rings=6) for sx in (-1, 1)] +
+         [P('sphere', (sx * 0.2, 0.12, 0.16), (0.2, 0.022, 0.09), rot=(0, sx * -28, 0), mat='accent', seg=12, rings=6) for sx in (-1, 1)])
     join('tail_hotarubin', [P('cyl', (0, 0.1, 0.02), (0.015, 0.015, 0.1), rot=(70, 0, 0), mat='accent', seg=6),
-                            P('sphere', (0, 0.22, 0.08), (0.09, 0.09, 0.09), mat='accent', seg=12, rings=8)])
+                            P('sphere', (0, 0.22, 0.08), (0.09, 0.09, 0.09), mat='glow', seg=12, rings=8)])
 
 
 def zenmainu():
@@ -414,30 +489,30 @@ def zenmainu():
         P('cube', (0, 0, 0.26), (0.27, 0.25, 0.23), bevel=0.07),
         P('cube', (0, -0.32, 0.18), (0.14, 0.12, 0.1), bevel=0.04),
         P('sphere', (0, -0.44, 0.23), (0.05, 0.04, 0.04), mat='accent', seg=8, rings=5),
-        P('cube', (-0.3, 0.04, 0.18), (0.04, 0.12, 0.2), rot=(0, 25, 0), mat='accent', bevel=0.03),
-        P('cube', (0.3, 0.04, 0.18), (0.04, 0.12, 0.2), rot=(0, -25, 0), mat='accent', bevel=0.03),
+        P('cube', (-0.36, 0.04, 0.2), (0.045, 0.15, 0.25), rot=(0, 40, 0), mat='accent', bevel=0.03),
+        P('cube', (0.36, 0.04, 0.2), (0.045, 0.15, 0.25), rot=(0, -40, 0), mat='accent', bevel=0.03),
     ] + eyes(-0.25, 0.34))
     pts = []
     for i in range(46):
         a = i * 0.3
-        r = 0.04 + 0.0115 * a
-        pts.append((0.0, r * math.cos(a), 0.32 + r * math.sin(a)))
-    join('back_zenmainu', [ribbon(pts, w=0.09, h=0.03, mat='accent'),
-                           P('cyl', (0, 0, 0.32), (0.05, 0.05, 0.07), rot=(0, 90, 0), seg=10),
-                           P('cyl', (0, 0, 0.14), (0.035, 0.035, 0.14), seg=8)])
+        r = 0.045 + 0.0155 * a
+        pts.append((0.0, r * math.cos(a), 0.38 + r * math.sin(a)))
+    join('back_zenmainu', [ribbon(pts, w=0.13, h=0.032, mat='accent'),
+                           P('cyl', (0, 0, 0.38), (0.05, 0.05, 0.08), rot=(0, 90, 0), seg=10),
+                           P('cyl', (0, 0, 0.17), (0.035, 0.035, 0.17), seg=8)])
     join('tail_zenmainu', [P('torus', (0, 0.06 + i * 0.05, 0.06 + i * 0.05), (0.05, 0.05, 0.16), rot=(45, 0, 0), mat='accent', minor=0.3, seg=8, minor_seg=4) for i in range(4)] +
          [P('sphere', (0, 0.3, 0.3), (0.06,) * 3, seg=8, rings=5)])
 
 
 def rousokun():
-    # 決め手: ずんぐり太いロウソクの頭と大きな炎 + 横に張り出した燭台の皿と取っ手(背中)
-    drips = [P('sphere', (0.33 * math.cos(a), 0.33 * math.sin(a), 0.36 - 0.1 * (i % 3)), (0.065, 0.065, 0.15), seg=8, rings=6) for i, a in enumerate([0.4, 1.5, 2.6, 3.6, 4.6, 5.5])]
+    # 決め手: 上が広い和ろうそく(朱)+ 2段の炎(発光)+ 横に張り出した燭台の皿と取っ手(背中)
+    drips = [P('sphere', (0.31 * math.cos(a), 0.31 * math.sin(a), 0.44 - 0.07 * (i % 3)), (0.05, 0.05, 0.11), seg=8, rings=6) for i, a in enumerate([0.9, 2.3, 3.9, 5.3])]
     join('head_rousokun', [
-        P('cyl', (0, 0, 0.23), (0.34, 0.34, 0.23), seg=18),
-        P('sphere', (0, 0, 0.46), (0.34, 0.34, 0.05), seg=18, rings=4),
-        P('cyl', (0, 0, 0.53), (0.018, 0.018, 0.06), mat='accent', seg=6),
-        P('sphere', (0, 0, 0.78), (0.15, 0.15, 0.24), mat='accent', seg=12, rings=8, taper=-0.8),
-    ] + drips + eyes(-0.34, 0.24))
+        P('frustum', (0, 0, 0.25), (0.26, 0.26, 0.25), minor=1.25, seg=18),
+        P('cyl', (0, 0, 0.51), (0.315, 0.315, 0.015), seg=18),
+        P('cyl', (0, 0, 0.56), (0.018, 0.018, 0.05), mat='accent', seg=6),
+        P('sphere', (0, 0, 0.8), (0.14, 0.14, 0.24), mat='glow', seg=12, rings=8, taper=-0.85, bend=-15),
+    ] + drips + eyes(-0.268, 0.3))
     join('back_rousokun', [P('cyl', (0, 0.0, 0.02), (0.3, 0.3, 0.025), rot=(90, 0, 0), mat='accent', seg=18, bevel=0.01),
                            P('torus', (0.34, 0.03, 0.06), (0.12, 0.12, 0.4), rot=(90, 0, 0), mat='accent', minor=0.25, seg=12, minor_seg=6)])
     join('tail_rousokun', [P('sphere', (0, 0.16, -0.02), (0.15, 0.22, 0.045), seg=12, rings=6),
@@ -445,18 +520,23 @@ def rousokun():
 
 
 def tsumiking():
-    # 決め手: 立方体の頭とギザギザの冠 + 背中に積んだつみきの城
-    crown = [P('cone', (0.14 * math.cos(a), 0.14 * math.sin(a), 0.6), (0.055, 0.055, 0.1), seg=4, mat='accent') for a in [i * math.pi / 2.5 for i in range(5)]]
+    # 決め手: 大小2つの積み木を積んだ頭(上の小さい積み木は 45° 回す)+ その上の冠。背中につみきの城
+    crown = [P('cone', (0.11 * math.cos(a), 0.11 * math.sin(a), 0.8), (0.05, 0.05, 0.09), seg=4, mat='accent') for a in [i * math.pi / 2.5 for i in range(5)]]
     join('head_tsumiking', [
-        P('cube', (0, 0, 0.25), (0.3, 0.28, 0.25), bevel=0.03),
-        P('cyl', (0, 0, 0.52), (0.18, 0.18, 0.03), mat='accent', seg=10),
-    ] + crown + eyes(-0.28, 0.26), flat=True)
-    join('back_tsumiking', [P('cube', (0, 0.08, 0.12), (0.2, 0.08, 0.12), bevel=0.015),
-                            P('cube', (-0.1, 0.08, 0.32), (0.07, 0.07, 0.08), mat='accent', bevel=0.015),
-                            P('cube', (0.1, 0.08, 0.32), (0.07, 0.07, 0.08), mat='accent', bevel=0.015),
-                            P('cone', (0, 0.08, 0.5), (0.1, 0.08, 0.1), seg=4, rot=(0, 0, 45))], flat=True)
-    join('tail_tsumiking', [P('cyl', (0, 0, 0.14), (0.025, 0.025, 0.26), mat='accent', seg=8),
-                            P('cube', (0, 0, 0.42), (0.065, 0.065, 0.065), bevel=0.015, rot=(0, 45, 45))], flat=True)
+        P('cube', (0, 0, 0.23), (0.28, 0.26, 0.23), bevel=0.03),
+        P('cube', (0, 0, 0.6), (0.15, 0.15, 0.14), rot=(0, 0, 45), bevel=0.02),
+        P('cyl', (0, 0, 0.75), (0.14, 0.14, 0.025), mat='accent', seg=10),
+    ] + crown + eyes(-0.26, 0.24), flat=True)
+    # つみきの城: 後ろへ大きく張り出す(真横で人形の型のほかの種と分ける)
+    join('back_tsumiking', [P('cube', (0, 0.2, 0.0), (0.24, 0.16, 0.16), bevel=0.015),
+                            P('cube', (-0.15, 0.24, 0.26), (0.08, 0.08, 0.1), mat='accent', bevel=0.015),
+                            P('cube', (0.15, 0.24, 0.26), (0.08, 0.08, 0.1), mat='accent', bevel=0.015),
+                            P('cube', (0, 0.3, 0.22), (0.1, 0.1, 0.08), bevel=0.015),
+                            P('cone', (0, 0.3, 0.42), (0.12, 0.12, 0.13), seg=4, rot=(0, 0, 45)),
+                            P('cone', (-0.15, 0.24, 0.46), (0.08, 0.08, 0.1), seg=4, rot=(0, 0, 45)),
+                            P('cone', (0.15, 0.24, 0.46), (0.08, 0.08, 0.1), seg=4, rot=(0, 0, 45))], flat=True)
+    join('tail_tsumiking', [P('cyl', (0, 0, 0.3), (0.028, 0.028, 0.42), mat='accent', seg=8),
+                            P('cube', (0, 0, 0.78), (0.08, 0.08, 0.08), bevel=0.015, rot=(0, 45, 45))], flat=True)
 
 
 def kamishibai():
@@ -495,47 +575,56 @@ def hibachineko():
     # 決め手: とがった猫耳とひげ + 背中の火鉢と炭
     join('head_hibachineko', [
         P('sphere', (0, 0, 0.28), (0.36, 0.32, 0.27), seg=18, rings=10),
-        P('cone', (-0.21, 0.02, 0.58), (0.11, 0.07, 0.17), rot=(0, -18, 0), seg=8),
-        P('cone', (0.21, 0.02, 0.58), (0.11, 0.07, 0.17), rot=(0, 18, 0), seg=8),
-        P('cone', (-0.2, -0.03, 0.56), (0.06, 0.03, 0.1), rot=(0, -18, 0), mat='accent', seg=6),
-        P('cone', (0.2, -0.03, 0.56), (0.06, 0.03, 0.1), rot=(0, 18, 0), mat='accent', seg=6),
+        P('cone', (-0.23, 0.02, 0.62), (0.14, 0.08, 0.22), rot=(0, -22, 0), seg=8),
+        P('cone', (0.23, 0.02, 0.62), (0.14, 0.08, 0.22), rot=(0, 22, 0), seg=8),
+        P('cone', (-0.22, -0.04, 0.6), (0.08, 0.03, 0.13), rot=(0, -22, 0), mat='accent', seg=6),
+        P('cone', (0.22, -0.04, 0.6), (0.08, 0.03, 0.13), rot=(0, 22, 0), mat='accent', seg=6),
         P('sphere', (0, -0.32, 0.2), (0.05, 0.03, 0.035), mat='accent', seg=8, rings=5),
     ] + [P('cyl', (sx * 0.34, -0.22, 0.17 + dz), (0.008, 0.008, 0.13), rot=(0, 90, sx * (10 + dz * 200)), mat='accent', seg=4) for sx in (-1, 1) for dz in (0, 0.05)]
          + eyes(-0.3, 0.3))
-    join('back_hibachineko', [P('frustum', (0, 0, 0.12), (0.23, 0.23, 0.12), minor=0.8, bevel=0.03, mat='accent', seg=14),
-                              P('cyl', (0, 0, 0.245), (0.18, 0.18, 0.01), seg=14)] +
-         [P('ico', (0.08 * math.cos(a), 0.08 * math.sin(a), 0.28), (0.055,) * 3, mat='accent', seg=1, noise=0.02) for a in (0, 2.1, 4.2)] +
-         [P('cone', (0, 0, 0.42), (0.08, 0.08, 0.13), seg=8, bend=20)])
-    join('tail_hibachineko', [P('cyl', (sx * 0.04, 0.2, 0.18), (0.016, 0.016, 0.26), rot=(-50, sx * 6, 0), mat='accent', seg=6) for sx in (-1, 1)] +
+    bowl = [(0.13, 0.0), (0.2, 0.02), (0.26, 0.08), (0.29, 0.16), (0.3, 0.23), (0.27, 0.25)]
+    join('back_hibachineko', [lathe(bowl, seg=18),
+                              P('cyl', (0, 0, 0.22), (0.255, 0.255, 0.02), mat='accent', seg=18)] +
+         [P('ico', (0.12 * math.cos(a), 0.12 * math.sin(a), 0.27), (0.065, 0.065, 0.05), mat='glow', seg=1, noise=0.02) for a in (0.3, 2.4, 4.4)] +
+         [P('ico', (0, 0, 0.29), (0.07, 0.07, 0.055), mat='glow', seg=1, noise=0.02)] +
+         [P('cyl', (0.12 + 0.05 * k, -0.08, 0.36), (0.012, 0.012, 0.18), rot=(-15, 25, 0), mat='accent', seg=6) for k in (0, 1)])
+    join('tail_hibachineko', [P('cyl', (sx * 0.035, 0.1, 0.34), (0.017, 0.017, 0.34), rot=(-16, sx * 5, 0), mat='accent', seg=6) for sx in (-1, 1)] +
          [P('torus', (0, 0.05, 0.05), (0.05, 0.05, 0.05), rot=(0, 90, 0), minor=0.35, seg=8, minor_seg=4)])
 
 
 def nuihebi():
-    # 決め手: まるい頭のつぎあてと縫い目、ふさふさの綿のしっぽ
+    # 決め手: まるい頭に少し浮いた四角い当て布(赤いギンガム)、背中にも当て布、ふさふさの綿のしっぽ
     join('head_nuihebi', [
-        P('sphere', (0, -0.06, 0.22), (0.33, 0.4, 0.24), seg=18, rings=10),
-        P('cube', (0, -0.5, 0.14), (0.025, 0.1, 0.01), mat='accent'),
-        P('cube', (0.14, 0.02, 0.44), (0.11, 0.11, 0.012), rot=(10, 0, 20), mat='accent'),
-        P('cube', (-0.2, 0.1, 0.38), (0.07, 0.07, 0.012), rot=(-30, 30, 0), mat='accent'),
-    ] + eyes(-0.36, 0.3))
-    join('back_nuihebi', [P('cube', (0.06 * (i - 1), 0.04, 0.03 + 0.012 * i), (0.09, 0.09, 0.015), rot=(0, 0, 25 * i), mat='accent') for i in range(3)])
+        P('sphere', (0, -0.06, 0.26), (0.38, 0.42, 0.3), seg=18, rings=10),
+        P('cube', (0.15, 0.04, 0.53), (0.12, 0.12, 0.015), rot=(12, 18, 20), mat='accent', bevel=0.008),
+        P('cube', (-0.33, 0.06, 0.3), (0.09, 0.09, 0.015), rot=(-10, -62, 0), mat='accent', bevel=0.008),
+    ] + eyes(-0.43, 0.34))
+    join('back_nuihebi', [P('cube', (0.0, 0.0, 0.02), (0.11, 0.12, 0.018), rot=(0, 0, 15), mat='accent', bevel=0.008),
+                          P('cube', (-0.12, 0.25, -0.05), (0.08, 0.08, 0.018), rot=(0, 10, -20), mat='accent', bevel=0.008),
+                          P('cube', (0.06, -0.2, 0.08), (0.07, 0.07, 0.018), rot=(20, 0, 30), mat='accent', bevel=0.008)])
     join('tail_nuihebi', [P('cyl', (0, 0.07, 0.0), (0.045, 0.045, 0.07), rot=(90, 0, 0), mat='accent', seg=10)] +
-         [P('sphere', (0.06 * math.cos(a), 0.22, 0.06 * math.sin(a)), (0.07, 0.1, 0.07), seg=8, rings=5) for a in [i * 2.1 for i in range(3)]])
+         [P('sphere', (0.07 * math.cos(a), 0.2 + 0.04 * k, 0.12 + 0.07 * math.sin(a) + 0.06 * k), (0.1, 0.12, 0.1), seg=8, rings=5) for k, a in enumerate([i * 2.1 for i in range(3)])])
 
 
 def burikishi():
-    # 決め手: 円筒のかぶとの羽かざり + 丸いたて + 長いけん
+    # 決め手: かぶとの扇の羽かざり(板3枚が後ろへなびく)+ 丸いたて + 長いけん
     join('head_burikishi', [
         P('cyl', (0, 0, 0.28), (0.3, 0.3, 0.28), bevel=0.05, seg=16),
         P('sphere', (0, 0, 0.56), (0.3, 0.3, 0.13), seg=16, rings=6),
         P('cube', (0, -0.3, 0.15), (0.18, 0.02, 0.025), mat='accent'),
-        P('cone', (0, 0.1, 0.86), (0.05, 0.2, 0.24), rot=(-25, 0, 0), mat='accent', seg=8),
+        P('cube', (0, 0.06, 0.88), (0.02, 0.12, 0.24), rot=(-12, 0, 0), mat='accent', bevel=0.01),
+        P('cube', (0, 0.18, 0.8), (0.02, 0.11, 0.21), rot=(-36, 0, 0), mat='accent', bevel=0.01),
+        P('cube', (0, 0.28, 0.68), (0.02, 0.1, 0.17), rot=(-60, 0, 0), mat='accent', bevel=0.01),
         P('cyl', (0, 0.0, 0.66), (0.03, 0.03, 0.06), mat='accent', seg=6),
     ] + eyes(-0.3, 0.36))
-    join('back_burikishi', [P('cyl', (0, 0.06, 0.2), (0.28, 0.28, 0.03), rot=(90, 0, 0), bevel=0.02, seg=18, mat='accent'),
-                            P('sphere', (0, 0.1, 0.2), (0.08, 0.04, 0.08), seg=10, rings=6),
-                            P('cube', (0, 0.1, 0.2), (0.025, 0.012, 0.22)),
-                            P('cube', (0, 0.1, 0.2), (0.22, 0.012, 0.025))])
+    # たては左の腕に(正面ななめから丸いたてが見える)
+    c, n = (-0.44, -0.14, -0.06), (-0.57, -0.82, 0.0)
+    f = lambda k: (c[0] + n[0] * k, c[1] + n[1] * k, c[2] + n[2] * k)
+    join('back_burikishi', [P('cyl', c, (0.34, 0.34, 0.03), rot=(90, 0, -35), bevel=0.02, seg=18, mat='accent'),
+                            P('sphere', f(0.03), (0.08, 0.04, 0.08), rot=(0, 0, -35), seg=10, rings=6),
+                            P('cube', f(0.035), (0.012, 0.025, 0.27), rot=(0, 0, 55)),
+                            P('cube', f(0.035), (0.27, 0.012, 0.025), rot=(0, 0, -35)),
+                            P('cyl', (-0.22, -0.07, -0.03), (0.03, 0.03, 0.24), rot=(90, 0, 60), mat='accent', seg=8)])
     join('tail_burikishi', [P('cube', (0, 0, 0.42), (0.04, 0.012, 0.34), mat='accent', bevel=0.008),
                             P('cone', (0, 0, 0.8), (0.04, 0.012, 0.05), seg=4, rot=(0, 0, 45), mat='accent'),
                             P('cube', (0, 0, 0.07), (0.12, 0.03, 0.025)),
@@ -544,15 +633,16 @@ def burikishi():
 
 def kageboushi():
     # 決め手: 大きなつばのとんがり帽子(いちばん横に広い頭)
-    # 決め手: 横に広いつばと、ななめに折れた高いシルクハット(影の紳士)
+    # 決め手: 後ろへかたむいたシルクハット(つばは肩幅の 1.3 倍まで)+ 裏地(すみれ)の見えるマント
     join('head_kageboushi', [
         P('sphere', (0, 0, 0.2), (0.27, 0.25, 0.23), seg=16, rings=10),
-        P('cyl', (0, 0, 0.37), (0.56, 0.48, 0.02), mat='accent', seg=24, bend=8),
-        P('frustum', (0.04, 0.04, 0.66), (0.24, 0.23, 0.3), minor=1.15, mat='accent', seg=16, bend=-28),
-        P('cyl', (0, 0, 0.43), (0.255, 0.245, 0.04), seg=16),
+        P('cyl', (0, 0.04, 0.38), (0.39, 0.37, 0.02), rot=(-15, 0, 0), mat='accent', seg=24, bevel=0.008),
+        P('frustum', (0, 0.1, 0.58), (0.21, 0.2, 0.2), minor=1.12, rot=(-15, 0, 0), mat='accent', seg=16),
+        P('cyl', (0, 0.07, 0.44), (0.225, 0.215, 0.04), rot=(-15, 0, 0), seg=16),
     ] + eyes(-0.23, 0.2))
-    join('back_kageboushi', [P('cone', (0, 0.12, 0.0), (0.42, 0.16, 0.38), rot=(180, 0, 0), seg=12),
-                             P('torus', (0, 0.04, 0.32), (0.18, 0.12, 0.4), mat='accent', minor=0.22, seg=12, minor_seg=6)])
+    cape = [(0.4, -0.42), (0.34, -0.25), (0.28, -0.05), (0.23, 0.1), (0.2, 0.16)]
+    join('back_kageboushi', [shell(cape, -40, 220, seg=16, t=0.03, outer='body', inner='accent', loc=(0, -0.2, 0)),
+                             P('torus', (0, -0.2, 0.16), (0.22, 0.2, 0.4), mat='accent', minor=0.22, seg=14, minor_seg=6)])
     join('tail_kageboushi', [P('plane', (0, 0.0, -0.18), (0.09, 0.2, 1), rot=(90, 0, 90), mat='accent', bend=40, twist=40),
                              P('sphere', (0, 0, 0.0), (0.06, 0.06, 0.06), seg=8, rings=5)])
 

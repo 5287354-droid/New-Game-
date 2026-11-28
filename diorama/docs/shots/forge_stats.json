@@ -1,180 +1,578 @@
 {
- "errors": [],
- "forge_A_nejiko": {
-  "rows": [
-   {
-    "label": "通常",
-    "triangles": 3172
-   },
-   {
-    "label": "きらり",
-    "triangles": 3172
-   },
-   {
-    "label": "おさがり ★1",
-    "triangles": 2466
-   },
-   {
-    "label": "おさがり ★2・★3",
-    "triangles": 2676
-   },
-   {
-    "label": "きらりの親から",
-    "triangles": 2724
-   }
-  ]
- },
- "forge_A_perari": {
-  "rows": [
-   {
-    "label": "通常",
-    "triangles": 1630
-   },
-   {
-    "label": "きらり",
-    "triangles": 1630
-   },
-   {
-    "label": "おさがり ★1",
-    "triangles": 1958
-   },
-   {
-    "label": "おさがり ★2・★3",
-    "triangles": 1504
-   },
-   {
-    "label": "きらりの親から",
-    "triangles": 2038
-   }
-  ]
- },
- "forge_A_koroishi": {
-  "rows": [
-   {
-    "label": "通常",
-    "triangles": 1572
-   },
-   {
-    "label": "きらり",
-    "triangles": 1572
-   },
-   {
-    "label": "おさがり ★1",
-    "triangles": 1952
-   },
-   {
-    "label": "おさがり ★2・★3",
-    "triangles": 1778
-   },
-   {
-    "label": "きらりの親から",
-    "triangles": 1592
-   }
-  ]
- },
- "forge_B_nejiko": {
-  "rows": [
-   {
-    "label": "通常",
-    "triangles": 3172
-   },
-   {
-    "label": "きらり",
-    "triangles": 3172
-   },
-   {
-    "label": "おさがり ★1",
-    "triangles": 2466
-   },
-   {
-    "label": "おさがり ★2・★3",
-    "triangles": 2676
-   },
-   {
-    "label": "きらりの親から",
-    "triangles": 2724
-   }
-  ]
- },
- "forge_B_perari": {
-  "rows": [
-   {
-    "label": "通常",
-    "triangles": 1630
-   },
-   {
-    "label": "きらり",
-    "triangles": 1630
-   },
-   {
-    "label": "おさがり ★1",
-    "triangles": 1958
-   },
-   {
-    "label": "おさがり ★2・★3",
-    "triangles": 1504
-   },
-   {
-    "label": "きらりの親から",
-    "triangles": 2038
-   }
-  ]
- },
- "forge_B_koroishi": {
-  "rows": [
-   {
-    "label": "通常",
-    "triangles": 1572
-   },
-   {
-    "label": "きらり",
-    "triangles": 1572
-   },
-   {
-    "label": "おさがり ★1",
-    "triangles": 1952
-   },
-   {
-    "label": "おさがり ★2・★3",
-    "triangles": 1778
-   },
-   {
-    "label": "きらりの親から",
-    "triangles": 1592
-   }
-  ]
- },
+ "forge_Aplus_nejiko": [
+  {
+   "label": "通常",
+   "triangles": 3236
+  },
+  {
+   "label": "きらり",
+   "triangles": 3236
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2638
+  },
+  {
+   "label": "おさがり ★2・★3",
+   "triangles": 2704
+  },
+  {
+   "label": "きらりの親から",
+   "triangles": 2848
+  }
+ ],
+ "forge_Aplus_perari": [
+  {
+   "label": "通常",
+   "triangles": 1438
+  },
+  {
+   "label": "きらり",
+   "triangles": 1438
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 1830
+  },
+  {
+   "label": "おさがり ★2・★3",
+   "triangles": 1288
+  },
+  {
+   "label": "きらりの親から",
+   "triangles": 1846
+  }
+ ],
+ "forge_Aplus_inky": [
+  {
+   "label": "通常",
+   "triangles": 1624
+  },
+  {
+   "label": "きらり",
+   "triangles": 1624
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 1780
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 1652
+  }
+ ],
+ "forge_Aplus_koroishi": [
+  {
+   "label": "通常",
+   "triangles": 1816
+  },
+  {
+   "label": "きらり",
+   "triangles": 1816
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2196
+  },
+  {
+   "label": "おさがり ★2・★3",
+   "triangles": 1886
+  },
+  {
+   "label": "きらりの親から",
+   "triangles": 1896
+  }
+ ],
+ "forge_Aplus_watabou": [
+  {
+   "label": "通常",
+   "triangles": 2858
+  },
+  {
+   "label": "きらり",
+   "triangles": 2858
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2274
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2746
+  }
+ ],
+ "forge_Aplus_matchbo": [
+  {
+   "label": "通常",
+   "triangles": 2400
+  },
+  {
+   "label": "きらり",
+   "triangles": 2400
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2084
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2396
+  }
+ ],
+ "forge_Aplus_origarasu": [
+  {
+   "label": "通常",
+   "triangles": 1066
+  },
+  {
+   "label": "きらり",
+   "triangles": 1066
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 1178
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 1986
+  }
+ ],
+ "forge_Aplus_jarihebi": [
+  {
+   "label": "通常",
+   "triangles": 1812
+  },
+  {
+   "label": "きらり",
+   "triangles": 1812
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 1840
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2128
+  }
+ ],
+ "forge_Aplus_felton": [
+  {
+   "label": "通常",
+   "triangles": 2370
+  },
+  {
+   "label": "きらり",
+   "triangles": 2370
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2656
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2242
+  }
+ ],
+ "forge_Aplus_hotarubin": [
+  {
+   "label": "通常",
+   "triangles": 2208
+  },
+  {
+   "label": "きらり",
+   "triangles": 2208
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2188
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2288
+  }
+ ],
+ "forge_Aplus_zenmainu": [
+  {
+   "label": "通常",
+   "triangles": 2568
+  },
+  {
+   "label": "きらり",
+   "triangles": 2568
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2360
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2540
+  }
+ ],
+ "forge_Aplus_rousokun": [
+  {
+   "label": "通常",
+   "triangles": 2188
+  },
+  {
+   "label": "きらり",
+   "triangles": 2188
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2352
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 1960
+  }
+ ],
+ "forge_Aplus_tsumiking": [
+  {
+   "label": "通常",
+   "triangles": 1940
+  },
+  {
+   "label": "きらり",
+   "triangles": 1940
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 1854
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 1964
+  }
+ ],
+ "forge_Aplus_kamishibai": [
+  {
+   "label": "通常",
+   "triangles": 1900
+  },
+  {
+   "label": "きらり",
+   "triangles": 1900
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 1738
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2236
+  }
+ ],
+ "forge_Aplus_haribote": [
+  {
+   "label": "通常",
+   "triangles": 2276
+  },
+  {
+   "label": "きらり",
+   "triangles": 2276
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2356
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2472
+  }
+ ],
+ "forge_Aplus_hibachineko": [
+  {
+   "label": "通常",
+   "triangles": 2312
+  },
+  {
+   "label": "きらり",
+   "triangles": 2312
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2528
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2324
+  }
+ ],
+ "forge_Aplus_nuihebi": [
+  {
+   "label": "通常",
+   "triangles": 2268
+  },
+  {
+   "label": "きらり",
+   "triangles": 2268
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2242
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2264
+  }
+ ],
+ "forge_Aplus_burikishi": [
+  {
+   "label": "通常",
+   "triangles": 2294
+  },
+  {
+   "label": "きらり",
+   "triangles": 2294
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 1872
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2514
+  }
+ ],
+ "forge_Aplus_kageboushi": [
+  {
+   "label": "通常",
+   "triangles": 2428
+  },
+  {
+   "label": "きらり",
+   "triangles": 2428
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 2422
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 1940
+  }
+ ],
+ "forge_Aplus_tokeimori": [
+  {
+   "label": "通常",
+   "triangles": 3112
+  },
+  {
+   "label": "きらり",
+   "triangles": 3112
+  },
+  {
+   "label": "おさがり ★1",
+   "triangles": 3124
+  },
+  {
+   "label": "おさがり ★3",
+   "triangles": 2888
+  }
+ ],
+ "iou": [
+  {
+   "pair": "ゼンマイヌ/ヒバチネコ",
+   "front": 0.73,
+   "side": 0.646,
+   "top": 0.746,
+   "over": false
+  },
+  {
+   "pair": "ネジコ/コロイシ",
+   "front": 0.694,
+   "side": 0.629,
+   "top": 0.744,
+   "over": false
+  },
+  {
+   "pair": "ハリボテ/ヒバチネコ",
+   "front": 0.737,
+   "side": 0.667,
+   "top": 0.714,
+   "over": false
+  },
+  {
+   "pair": "ペラリ/ロウソクン",
+   "front": 0.699,
+   "side": 0.65,
+   "top": 0.73,
+   "over": false
+  },
+  {
+   "pair": "ブリキシ/カゲボウシ",
+   "front": 0.726,
+   "side": 0.704,
+   "top": 0.682,
+   "over": false
+  },
+  {
+   "pair": "ゼンマイヌ/ハリボテ",
+   "front": 0.693,
+   "side": 0.593,
+   "top": 0.714,
+   "over": false
+  },
+  {
+   "pair": "ペラリ/インキー",
+   "front": 0.666,
+   "side": 0.656,
+   "top": 0.705,
+   "over": false
+  },
+  {
+   "pair": "ツミキング/カミシバイ",
+   "front": 0.692,
+   "side": 0.53,
+   "top": 0.687,
+   "over": false
+  },
+  {
+   "pair": "ツミキング/ブリキシ",
+   "front": 0.679,
+   "side": 0.596,
+   "top": 0.689,
+   "over": false
+  },
+  {
+   "pair": "ツミキング/カゲボウシ",
+   "front": 0.648,
+   "side": 0.545,
+   "top": 0.688,
+   "over": false
+  },
+  {
+   "pair": "オリガラス/ホタルビン",
+   "front": 0.655,
+   "side": 0.652,
+   "top": 0.681,
+   "over": false
+  },
+  {
+   "pair": "インキー/ロウソクン",
+   "front": 0.665,
+   "side": 0.673,
+   "top": 0.669,
+   "over": false
+  },
+  {
+   "pair": "ジャリヘビ/ヌイヘビ",
+   "front": 0.625,
+   "side": 0.524,
+   "top": 0.668,
+   "over": false
+  },
+  {
+   "pair": "ワタボウシ/ホタルビン",
+   "front": 0.642,
+   "side": 0.621,
+   "top": 0.605,
+   "over": false
+  },
+  {
+   "pair": "ネジコ/フェルトン",
+   "front": 0.609,
+   "side": 0.549,
+   "top": 0.515,
+   "over": false
+  },
+  {
+   "pair": "ワタボウシ/オリガラス",
+   "front": 0.545,
+   "side": 0.507,
+   "top": 0.594,
+   "over": false
+  },
+  {
+   "pair": "カミシバイ/カゲボウシ",
+   "front": 0.563,
+   "side": 0.552,
+   "top": 0.593,
+   "over": false
+  },
+  {
+   "pair": "コロイシ/フェルトン",
+   "front": 0.557,
+   "side": 0.527,
+   "top": 0.476,
+   "over": false
+  },
+  {
+   "pair": "ヒバチネコ/トケイモリ",
+   "front": 0.412,
+   "side": 0.389,
+   "top": 0.555,
+   "over": false
+  },
+  {
+   "pair": "ハリボテ/トケイモリ",
+   "front": 0.388,
+   "side": 0.304,
+   "top": 0.55,
+   "over": false
+  },
+  {
+   "pair": "カミシバイ/ブリキシ",
+   "front": 0.547,
+   "side": 0.546,
+   "top": 0.509,
+   "over": false
+  },
+  {
+   "pair": "マッチボウ/ヌイヘビ",
+   "front": 0.523,
+   "side": 0.424,
+   "top": 0.534,
+   "over": false
+  },
+  {
+   "pair": "ゼンマイヌ/トケイモリ",
+   "front": 0.421,
+   "side": 0.387,
+   "top": 0.534,
+   "over": false
+  },
+  {
+   "pair": "マッチボウ/ジャリヘビ",
+   "front": 0.482,
+   "side": 0.336,
+   "top": 0.519,
+   "over": false
+  }
+ ],
  "triangles": {
   "perSpecies": {
-   "nejiko": 3172,
-   "perari": 1630,
-   "inky": 2426,
-   "koroishi": 1572,
+   "nejiko": 3236,
+   "perari": 1438,
+   "inky": 1624,
+   "koroishi": 1816,
    "watabou": 2858,
-   "matchbo": 2414,
+   "matchbo": 2400,
    "origarasu": 1066,
-   "jarihebi": 1778,
-   "felton": 2282,
-   "hotarubin": 2148,
-   "zenmainu": 2372,
-   "rousokun": 2604,
-   "tsumiking": 1712,
+   "jarihebi": 1812,
+   "felton": 2370,
+   "hotarubin": 2208,
+   "zenmainu": 2568,
+   "rousokun": 2188,
+   "tsumiking": 1940,
    "kamishibai": 1900,
    "haribote": 2276,
-   "hibachineko": 2202,
-   "nuihebi": 1940,
-   "burikishi": 1956,
-   "kageboushi": 1898,
+   "hibachineko": 2312,
+   "nuihebi": 2268,
+   "burikishi": 2294,
+   "kageboushi": 2428,
    "tokeimori": 3112
   },
   "worstCombo": {
    "maru": 3386,
-   "shizuku": 3330,
+   "shizuku": 3114,
    "yotsuashi": 3418,
    "tori": 3102,
-   "hebi": 3410,
+   "hebi": 3270,
    "ningyo": 3166
   },
   "partCount": 66
- }
+ },
+ "errors": []
 }

@@ -107,3 +107,7 @@
 - 2026-11-28 [音] 曲の RMS を -21 dBFS(音量最大)にそろえる。補正 SONG_TRIM は tools/audio/levels.mjs --apply で決める
 - 2026-11-28 (builder) 出現レベルと群れの数は docs/BALANCE.md §5 を正にする(設計図・DESIGN §9 の Lv より高め)。群れの数は spawns[].pack = [1体,2体,3体] の割合で、field の encounter.count に出す
 - 2026-11-28 (builder) BALANCE の森の「東」は F2 と F3(x34〜55)をまとめた1つの決まり(Lv10〜13・5体)。つみき野の R4 の小島と夕方のマッチボウは表にないので、Lv はそのまま、群れは 80/20/0
+- 2026-11-28 (monster-forge) 質感は A+ 案だけにした(A/B の切りかえを消す)。素材ごとのつや・あらさは MAT_FINISH、紙は三角形ごとの平らな法線で折り目を見せる
+- 2026-11-28 (monster-forge) マテリアルのスロットに glow(炎・ホタルの光・炭)を足した。外の色 → 内の黄の2段 + 発光。おさがりでも炎は炎のまま
+- 2026-11-28 (monster-forge) art-director の色の直し(11種)は、data/monsters.json が game-designer の持ち場なので、forge.js の COLOR_FIX で上書きしておく(移したら消す)
+- 2026-11-28 (monster-forge) 64px の判定に「同じ型どうしの IoU ≤ 0.75(正面ななめ・真横・見下ろし 52°)」を撮影ツールで自動計測。第2回は全 24 組で 0.75 以下
