@@ -402,3 +402,58 @@ Phase 1 のたたき台からの形はできるだけ保った。**変わった�
 | `checkArea(id)` | 合否(全部届く・詰みなし・ピンセットの印・EXPECT の約束) |
 | `replayPlan(area, plan)` | 手順を grid.js の規則で通しで遊ぶ(QA の通しプレイの台本に使える) |
 | 手順のファイル | `tools/solver/plans/<area>.json` = `{targets: {id: {ops, steps:[{walk:[l,x,z]}, {use:id}, {exit:id}, {reach:id}]}}}` |
+
+## field(diorama-builder — `src/field/field.js` `src/field/monsters.js`、three に依存しない)
+
+```js
+import { createField } from './field/field.js';
+const f = createField(area, {
+  state: save.areas[area.id],          // { gs, opened:[id], rares:{id:true} }。なければ新しく作る(持っていた物は元へ)
+  flags: save.flags, abilities: save.abilities, clock: save.clock,
+  rng,                                 // core/rng.js の rng か種の数字
+  beat: (ms) => 拍の番号,              // 音響班の拍。省くと仮の defaultBeat(120 BPM = 500ms ごと)
+  entry: 'south' | at: {l,x,z}, dir,   // 入る場所
+  monsters: true, respawnMs: 90000,
+});
+let ev = f.update(dtMs);               // 毎フレーム。出来事の配列
+```
+
+| 関数 | 中身 |
+|---|---|
+| `hold(dir, run)` / `release()` | 押し続けでその向きへ1マスずつ歩く。dir は grid の DIRS の番号(0 東 +x / 1 南 +z / 2 西 -x / 3 北 -z)。カメラの向きに合わせて変えるのは UI 側 |
+| `walkTo([l,x,z])` / `tapObject(id)` | タップした所まで自動で歩く(出口・ランプ台は行き先のときだけ通る)。物なら、いちばん近い調べられるマスまで歩いて調べる。人形に触れる・ランプ台に乗る・ふさがれると止まる。振り子は待つ |
+| `interact()` / `use(id)` | 目の前の物(乗る物は足もと)を調べる・話す・動かす / 指定の物(となりにいるとき。向きも変える) |
+| `update(ms)` | 歩く(1マス 歩き 220ms・走り 130ms)・人形が歩く・振り子に押し戻される・出なくなった人形が戻る |
+| `setClock(clock)` | 時刻。時間帯が変わると住人が `night` の位置へ(夜)・夕方の魔物が出る/消える |
+| `battleEnd(puppetId, 'win'\|'scout'\|'flee'\|'lose')` | 戦闘のあと。win/scout は消えて `respawnMs` のあいだ出ない(レアはもう出ない `state.rares`)、flee は2秒触れない、lose は置いていない物が戻り `lost` |
+| `leave()` / `leaveState()` | エリアを出る。セーブの `areas[id]` に入れる `{gs, opened, rares}`(`gs.held` は null、運んでいた物は 'home'、くぼみに置いた物は置いたまま) |
+| `pos()` `player` `puppets` `gs` `view` `busy` | 今の様子。`busy` = 'battle' / 'left' / null(止まっているあいだ update は何もしない)。`view` は住人を時間帯の位置に置いたエリア(grid の関数にはこれを渡す) |
+
+**出来事**(`{ t, ... }`。描画と UI がアニメにする。座標は `[l,x,z]`)
+
+| t | 項目 | いつ |
+|---|---|---|
+| move | from, to, dir, run, dur, h, ladder | 1マス歩いた |
+| turn | dir | 向きを変えた |
+| stairs | id, from, to, up | 階段で別の階へ |
+| bump | at, why: blocked/pendulum | 進めなかった |
+| fall | at, back | 光の当たる谷に落ちて、直前の足場へ |
+| pushed | from, to, why: pendulum/exitClosed/holding | 押し戻された |
+| wait | why | 自動で歩いていて、振り子を待っている |
+| walkStart / arrive / stop / noPath / tooFar | to, steps, then / at / why / to | 自動で歩く |
+| rotate | kind: disc/ring, id, to, by, player(いっしょに回った), puppets:[{id,from,to}], linked(歯車で回った輪) | 回転台・外周の床が90°回った |
+| gearHalf | socket, gp | 大きい歯車が半回転(相手の輪はまだ回らない) |
+| lamp | id, lamp, shadow:[マス番号] | ランプの向きが変わった(影の Set の中身) |
+| pick / place / flag | item, from / item, socket, flag / flag | ピンセットでつまんだ・置いた・旗が立つ(立てるのはゲーム) |
+| gimmickFail | id, msg | need-tweezers / hands-full / wrong-kind / standing … |
+| chest / chestEmpty | id, item, qty, book?, flag?, shelf? | 宝箱・棚(1回だけ。`state.opened`) |
+| talk | id, name, role, lines, face | 人と話す(face = 人がこちらを向く向き) |
+| read | id, text, book?, role?, locked? | 看板・本・家具 |
+| encounter | puppet, species, lv, first: 'player'(後ろから触れた=先制)/'enemy'(後ろから触れられた)/null, rare, rareId, shinyRate | 人形に触れた → 戦闘 |
+| boss / goal | id, species, lv, flag / id, flag, text | ぬし・ボス / つなぎ目・塔の文字盤 |
+| exit / exitClosed / say | id, to, entry, state / id, needFlag / key:'dropFirst' | 出口(state はセーブに入れる)/ 閉じている / 部品を置いてから |
+| spawn / despawn / puppetMove / puppetTurn | puppet / id, why / id, from, to, dir / id, dir | 人形 |
+| npcMove / period | id, from, to / tod | 住人の時間帯の移動 / 時間帯が変わった |
+| lost | state | 戦闘で負けた |
+
+人形の形: `{ id, sp, lv, l, x, z, dir, rule(出現の表の行), rare, rareId?, asleep? }`。レアは光る台座で眠る(動かない)。回転台・外周の床の上の人形は、台といっしょに回る(`rotate.puppets`)。
