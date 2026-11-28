@@ -1,0 +1,271 @@
+{
+ "date": "2026-11-27",
+ "songs": {
+  "village": {
+   "label": "ネジマキ村",
+   "bpm": 92,
+   "loopSecs": 41.74,
+   "peak": -7.32,
+   "rms": -21,
+   "hi": -31.1,
+   "seamDrop": 5.6,
+   "seamOk": true,
+   "renderMs": 19334
+  },
+  "tsumiki": {
+   "label": "つみき野",
+   "bpm": 116,
+   "loopSecs": 33.1,
+   "peak": -6.52,
+   "rms": -21,
+   "hi": -30.2,
+   "seamDrop": 7.7,
+   "seamOk": true,
+   "renderMs": 12279
+  },
+  "forest": {
+   "label": "ランプの森",
+   "bpm": 70,
+   "loopSecs": 54.86,
+   "peak": -7.82,
+   "rms": -21,
+   "hi": -38.8,
+   "seamDrop": 8,
+   "seamOk": true,
+   "renderMs": 23095
+  },
+  "tower": {
+   "label": "ゼンマイ時計塔",
+   "bpm": 108,
+   "loopSecs": 35.56,
+   "peak": -4.93,
+   "rms": -21,
+   "hi": -26.5,
+   "seamDrop": 11.8,
+   "seamOk": true,
+   "renderMs": 12325
+  },
+  "battle": {
+   "label": "戦闘",
+   "bpm": 152,
+   "loopSecs": 25.26,
+   "peak": -6.23,
+   "rms": -21,
+   "hi": -22.9,
+   "seamDrop": 4.7,
+   "seamOk": true,
+   "renderMs": 12729
+  },
+  "nushi": {
+   "label": "ぬし戦",
+   "bpm": 138,
+   "loopSecs": 27.83,
+   "peak": -7.68,
+   "rms": -21.01,
+   "hi": -29.2,
+   "seamDrop": 5.2,
+   "seamOk": true,
+   "renderMs": 19913
+  },
+  "boss": {
+   "label": "ボス戦",
+   "bpm": 164,
+   "loopSecs": 23.41,
+   "peak": -5.69,
+   "rms": -21,
+   "hi": -23.1,
+   "seamDrop": 8.4,
+   "seamOk": true,
+   "renderMs": 13736
+  },
+  "title": {
+   "label": "タイトル",
+   "bpm": 80,
+   "loopSecs": 48,
+   "peak": -7.6,
+   "rms": -21,
+   "hi": -31.8,
+   "seamDrop": 9,
+   "seamOk": true,
+   "renderMs": 18417
+  },
+  "workbench": {
+   "label": "作業台",
+   "bpm": 88,
+   "loopSecs": 43.64,
+   "peak": -5.51,
+   "rms": -21,
+   "hi": -36.5,
+   "seamDrop": 7.8,
+   "seamOk": true,
+   "renderMs": 15646
+  },
+  "ending": {
+   "label": "エンディング",
+   "bpm": 72,
+   "loopSecs": 53.33,
+   "peak": -5.86,
+   "rms": -21,
+   "hi": -29.8,
+   "seamDrop": 6,
+   "seamOk": true,
+   "renderMs": 27269
+  }
+ },
+ "jingles": {
+  "victory": {
+   "label": "勝利",
+   "secs": 2.4,
+   "peak": -3.37,
+   "rms": -19.02
+  },
+  "scout": {
+   "label": "スカウト成功",
+   "secs": 1.5,
+   "peak": -3.21,
+   "rms": -19.01
+  },
+  "breed": {
+   "label": "配合完成",
+   "secs": 2.75,
+   "peak": -2.49,
+   "rms": -19.11
+  },
+  "levelup": {
+   "label": "レベルアップ",
+   "secs": 1.17,
+   "peak": -2.04,
+   "rms": -19.08
+  }
+ },
+ "sfx": {
+  "cursor": {
+   "peak": -20.35,
+   "rms": -31.98
+  },
+  "ok": {
+   "peak": -12.97,
+   "rms": -27.89
+  },
+  "cancel": {
+   "peak": -15.23,
+   "rms": -30.5
+  },
+  "pickup": {
+   "peak": -21.35,
+   "rms": -30.06
+  },
+  "place": {
+   "peak": -10.74,
+   "rms": -25.05
+  },
+  "roof": {
+   "peak": -7.62,
+   "rms": -23.91
+  },
+  "roofClose": {
+   "peak": -7.98,
+   "rms": -25.96
+  },
+  "step:grass": {
+   "peak": -18.27,
+   "rms": -33.99
+  },
+  "step:path": {
+   "peak": -18.04,
+   "rms": -35.23
+  },
+  "step:dirt": {
+   "peak": -21.22,
+   "rms": -34.01
+  },
+  "step:sand": {
+   "peak": -17.21,
+   "rms": -34.64
+  },
+  "step:wood": {
+   "peak": -23.45,
+   "rms": -33
+  },
+  "step:board": {
+   "peak": -22.79,
+   "rms": -33.47
+  },
+  "step:ladder": {
+   "peak": -23.22,
+   "rms": -33.96
+  },
+  "step:shadow": {
+   "peak": -19.5,
+   "rms": -37.79
+  },
+  "step:stone": {
+   "peak": -18.66,
+   "rms": -34
+  },
+  "step:rug": {
+   "peak": -23.14,
+   "rms": -39.18
+  },
+  "turntable": {
+   "peak": -7.95,
+   "rms": -23.96
+  },
+  "lamp": {
+   "peak": -12.79,
+   "rms": -27.26
+  },
+  "tick": {
+   "peak": -9.56,
+   "rms": -32.29
+  },
+  "gear": {
+   "peak": -6.5,
+   "rms": -25.03
+  },
+  "kintsugi": {
+   "peak": -7.32,
+   "rms": -23.99
+  },
+  "chest": {
+   "peak": -6.77,
+   "rms": -21.51
+  },
+  "hit": {
+   "peak": -8.88,
+   "rms": -21.21
+  },
+  "hitWeak": {
+   "peak": -5.19,
+   "rms": -19.87
+  },
+  "miss": {
+   "peak": -15.45,
+   "rms": -29.99
+  },
+  "faint": {
+   "peak": -6.63,
+   "rms": -21.37
+  },
+  "heal": {
+   "peak": -8.86,
+   "rms": -23.89
+  },
+  "fall": {
+   "peak": -15.45,
+   "rms": -25.54
+  },
+  "door": {
+   "peak": -17.52,
+   "rms": -27.24
+  },
+  "buy": {
+   "peak": -10.14,
+   "rms": -25.67
+  },
+  "alarm": {
+   "peak": -9.43,
+   "rms": -23.28
+  }
+ }
+}
